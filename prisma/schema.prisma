@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum GroupRole {
+    USER
+    ADMIN
+}
+
+model User {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    email     String   @unique
+    username  String   @unique
+    name      String
+    course    String?
+
+    groups_owned Group[]
+    groups       UserGroup[]
+    events_owned Event[]
+    messages     Message[]
+}
+
+model Group {
+    id          Int      @id @default(autoincrement())
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    name        String
+    description String?
+
+    createdBy User        @relation(fields: [creatorId], references: [id])
+    creatorId Int
+    users     UserGroup[]
+    events    Event[]
+    messages  Message[]
+}
+
+model UserGroup {
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    role      GroupRole @default(USER)
+
+    user    User  @relation(fields: [userId], references: [id])
+    userId  Int
+    group   Group @relation(fields: [groupId], references: [id])
+    groupId Int
+
+    @@id([userId, groupId])
+}
+
+model Event {
+    id          Int       @id @default(autoincrement())
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+    name        String
+    description String?
+    body        String?
+    location    String?
+    eventDate   DateTime?
+
+    createdBy User      @relation(fields: [creatorId], references: [id])
+    creatorId Int
+    group     Group?    @relation(fields: [groupId], references: [id])
+    groupId   Int?
+    messages  Message[]
+}
+
+model Message {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    body      String
+
+    sentBy   User   @relation(fields: [senderId], references: [id])
+    senderId Int
+    group    Group? @relation(fields: [groupId], references: [id])
+    groupId  Int?
+    event    Event? @relation(fields: [eventId], references: [id])
+    eventId  Int?
+}
