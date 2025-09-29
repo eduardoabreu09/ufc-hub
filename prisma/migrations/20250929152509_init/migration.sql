@@ -10,6 +10,7 @@ CREATE TABLE "public"."User" (
     "username" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "course" TEXT,
+    "password" TEXT NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );

@@ -26,6 +26,7 @@ model User {
     username  String   @unique
     name      String
     course    String?
+    password  String
 
     groups_owned Group[]
     groups       UserGroup[]

@@ -1,8 +1,10 @@
 import { GroupRole, PrismaClient } from "@prisma/client";
+import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
 async function main() {
+  const defaultPassword = await bcrypt.hash("@Admin123", 10);
   const usersData = [
     {
       id: 0,
@@ -10,6 +12,7 @@ async function main() {
       username: "anasilva",
       name: "Ana Silva",
       course: "Engenharia Civil",
+      password: defaultPassword,
     },
     {
       id: 1,
@@ -17,6 +20,7 @@ async function main() {
       username: "joaosousa",
       name: "João Sousa",
       course: "Engenharia de Computação",
+      password: defaultPassword,
     },
     {
       id: 2,
@@ -24,6 +28,7 @@ async function main() {
       username: "marialima",
       name: "Maria Lima",
       course: "Medicina",
+      password: defaultPassword,
     },
   ];
 
