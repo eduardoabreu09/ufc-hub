@@ -28,11 +28,11 @@ export default function LoginPage() {
         </div>
       </div>
       <div className="bg-muted relative hidden lg:block">
-        <div className="w-full absolute z-10 mt-2 max-w-md left-1/2 transform -translate-x-1/2 ">
+        <div className="flex w-full h-full absolute z-10 bg-black/70 backdrop-blur-md justify-center">
           <Accordion
             type="single"
             collapsible
-            className="p-4 dark:bg-black/30 bg-black/70 rounded-md backdrop-blur-md text-primary-foreground"
+            className="w-md p-6 text-primary-foreground"
           >
             <AccordionItem value="item-1">
               <AccordionTrigger>Product Information</AccordionTrigger>
@@ -83,7 +83,7 @@ export default function LoginPage() {
         </div>
 
         <Image
-          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+          className="absolute inset-0 h-full w-full object-cover"
           src="/portrait.png"
           alt="UFC Campus do Pici"
           fill={true}
