@@ -1,16 +1,18 @@
 "use server";
 
-import { FormState, SignupFormSchema } from "@/form-schema/signup";
+import { SignupFormSchema, SignUpFormState } from "@/form-schema/signup";
 import { prisma } from "@/lib/prisma";
-import { createSession, deleteSession } from "@/lib/session";
+import { createSession } from "@/lib/session";
 import bcrypt from "bcrypt";
 import { redirect } from "next/navigation";
-import { z } from "zod";
+import z from "zod";
 
-export async function signup(state: FormState, formData: FormData) {
+export async function signup(
+  state: SignUpFormState | undefined,
+  formData: FormData
+): Promise<SignUpFormState> {
   // Validate form fields
   const validatedFields = SignupFormSchema.safeParse({
-    username: formData.get("username"),
     name: formData.get("name"),
     course: formData.get("course"),
     email: formData.get("email"),
@@ -19,7 +21,6 @@ export async function signup(state: FormState, formData: FormData) {
 
   // If any form fields are invalid, return early
   if (!validatedFields.success) {
-    console.log(z.treeifyError(validatedFields.error));
     return {
       errors: z.treeifyError(validatedFields.error).properties,
       message: z
@@ -27,22 +28,11 @@ export async function signup(state: FormState, formData: FormData) {
         .errors.map((e) => e)
         .join(", "),
       payload: formData,
-    } as FormState;
+    };
   }
 
   // 2. Prepare data for insertion into database
-  const { username, name, course, email, password } = validatedFields.data;
-
-  const checkSameUsername = await prisma.user.findFirst({
-    where: { username },
-  });
-
-  if (checkSameUsername) {
-    return {
-      errors: { username: { errors: ["Usuário já existe"] } },
-      payload: formData,
-    } as FormState;
-  }
+  const { name, course, email, password } = validatedFields.data;
 
   const checkSameEmail = await prisma.user.findFirst({
     where: { email },
@@ -52,7 +42,7 @@ export async function signup(state: FormState, formData: FormData) {
     return {
       errors: { email: { errors: ["Email já cadastrado"] } },
       payload: formData,
-    } as FormState;
+    };
   }
 
   // e.g. Hash the user's password before storing it
@@ -61,8 +51,6 @@ export async function signup(state: FormState, formData: FormData) {
   // 3. Insert the user into the database or call an Auth Library's API
   const user = await prisma.user.create({
     data: {
-      id: undefined,
-      username,
       name,
       course,
       email,
@@ -74,15 +62,9 @@ export async function signup(state: FormState, formData: FormData) {
     return {
       message: "An error occurred while creating your account.",
       payload: formData,
-    } as FormState;
+    };
   }
 
-  await createSession(user.id);
-  // 5. Redirect user
-  redirect("/profile");
-}
-
-export async function logout() {
-  await deleteSession();
-  redirect("/login");
+  await createSession(user.id, user.email);
+  redirect("/home");
 }
