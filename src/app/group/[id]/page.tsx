@@ -16,7 +16,7 @@ import { Suspense } from "react";
 export default async function GroupChatPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
 
