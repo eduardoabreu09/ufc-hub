@@ -1,6 +1,9 @@
 "use server";
 
-import { LoginFormState, LoginSchema } from "@/form-schema/login";
+import {
+  LoginFormState,
+  LoginSchema,
+} from "@/features/session/form-schema/login";
 import { prisma } from "@/lib/prisma";
 import { createSession } from "@/lib/session";
 import { redirect } from "next/navigation";

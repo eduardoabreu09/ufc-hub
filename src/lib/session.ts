@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 
 const secretKey = process.env.SESSION_SECRET;
 const encodedKey = new TextEncoder().encode(secretKey);
-const expiresIn = 10 * 60 * 1000; // 10 minutes
+const expiresIn = 60 * 60 * 1000; // 60 minutes
 
 export type SessionPayload = {
   user: { id: number; email: string };
@@ -16,7 +16,7 @@ export async function encrypt(payload: SessionPayload): Promise<string> {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("10 minutes from now")
+    .setExpirationTime("60 minutes from now")
     .sign(encodedKey);
 }
 
@@ -28,7 +28,7 @@ export async function decrypt(
       algorithms: ["HS256"],
     })) as { payload: SessionPayload };
     return payload;
-  } catch (error) {
+  } catch {
     console.log("Failed to verify session");
   }
 }
@@ -61,7 +61,7 @@ export async function updateSession(): Promise<void> {
     return;
   }
 
-  const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  const expires = new Date(Date.now() + expiresIn);
 
   const cookieStore = await cookies();
   cookieStore.set("session", session, {

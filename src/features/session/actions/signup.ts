@@ -1,6 +1,9 @@
 "use server";
 
-import { SignupFormSchema, SignUpFormState } from "@/form-schema/signup";
+import {
+  SignupFormSchema,
+  SignUpFormState,
+} from "@/features/session/form-schema/signup";
 import { prisma } from "@/lib/prisma";
 import { createSession } from "@/lib/session";
 import bcrypt from "bcrypt";
