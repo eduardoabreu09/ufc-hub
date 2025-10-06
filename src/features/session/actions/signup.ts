@@ -25,7 +25,7 @@ export async function signup(
   // If any form fields are invalid, return early
   if (!validatedFields.success) {
     return {
-      errors: z.treeifyError(validatedFields.error).properties,
+      errors: z.flattenError(validatedFields.error).fieldErrors,
       message: z
         .treeifyError(validatedFields.error)
         .errors.map((e) => e)
@@ -43,7 +43,7 @@ export async function signup(
 
   if (checkSameEmail) {
     return {
-      errors: { email: { errors: ["Email já cadastrado"] } },
+      errors: { email: ["Email já cadastrado"] },
       payload: formData,
     };
   }

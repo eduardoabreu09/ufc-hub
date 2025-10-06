@@ -1,7 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "./badge";
-import Image from "next/image";
 
 interface BlogPost {
   id: string;

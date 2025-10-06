@@ -40,11 +40,12 @@ model Group {
     name        String
     description String?
 
-    createdBy User        @relation(fields: [creatorId], references: [id])
+    createdBy User @relation(fields: [creatorId], references: [id])
     creatorId Int
-    users     UserGroup[]
-    events    Event[]
-    messages  Message[]
+
+    users    UserGroup[]
+    events   Event[]
+    messages Message[]
 }
 
 model UserGroup {
@@ -70,11 +71,12 @@ model Event {
     location    String?
     eventDate   DateTime?
 
-    createdBy User      @relation(fields: [creatorId], references: [id])
+    createdBy User   @relation(fields: [creatorId], references: [id])
     creatorId Int
-    group     Group?    @relation(fields: [groupId], references: [id])
+    group     Group? @relation(fields: [groupId], references: [id])
     groupId   Int?
-    messages  Message[]
+
+    messages Message[]
 }
 
 model Message {

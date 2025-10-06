@@ -52,7 +52,7 @@ export async function createGroup(
       },
     });
 
-    revalidatePath("/group");
+    revalidatePath("/home/group");
 
     return {
       message: "Group created successfully",

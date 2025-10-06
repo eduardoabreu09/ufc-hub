@@ -31,8 +31,6 @@ export async function login(
     where: { email },
   });
 
-  console.log(user);
-
   if (!user) {
     return {
       message: "Email ou senha incorretos",

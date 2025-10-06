@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { PlusIcon } from "lucide-react";
+import { Loader2, PlusIcon } from "lucide-react";
 import { createGroup } from "@/features/groups/actions/create-group";
 
 export function CreateGroupDialog() {
@@ -33,15 +33,15 @@ export function CreateGroupDialog() {
       <DialogTrigger asChild>
         <Button>
           <PlusIcon className="h-4 w-4 mr-2" />
-          Create Group
+          Criar Grupo
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <form action={formAction}>
           <DialogHeader>
-            <DialogTitle>Create New Group</DialogTitle>
+            <DialogTitle>Criar Novo Grupo</DialogTitle>
             <DialogDescription>
-              Create a new group to collaborate with other students.
+              Crie um novo grupo para colaborar com outros colegas
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -51,11 +51,11 @@ export function CreateGroupDialog() {
               </div>
             )}
             <div className="grid gap-2">
-              <Label htmlFor="name">Group Name</Label>
+              <Label htmlFor="name">Name</Label>
               <Input
                 id="name"
                 name="name"
-                placeholder="Enter group name"
+                placeholder="Nome do Grupo"
                 required
               />
               {state?.errors?.name && (
@@ -63,12 +63,12 @@ export function CreateGroupDialog() {
               )}
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="description">Description (Optional)</Label>
+              <Label htmlFor="description">Descrição (Opicional)</Label>
               <Textarea
                 id="description"
                 name="description"
-                placeholder="Describe your group's purpose"
-                rows={3}
+                placeholder="Uma breve descrição do que será discutido no grupo"
+                rows={4}
               />
               {state?.errors?.description && (
                 <p className="text-sm text-red-600">
@@ -83,11 +83,14 @@ export function CreateGroupDialog() {
               variant="outline"
               onClick={() => setOpen(false)}
             >
-              Cancel
+              Voltar
             </Button>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Creating..." : "Create Group"}
-            </Button>
+            {isPending && (
+              <Button type="submit" disabled>
+                <Loader2 className=" animate-spin" /> Criando...
+              </Button>
+            )}
+            {!isPending && <Button type="submit">Criar Grupo</Button>}
           </DialogFooter>
         </form>
       </DialogContent>

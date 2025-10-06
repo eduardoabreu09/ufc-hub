@@ -1,7 +1,5 @@
-import { Hero } from "@/components/ui/hero";
 import { Gallery } from "@/components/ui/gallery";
 import { PostList } from "@/components/ui/post-list";
-import { Header } from "@/components/header";
 
 export default function Home() {
   // Sample gallery items
@@ -84,11 +82,6 @@ export default function Home() {
   ];
   return (
     <div className="min-h-screen">
-      <Header />
-      <Hero
-        title="Welcome to UFC Hub"
-        description="Connect with fellow students, join study groups, and stay updated with university events and announcements."
-      />
       <Gallery title="Featured Content" items={galleryItems} />
       <PostList
         title="Latest Updates"

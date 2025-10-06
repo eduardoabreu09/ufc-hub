@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useActionState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { SendIcon } from "lucide-react";
-import { Group, GroupMessage } from "@/types/group";
+import { Loader2, SendIcon } from "lucide-react";
+import { Group } from "@/types/group";
 import { sendMessage } from "@/features/groups/actions/send-message";
 import { useMessages } from "@/lib/fetcher";
 
@@ -38,14 +38,23 @@ export function GroupChat({ group, currentUserId }: GroupChatProps) {
         <CardTitle className="text-lg">Chat</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col min-h-0">
-        <ScrollArea className="flex-1 min-h-0 pr-4">
-          <div className="space-y-4 p-1">
-            {!messages || messages.length === 0 ? (
-              <div className="text-center text-muted-foreground py-8">
-                No messages yet. Start the conversation!
-              </div>
-            ) : (
-              messages.map((message) => (
+        {isLoading && (
+          <div className="flex justify-center items-center h-full">
+            <p className="flex flex-row">
+              <Loader2 className="animate-spin mr-1" />
+              Carregando mensagens...
+            </p>
+          </div>
+        )}
+        {!isLoading && messages?.length === 0 && (
+          <div className="flex justify-center items-center h-full text-center text-muted-foreground ">
+            Sem mensagens. Seja o primeiro a interagir!
+          </div>
+        )}
+        {!isLoading && messages && messages?.length > 0 && (
+          <ScrollArea className="flex-1 min-h-0 pr-4">
+            <div className="space-y-4 p-1">
+              {messages.map((message) => (
                 <div
                   key={message.id}
                   className={`flex ${
@@ -68,15 +77,23 @@ export function GroupChat({ group, currentUserId }: GroupChatProps) {
                     )}
                     <div className="break-words">{message.body}</div>
                     <div className="text-xs opacity-70 mt-1">
-                      {new Date(message.createdAt).toLocaleTimeString()}
+                      {new Date(message.createdAt).toLocaleTimeString(
+                        undefined,
+                        {
+                          day: "2-digit",
+                          month: "2-digit",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }
+                      )}
                     </div>
                   </div>
                 </div>
-              ))
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-        </ScrollArea>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+          </ScrollArea>
+        )}
 
         <div className="flex-shrink-0 mt-4">
           {state?.message && !state.success && (
@@ -87,7 +104,7 @@ export function GroupChat({ group, currentUserId }: GroupChatProps) {
           <form action={formAction} className="flex gap-2">
             <Input
               name="content"
-              placeholder="Type your message..."
+              placeholder="Digite sua mensagem..."
               disabled={isPending}
               className="flex-1"
               required

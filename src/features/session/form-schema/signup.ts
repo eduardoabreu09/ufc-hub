@@ -5,10 +5,7 @@ export const SignupFormSchema = z.object({
     .string()
     .min(3, { message: "Nome precisa ter no mínimo 3 caracteres." })
     .trim(),
-  course: z
-    .string()
-    .min(3, { message: "Curso precisa ter no mínimo 3 caracteres." })
-    .trim(),
+  course: z.string().trim(),
   email: z.email({ error: "Email inválido." }).trim(),
   password: z
     .string()
@@ -23,10 +20,10 @@ export const SignupFormSchema = z.object({
 
 export type SignUpFormState = {
   errors?: {
-    name?: { errors: string[] };
-    course?: { errors: string[] };
-    email?: { errors: string[] };
-    password?: { errors: string[] };
+    name?: string[];
+    course?: string[];
+    email?: string[];
+    password?: string[];
   };
   message?: string;
   payload?: FormData;

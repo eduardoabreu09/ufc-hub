@@ -15,8 +15,6 @@ interface GroupCardProps {
 }
 
 export function GroupCard({ group }: GroupCardProps) {
-  // For now, we'll display the groups without user-specific admin/member status
-  // This can be improved later to fetch current user server-side
   const memberCount = group._count?.users || group.users.length;
 
   return (
@@ -26,7 +24,7 @@ export function GroupCard({ group }: GroupCardProps) {
           <div className="space-y-1">
             <CardTitle className="text-lg">{group.name}</CardTitle>
             <CardDescription className="line-clamp-2">
-              {group.description || "No description provided"}
+              {group.description || "Sem descrição"}
             </CardDescription>
           </div>
         </div>
@@ -35,22 +33,24 @@ export function GroupCard({ group }: GroupCardProps) {
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
             <UsersIcon className="h-4 w-4" />
-            <span>{memberCount} members</span>
+            <span>{memberCount} membros</span>
           </div>
           <div className="flex items-center gap-1">
             <MessageCircleIcon className="h-4 w-4" />
-            <span>{group._count?.messages || 0} messages</span>
+            <span>{group._count?.messages || 0} mensagens</span>
           </div>
         </div>
 
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <CalendarIcon className="h-3 w-3" />
-          <span>Created {new Date(group.createdAt).toLocaleDateString()}</span>
+          <span>
+            Criado em: {new Date(group.createdAt).toLocaleDateString()}
+          </span>
         </div>
 
         <div className="flex gap-2">
-          <Link href={`/group/${group.id}`} className="flex w-full">
-            <Button className="flex-1">Open Chat</Button>
+          <Link href={`/home/group/${group.id}`} className="flex w-full">
+            <Button className="flex-1">Abrir Chat</Button>
           </Link>
         </div>
       </CardContent>

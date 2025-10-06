@@ -62,7 +62,7 @@ export async function sendMessage(
       },
     });
 
-    revalidatePath(`/group/${groupId}`);
+    revalidatePath(`/home/group/${groupId}`);
 
     return {
       message: "Message sent successfully",

@@ -1,8 +1,14 @@
 import AddMemberDialog from "@/components/group/add-member-dialog";
 import { GroupChat } from "@/components/group/group-chat";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -91,13 +97,16 @@ function LoadingChat() {
 }
 
 async function GroupNameHeader({ groupId }: { groupId: number }) {
-  const group = await getGroupById(groupId);
-  const currentUserId = await getCurrentUserId();
+  const [group, currentUserId] = await Promise.all([
+    getGroupById(groupId),
+    getCurrentUserId(),
+  ]);
 
   if (!group) {
+    // TODO: Redirect to 404 page
     return (
       <div className="container mx-auto px-4 py-8">
-        <p>Group not found or you do not have access.</p>
+        <p>Esse grupo não existe ou você não tem acesso.</p>
       </div>
     );
   }
@@ -109,10 +118,10 @@ async function GroupNameHeader({ groupId }: { groupId: number }) {
   return (
     <>
       <Card>
-        <CardHeader>
+        <CardContent>
           <div className="flex flex-col w-full sm:flex-row justify-between sm:items-center">
             <div className="flex items-center gap-4 max-sm:mb-4">
-              <Link href="/group">
+              <Link href="/home/group">
                 <Button variant="ghost" size="sm">
                   <ArrowLeftIcon className="h-4 w-4" />
                 </Button>
@@ -130,28 +139,34 @@ async function GroupNameHeader({ groupId }: { groupId: number }) {
             </div>
             {isAdmin && <AddMemberDialog groupId={group.id} />}
           </div>
-        </CardHeader>
+        </CardContent>
       </Card>
       <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">
-            Members ({group.users.length})
-          </CardTitle>
-        </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {group.users.map((userGroup) => (
-              <Badge
-                key={userGroup.userId}
-                variant={
-                  userGroup.role === GroupRole.ADMIN ? "default" : "secondary"
-                }
-              >
-                {userGroup.user.name}
-                {userGroup.role === GroupRole.ADMIN && " (Admin)"}
-              </Badge>
-            ))}
-          </div>
+          <Accordion type="single" collapsible>
+            <AccordionItem value="item-1">
+              <AccordionTrigger className=" text-lg font-semibold" size={26}>
+                Membros ({group.users.length})
+              </AccordionTrigger>
+              <AccordionContent className="flex flex-col gap-4 text-balance">
+                <div className="flex flex-wrap gap-2">
+                  {group.users.map((userGroup) => (
+                    <Badge
+                      key={userGroup.userId}
+                      variant={
+                        userGroup.role === GroupRole.ADMIN
+                          ? "default"
+                          : "secondary"
+                      }
+                    >
+                      {userGroup.user.name}
+                      {userGroup.role === GroupRole.ADMIN && " (Admin)"}
+                    </Badge>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </CardContent>
       </Card>
     </>
@@ -159,13 +174,16 @@ async function GroupNameHeader({ groupId }: { groupId: number }) {
 }
 
 async function GroupBody({ groupId }: { groupId: number }) {
-  const group = await getGroupById(groupId);
-  const currentUserId = await getCurrentUserId();
+  const [group, currentUserId] = await Promise.all([
+    getGroupById(groupId),
+    getCurrentUserId(),
+  ]);
 
   if (!group) {
+    // TODO: Redirect to 404 page
     return (
       <div className="container mx-auto px-4 py-8">
-        <p>Group not found or you do not have access.</p>
+        <p>Esse grupo não existe ou você não tem acesso.</p>
       </div>
     );
   }

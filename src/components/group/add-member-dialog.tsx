@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { UserPlusIcon } from "lucide-react";
+import { Loader2, UserPlusIcon } from "lucide-react";
 import { addMember } from "@/features/groups/actions/add-member";
 import { GroupRole } from "@prisma/client";
 
@@ -47,15 +47,15 @@ export default function AddMemberDialog({ groupId }: AddMemberDialogProps) {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <UserPlusIcon className="h-4 w-4 mr-2" />
-          Add Member
+          Adicionar
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <form action={formAction}>
           <DialogHeader>
-            <DialogTitle>Add Group Member</DialogTitle>
+            <DialogTitle>Adicionar Membro</DialogTitle>
             <DialogDescription>
-              Add a new member to this group by their email address.
+              Adicione um novo membro ao grupo usando o email.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -70,12 +70,12 @@ export default function AddMemberDialog({ groupId }: AddMemberDialogProps) {
               </div>
             )}
             <div className="grid gap-2">
-              <Label htmlFor="email">User Email</Label>
+              <Label htmlFor="email">Email do Usuário</Label>
               <Input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="Enter user's email address"
+                placeholder="Email"
                 required
               />
               {state?.errors?.email && (
@@ -83,13 +83,13 @@ export default function AddMemberDialog({ groupId }: AddMemberDialogProps) {
               )}
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="role">Role</Label>
+              <Label htmlFor="role">Função</Label>
               <Select name="role" defaultValue={GroupRole.USER}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={GroupRole.USER}>Member</SelectItem>
+                  <SelectItem value={GroupRole.USER}>Membro</SelectItem>
                   <SelectItem value={GroupRole.ADMIN}>Admin</SelectItem>
                 </SelectContent>
               </Select>
@@ -104,11 +104,14 @@ export default function AddMemberDialog({ groupId }: AddMemberDialogProps) {
               variant="outline"
               onClick={() => setOpen(false)}
             >
-              Cancel
+              Voltar
             </Button>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Adding..." : "Add Member"}
-            </Button>
+            {isPending && (
+              <Button type="submit" disabled>
+                <Loader2 className=" animate-spin" /> Adicionando...
+              </Button>
+            )}
+            {!isPending && <Button type="submit">Adicionar</Button>}
           </DialogFooter>
         </form>
       </DialogContent>
