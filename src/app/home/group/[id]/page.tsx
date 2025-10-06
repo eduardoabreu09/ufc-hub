@@ -49,7 +49,7 @@ function LoadingHeader() {
           <Skeleton className="h-9 w-full max-w-35"></Skeleton>
         </div>
       </div>
-      <div className="border rounded-lg p-6 py-8 space-y-4 sm:space-y-8">
+      <div className="border rounded-lg p-6 py-8 space-y-2">
         <Skeleton className="h-4 w-24"></Skeleton>
         <div className="flex gap-2 flex-wrap">
           {[...Array(3)].map((_, i) => (
@@ -83,7 +83,7 @@ function LoadingChat() {
       <div className="flex gap-2">
         <Input
           name="content"
-          placeholder="Type your message..."
+          placeholder="Digite sua mensagem..."
           disabled
           className="flex-1"
           required
