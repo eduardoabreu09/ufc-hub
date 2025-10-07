@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/features/session/queries/get-current-user";
 import { GroupRole } from "@prisma/client";
+import { z } from "zod";
 
 export async function addMember(
   groupId: number,
@@ -18,12 +19,11 @@ export async function addMember(
 
   if (!currentUser) {
     return {
-      message: "You must be logged in to add members",
+      message: "Você precisa estar logado para adicionar membros.",
       success: false,
     };
   }
 
-  // Check if current user is admin of the group
   const userGroup = await prisma.userGroup.findUnique({
     where: {
       userId_groupId: {
@@ -35,7 +35,7 @@ export async function addMember(
 
   if (!userGroup || userGroup.role !== GroupRole.ADMIN) {
     return {
-      message: "You must be an admin of this group to add members",
+      message: "Você não tem permissão para adicionar membros a este grupo.",
       success: false,
     };
   }
@@ -47,8 +47,11 @@ export async function addMember(
 
   if (!validatedFields.success) {
     return {
-      message: "Invalid form data",
-      errors: validatedFields.error.flatten().fieldErrors,
+      message: z
+        .treeifyError(validatedFields.error)
+        .errors.map((e) => e)
+        .join(", "),
+      errors: z.flattenError(validatedFields.error).fieldErrors,
       success: false,
     };
   }
@@ -56,19 +59,17 @@ export async function addMember(
   try {
     const { email, role } = validatedFields.data;
 
-    // Find user by email
     const userToAdd = await prisma.user.findUnique({
       where: { email },
     });
 
     if (!userToAdd) {
       return {
-        message: "User not found",
+        message: "Email não encontrado.",
         success: false,
       };
     }
 
-    // Check if user is already in group
     const existingMember = await prisma.userGroup.findUnique({
       where: {
         userId_groupId: {
@@ -80,12 +81,11 @@ export async function addMember(
 
     if (existingMember) {
       return {
-        message: "User is already a member of this group",
+        message: "Usuário já é membro do grupo.",
         success: false,
       };
     }
 
-    // Add user to group
     await prisma.userGroup.create({
       data: {
         userId: userToAdd.id,
@@ -97,13 +97,12 @@ export async function addMember(
     revalidatePath(`/home/group/${groupId}`);
 
     return {
-      message: "Member added successfully",
+      message: "Membro adicionado com sucesso.",
       success: true,
     };
   } catch (error) {
-    console.error("Failed to add member:", error);
     return {
-      message: "Failed to add member",
+      message: "Erro inesperado no servidor. Tente novamente.",
       success: false,
     };
   }

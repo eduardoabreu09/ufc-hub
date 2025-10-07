@@ -3,8 +3,9 @@ import { z } from "zod";
 export const SendMessageSchema = z.object({
   content: z
     .string()
-    .min(1, { message: "Message content is required" })
-    .max(1000, { message: "Message must be less than 1000 characters" }),
+    .trim()
+    .min(1, { message: "Mensagem deve ter corpo" })
+    .max(1000, { message: "Limite máximo de 1000 caracteres" }),
 });
 
 export type SendMessageFormState = {

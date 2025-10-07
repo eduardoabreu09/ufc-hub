@@ -1,5 +1,7 @@
 import AddMemberDialog from "@/components/group/add-member-dialog";
+import DeleteGroupDialog from "@/components/group/delete-group-dialog";
 import { GroupChat } from "@/components/group/group-chat";
+import RemoveMemberButton from "@/components/group/remove-member-button";
 import {
   Accordion,
   AccordionContent,
@@ -115,6 +117,8 @@ async function GroupNameHeader({ groupId }: { groupId: number }) {
     (ug) => ug.userId === currentUserId && ug.role === GroupRole.ADMIN
   );
 
+  const isOwner = group.creatorId === currentUserId;
+
   return (
     <>
       <Card>
@@ -137,7 +141,12 @@ async function GroupNameHeader({ groupId }: { groupId: number }) {
                 </p>
               </div>
             </div>
-            {isAdmin && <AddMemberDialog groupId={group.id} />}
+            <div className="flex gap-2 max-sm:flex-col">
+              {isAdmin && <AddMemberDialog groupId={group.id} />}
+              {isOwner && (
+                <DeleteGroupDialog groupId={group.id} groupName={group.name} />
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -151,17 +160,27 @@ async function GroupNameHeader({ groupId }: { groupId: number }) {
               <AccordionContent className="flex flex-col gap-4 text-balance">
                 <div className="flex flex-wrap gap-2">
                   {group.users.map((userGroup) => (
-                    <Badge
-                      key={userGroup.userId}
-                      variant={
-                        userGroup.role === GroupRole.ADMIN
-                          ? "default"
-                          : "secondary"
-                      }
-                    >
-                      {userGroup.user.name}
-                      {userGroup.role === GroupRole.ADMIN && " (Admin)"}
-                    </Badge>
+                    <div key={userGroup.userId} className="flex items-center">
+                      <Badge
+                        variant={
+                          userGroup.role === GroupRole.ADMIN
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
+                        {userGroup.user.name}
+                        {userGroup.role === GroupRole.ADMIN && " (Admin)"}
+                      </Badge>
+                      {currentUserId &&
+                        userGroup.userId !== currentUserId &&
+                        isAdmin && (
+                          <RemoveMemberButton
+                            groupId={group.id}
+                            memberId={userGroup.userId}
+                            memberName={userGroup.user.name}
+                          />
+                        )}
+                    </div>
                   ))}
                 </div>
               </AccordionContent>

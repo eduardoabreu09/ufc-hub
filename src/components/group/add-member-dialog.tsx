@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +24,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, UserPlusIcon } from "lucide-react";
 import { addMember } from "@/features/groups/actions/add-member";
 import { GroupRole } from "@prisma/client";
+import { toast } from "sonner";
 
 interface AddMemberDialogProps {
   groupId: number;
@@ -35,12 +36,25 @@ export default function AddMemberDialog({ groupId }: AddMemberDialogProps) {
     addMember.bind(null, groupId),
     undefined
   );
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const previousStateRef = useRef(state);
 
   useEffect(() => {
-    if (state?.success) {
+    if (state?.success && state !== previousStateRef.current) {
+      toast.success(state.message);
       setOpen(false);
+      formRef.current?.reset();
     }
-  }, [state?.success]);
+    if (
+      !state?.success &&
+      state !== previousStateRef.current &&
+      state?.message
+    ) {
+      toast.error(state.message);
+    }
+    previousStateRef.current = state;
+  }, [state]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -59,16 +73,6 @@ export default function AddMemberDialog({ groupId }: AddMemberDialogProps) {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            {state?.message && !state.success && (
-              <div className="text-sm text-red-600 bg-red-50 p-2 rounded">
-                {state.message}
-              </div>
-            )}
-            {state?.success && (
-              <div className="text-sm text-green-600 bg-green-50 p-2 rounded">
-                {state.message}
-              </div>
-            )}
             <div className="grid gap-2">
               <Label htmlFor="email">Email do Usuário</Label>
               <Input

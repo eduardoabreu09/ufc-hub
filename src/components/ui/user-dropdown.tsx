@@ -11,8 +11,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getCurrentUser } from "@/features/session/queries/get-current-user";
 
-import { LogOut, Settings } from "lucide-react";
+import { Settings } from "lucide-react";
 import { Suspense } from "react";
+import SignOutButton from "./sign-out-button";
 
 export default async function UserDropdown() {
   return (
@@ -68,10 +69,7 @@ async function UserLoadedDropdown() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <LogOut size={16} className="opacity-60" aria-hidden="true" />
-          <span>Sair</span>
-        </DropdownMenuItem>
+        <SignOutButton />
       </DropdownMenuContent>
     </DropdownMenu>
   );

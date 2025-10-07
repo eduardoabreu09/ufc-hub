@@ -14,7 +14,6 @@ export async function signup(
   state: SignUpFormState | undefined,
   formData: FormData
 ): Promise<SignUpFormState> {
-  // Validate form fields
   const validatedFields = SignupFormSchema.safeParse({
     name: formData.get("name"),
     course: formData.get("course"),
@@ -22,7 +21,6 @@ export async function signup(
     password: formData.get("password"),
   });
 
-  // If any form fields are invalid, return early
   if (!validatedFields.success) {
     return {
       errors: z.flattenError(validatedFields.error).fieldErrors,
@@ -34,7 +32,6 @@ export async function signup(
     };
   }
 
-  // 2. Prepare data for insertion into database
   const { name, course, email, password } = validatedFields.data;
 
   const checkSameEmail = await prisma.user.findFirst({
@@ -48,10 +45,8 @@ export async function signup(
     };
   }
 
-  // e.g. Hash the user's password before storing it
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // 3. Insert the user into the database or call an Auth Library's API
   const user = await prisma.user.create({
     data: {
       name,
