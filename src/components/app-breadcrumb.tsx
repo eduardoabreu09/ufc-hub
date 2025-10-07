@@ -26,6 +26,9 @@ export function AppBreadcrumb() {
     if (clientPathname.includes("group")) {
       return "Grupos";
     }
+    if (clientPathname.includes("event")) {
+      return "Eventos";
+    }
     return "";
   }, [clientPathname]);
 

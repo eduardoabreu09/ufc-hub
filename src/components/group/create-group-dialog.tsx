@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,16 +17,30 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, PlusIcon } from "lucide-react";
 import { createGroup } from "@/features/groups/actions/create-group";
+import { toast } from "sonner";
 
 export function CreateGroupDialog() {
   const [open, setOpen] = useState(false);
   const [state, formAction, isPending] = useActionState(createGroup, undefined);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const previousStateRef = useRef(state);
 
   useEffect(() => {
-    if (state?.success) {
+    if (state?.success && state !== previousStateRef.current) {
+      toast.success(state.message);
       setOpen(false);
+      formRef.current?.reset();
     }
-  }, [state?.success]);
+    if (
+      !state?.success &&
+      state !== previousStateRef.current &&
+      state?.message
+    ) {
+      toast.error(state.message);
+    }
+    previousStateRef.current = state;
+  }, [state]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -37,7 +51,7 @@ export function CreateGroupDialog() {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
-        <form action={formAction}>
+        <form action={formAction} ref={formRef}>
           <DialogHeader>
             <DialogTitle>Criar Novo Grupo</DialogTitle>
             <DialogDescription>
@@ -45,11 +59,6 @@ export function CreateGroupDialog() {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            {state?.message && !state.success && (
-              <div className="text-sm text-red-600 bg-red-50 p-2 rounded">
-                {state.message}
-              </div>
-            )}
             <div className="grid gap-2">
               <Label htmlFor="name">Name</Label>
               <Input
@@ -70,11 +79,6 @@ export function CreateGroupDialog() {
                 placeholder="Uma breve descrição do que será discutido no grupo"
                 rows={4}
               />
-              {state?.errors?.description && (
-                <p className="text-sm text-red-600">
-                  {state.errors.description[0]}
-                </p>
-              )}
             </div>
           </div>
           <DialogFooter>

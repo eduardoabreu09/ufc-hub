@@ -96,11 +96,6 @@ export function GroupChat({ group, currentUserId }: GroupChatProps) {
         )}
 
         <div className="flex-shrink-0 mt-4">
-          {state?.message && !state.success && (
-            <div className="text-sm text-red-600 bg-red-50 p-2 rounded mb-2">
-              {state.message}
-            </div>
-          )}
           <form action={formAction} className="flex gap-2">
             <Input
               name="content"

@@ -7,6 +7,7 @@ import {
 import { getCurrentUser } from "@/features/session/queries/get-current-user";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
 export async function sendMessage(
   groupId: number,
@@ -17,12 +18,11 @@ export async function sendMessage(
 
   if (!currentUser) {
     return {
-      message: "You must be logged in to send messages",
+      message: "Você precisa estar logado para enviar mensagens.",
       success: false,
     };
   }
 
-  // Check if user is a member of the group
   const userGroup = await prisma.userGroup.findUnique({
     where: {
       userId_groupId: {
@@ -34,7 +34,7 @@ export async function sendMessage(
 
   if (!userGroup) {
     return {
-      message: "You must be a member of this group to send messages",
+      message: "Você precisa ser membro deste grupo para enviar mensagens.",
       success: false,
     };
   }
@@ -45,8 +45,11 @@ export async function sendMessage(
 
   if (!validatedFields.success) {
     return {
-      message: "Invalid message content",
-      errors: validatedFields.error.flatten().fieldErrors,
+      message: z
+        .treeifyError(validatedFields.error)
+        .errors.map((e) => e)
+        .join(", "),
+      errors: z.flattenError(validatedFields.error).fieldErrors,
       success: false,
     };
   }
@@ -65,13 +68,12 @@ export async function sendMessage(
     revalidatePath(`/home/group/${groupId}`);
 
     return {
-      message: "Message sent successfully",
+      message: "Mensagem enviada com sucesso.",
       success: true,
     };
   } catch (error) {
-    console.error("Failed to send message:", error);
     return {
-      message: "Failed to send message",
+      message: "Erro inesperado no servidor. Tente novamente.",
       success: false,
     };
   }

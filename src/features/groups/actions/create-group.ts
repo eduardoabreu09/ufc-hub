@@ -8,6 +8,7 @@ import { getCurrentUser } from "@/features/session/queries/get-current-user";
 import { prisma } from "@/lib/prisma";
 import { GroupRole } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
 export async function createGroup(
   state: CreateGroupFormState | undefined,
@@ -17,7 +18,7 @@ export async function createGroup(
 
   if (!currentUser) {
     return {
-      message: "You must be logged in to create a group",
+      message: "Você precisa estar logado para criar um grupo.",
       success: false,
     };
   }
@@ -29,8 +30,11 @@ export async function createGroup(
 
   if (!validatedFields.success) {
     return {
-      message: "Invalid form data",
-      errors: validatedFields.error.flatten().fieldErrors,
+      message: z
+        .treeifyError(validatedFields.error)
+        .errors.map((e) => e)
+        .join(", "),
+      errors: z.flattenError(validatedFields.error).fieldErrors,
       success: false,
     };
   }
@@ -55,13 +59,12 @@ export async function createGroup(
     revalidatePath("/home/group");
 
     return {
-      message: "Group created successfully",
+      message: "Grupo criado com sucesso.",
       success: true,
     };
   } catch (error) {
-    console.error("Failed to create group:", error);
     return {
-      message: "Failed to create group",
+      message: "Erro inesperado no servidor. Tente novamente.",
       success: false,
     };
   }

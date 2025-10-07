@@ -19,7 +19,7 @@ import { logout } from "@/features/session/actions/logout";
 import { useActionState, useCallback, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Home, LogOut, Settings, Users } from "lucide-react";
+import { CalendarDays, Home, LogOut, Settings, Users } from "lucide-react";
 
 // This is sample data.
 const data = {
@@ -51,7 +51,11 @@ const data = {
           title: "Grupos",
           url: "/home/group",
           icon: Users,
-          isActive: true,
+        },
+        {
+          title: "Eventos",
+          url: "/home/event",
+          icon: CalendarDays,
         },
       ],
     },
