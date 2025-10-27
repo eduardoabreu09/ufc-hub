@@ -1,6 +1,5 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
@@ -18,6 +17,12 @@ enum GroupRole {
     ADMIN
 }
 
+enum Participation {
+    YES
+    NO
+    MAYBE
+}
+
 model User {
     id        Int      @id @default(autoincrement())
     createdAt DateTime @default(now())
@@ -27,10 +32,12 @@ model User {
     course    String?
     password  String
 
-    groups_owned Group[]
-    groups       UserGroup[]
-    events_owned Event[]
-    messages     Message[]
+    groups_owned         Group[]
+    groups               UserGroup[]
+    events_created       Event[]
+    event_participations EventParticipation[]
+    messages             Message[]
+    blog_posts           BlogPost[]
 }
 
 model Group {
@@ -55,7 +62,7 @@ model UserGroup {
 
     user    User  @relation(fields: [userId], references: [id])
     userId  Int
-    group   Group @relation(fields: [groupId], references: [id])
+    group   Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
     groupId Int
 
     @@id([userId, groupId])
@@ -65,7 +72,7 @@ model Event {
     id          Int       @id @default(autoincrement())
     createdAt   DateTime  @default(now())
     updatedAt   DateTime  @updatedAt
-    name        String
+    title       String
     description String?
     body        String?
     location    String?
@@ -73,10 +80,24 @@ model Event {
 
     createdBy User   @relation(fields: [creatorId], references: [id])
     creatorId Int
-    group     Group? @relation(fields: [groupId], references: [id])
+    group     Group? @relation(fields: [groupId], references: [id], onDelete: Cascade)
     groupId   Int?
 
-    messages Message[]
+    messages       Message[]
+    participations EventParticipation[]
+}
+
+model EventParticipation {
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt
+    participation Participation?
+
+    user    User  @relation(fields: [userId], references: [id])
+    userId  Int
+    event   Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+    eventId Int
+
+    @@id([userId, eventId])
 }
 
 model Message {
@@ -85,10 +106,36 @@ model Message {
     updatedAt DateTime @updatedAt
     body      String
 
-    sentBy   User   @relation(fields: [senderId], references: [id])
-    senderId Int
-    group    Group? @relation(fields: [groupId], references: [id])
-    groupId  Int?
-    event    Event? @relation(fields: [eventId], references: [id])
-    eventId  Int?
+    sentBy     User      @relation(fields: [senderId], references: [id])
+    senderId   Int
+    group      Group?    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+    groupId    Int?
+    event      Event?    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+    eventId    Int?
+    blog_post  BlogPost? @relation(fields: [blogPostId], references: [id], onDelete: Cascade)
+    blogPostId Int?
+}
+
+model BlogPost {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    title     String
+    body      String
+    content   String   @db.Text
+
+    author   User @relation(fields: [authorId], references: [id])
+    authorId Int
+
+    tags     Tag[]
+    messages Message[]
+}
+
+model Tag {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    name      String   @unique
+
+    blogPosts BlogPost[]
 }

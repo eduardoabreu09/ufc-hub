@@ -1,55 +1,28 @@
-import { GroupRole } from "@prisma/client";
+import { MessageDTO } from "./message";
+import { UserDTO, UserGroupDTO } from "./user";
 
-export interface Group {
+export interface GroupMessagesDTO {
   id: number;
   name: string;
   description: string | null;
   createdAt: Date;
-  updatedAt: Date;
+  createdBy: UserDTO;
   creatorId: number;
-  createdBy: {
-    id: number;
-    name: string;
-    email: string;
-  };
-  users: UserGroup[];
-  messages?: GroupMessage[];
+  users: UserGroupDTO[];
+  messages?: MessageDTO[];
   _count?: {
     users: number;
     messages: number;
   };
 }
 
-export interface UserGroup {
-  userId: number;
-  groupId: number;
-  role: GroupRole;
-  createdAt: Date;
-  updatedAt: Date;
-  user: {
-    id: number;
-    name: string;
-    email: string;
-    course: string | null;
-  };
-}
-
-export interface GroupMessage {
+export interface GroupDTO {
   id: number;
-  body: string;
-  createdAt: Date;
-  updatedAt: Date;
-  senderId: number;
-  groupId: number | null;
-  sentBy: {
-    id: number;
-    name: string;
-    email: string;
-    course: string | null;
-  };
-}
-
-export interface CreateGroupData {
   name: string;
-  description?: string;
+  description: string | null;
+  createdAt: Date;
+  _count?: {
+    users: number;
+    messages: number;
+  };
 }

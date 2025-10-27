@@ -1,3 +1,4 @@
+import { GeneralFormState } from "@/types/form";
 import { z } from "zod";
 
 export const CreateGroupSchema = z.object({
@@ -9,11 +10,9 @@ export const CreateGroupSchema = z.object({
   description: z.string().trim().optional(),
 });
 
-export type CreateGroupFormState = {
-  message?: string;
+export interface CreateGroupFormState extends GeneralFormState {
   errors?: {
     name?: string[];
     description?: string[];
   };
-  success?: boolean;
-};
+}

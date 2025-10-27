@@ -24,9 +24,9 @@ export default function GroupsPage() {
 }
 
 async function GroupList() {
-  const groups = await getGroups();
+  const groupsResult = await getGroups();
 
-  if (groups.length === 0) {
+  if (groupsResult.isFailure) {
     return (
       <div className="text-center py-12">
         <div className="text-muted-foreground mb-4">
@@ -35,6 +35,8 @@ async function GroupList() {
       </div>
     );
   }
+
+  const groups = groupsResult.getValue();
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

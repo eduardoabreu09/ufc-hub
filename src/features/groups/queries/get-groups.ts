@@ -1,14 +1,15 @@
 import "server-only";
 
 import { prisma } from "@/lib/prisma";
-import { Group } from "@/types/group";
 import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
+import { Result } from "@/lib/results";
+import { GroupDTO } from "@/types/group";
 
-export async function getGroups(): Promise<Group[]> {
-  const userId = await getCurrentUserId();
+export async function getGroups(): Promise<Result<GroupDTO[]>> {
+  const userIdResult = await getCurrentUserId();
 
-  if (!userId) {
-    return [];
+  if (userIdResult.error && userIdResult.isFailure) {
+    return Result.failure(userIdResult.error);
   }
 
   try {
@@ -23,17 +24,11 @@ export async function getGroups(): Promise<Group[]> {
         },
       },
       */
-      include: {
-        createdBy: {
-          select: { id: true, name: true, email: true },
-        },
-        users: {
-          include: {
-            user: {
-              select: { id: true, name: true, email: true, course: true },
-            },
-          },
-        },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        createdAt: true,
         _count: {
           select: { users: true, messages: true },
         },
@@ -41,9 +36,8 @@ export async function getGroups(): Promise<Group[]> {
       orderBy: { createdAt: "desc" },
     });
 
-    return groups;
+    return Result.success(groups);
   } catch (error) {
-    console.error("Failed to fetch groups:", error);
-    return [];
+    return Result.failure("Erro ao buscar os grupos.");
   }
 }

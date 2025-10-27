@@ -22,18 +22,16 @@ import { toast } from "sonner";
 export function CreateGroupDialog() {
   const [open, setOpen] = useState(false);
   const [state, formAction, isPending] = useActionState(createGroup, undefined);
-  const formRef = useRef<HTMLFormElement>(null);
 
   const previousStateRef = useRef(state);
 
   useEffect(() => {
-    if (state?.success && state !== previousStateRef.current) {
+    if (state?.isSuccess && state !== previousStateRef.current) {
       toast.success(state.message);
       setOpen(false);
-      formRef.current?.reset();
     }
     if (
-      !state?.success &&
+      !state?.isSuccess &&
       state !== previousStateRef.current &&
       state?.message
     ) {
@@ -51,7 +49,7 @@ export function CreateGroupDialog() {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
-        <form action={formAction} ref={formRef}>
+        <form action={formAction}>
           <DialogHeader>
             <DialogTitle>Criar Novo Grupo</DialogTitle>
             <DialogDescription>

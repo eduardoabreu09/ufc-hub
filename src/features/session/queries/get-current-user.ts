@@ -4,25 +4,29 @@ import { cookies } from "next/headers";
 import { decrypt } from "@/lib/session";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
+import { UserDTO } from "@/types/user";
+import { Result } from "@/lib/results";
 
-export const getCurrentUser = cache(async () => {
-  const session = (await cookies()).get("session")?.value;
-  const payload = await decrypt(session);
+export const getCurrentUser = cache(async (): Promise<Result<UserDTO>> => {
+  const cookie = (await cookies()).get("session")?.value;
+  const session = await decrypt(cookie);
 
-  if (!payload?.user?.id) {
-    //TODO: redict to login and clear cookies
-    return null;
+  if (!session?.user) {
+    return Result.failure("Usuário não autenticado.");
   }
 
-  const user = prisma.user.findUnique({
-    where: { id: payload.user.id },
-    select: { id: true, name: true, email: true, course: true },
-  });
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { id: true, name: true, email: true, course: true },
+    });
 
-  if (!user) {
-    //TODO: redict to login and clear cookies
-    return null;
+    if (!user) {
+      //TODO: redict to login and clear cookies
+      return Result.failure("Usuário não encontrado.");
+    }
+    return Result.success(user);
+  } catch (error) {
+    return Result.failure("Erro no servidor.");
   }
-
-  return user;
 });

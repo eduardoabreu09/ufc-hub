@@ -14,14 +14,16 @@ export async function createGroup(
   state: CreateGroupFormState | undefined,
   formData: FormData
 ): Promise<CreateGroupFormState> {
-  const currentUser = await getCurrentUser();
+  const userResult = await getCurrentUser();
 
-  if (!currentUser) {
+  if (userResult.isFailure) {
     return {
-      message: "Você precisa estar logado para criar um grupo.",
-      success: false,
+      message: userResult.error,
+      isSuccess: false,
     };
   }
+
+  const currentUser = userResult.getValue();
 
   const validatedFields = CreateGroupSchema.safeParse({
     name: formData.get("name"),
@@ -35,7 +37,7 @@ export async function createGroup(
         .errors.map((e) => e)
         .join(", "),
       errors: z.flattenError(validatedFields.error).fieldErrors,
-      success: false,
+      isSuccess: false,
     };
   }
 
@@ -60,12 +62,12 @@ export async function createGroup(
 
     return {
       message: "Grupo criado com sucesso.",
-      success: true,
+      isSuccess: true,
     };
   } catch (error) {
     return {
       message: "Erro inesperado no servidor. Tente novamente.",
-      success: false,
+      isSuccess: false,
     };
   }
 }

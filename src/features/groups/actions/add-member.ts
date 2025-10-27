@@ -6,67 +6,71 @@ import {
 } from "@/features/groups/form-schema/add-member";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { getCurrentUser } from "@/features/session/queries/get-current-user";
 import { GroupRole } from "@prisma/client";
 import { z } from "zod";
+import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
 
 export async function addMember(
   groupId: number,
   state: AddMemberFormState | undefined,
   formData: FormData
 ): Promise<AddMemberFormState> {
-  const currentUser = await getCurrentUser();
+  const userIdResult = await getCurrentUserId();
 
-  if (!currentUser) {
+  if (userIdResult.isFailure) {
     return {
-      message: "Você precisa estar logado para adicionar membros.",
-      success: false,
+      message: userIdResult.error,
+      isSuccess: false,
     };
   }
 
-  const userGroup = await prisma.userGroup.findUnique({
-    where: {
-      userId_groupId: {
-        userId: currentUser.id,
-        groupId: groupId,
-      },
-    },
-  });
-
-  if (!userGroup || userGroup.role !== GroupRole.ADMIN) {
-    return {
-      message: "Você não tem permissão para adicionar membros a este grupo.",
-      success: false,
-    };
-  }
-
-  const validatedFields = AddMemberSchema.safeParse({
-    email: formData.get("email"),
-    role: formData.get("role") || GroupRole.USER,
-  });
-
-  if (!validatedFields.success) {
-    return {
-      message: z
-        .treeifyError(validatedFields.error)
-        .errors.map((e) => e)
-        .join(", "),
-      errors: z.flattenError(validatedFields.error).fieldErrors,
-      success: false,
-    };
-  }
+  const currentUserId = userIdResult.getValue();
 
   try {
+    const userGroup = await prisma.userGroup.findUnique({
+      where: {
+        userId_groupId: {
+          userId: currentUserId,
+          groupId: groupId,
+        },
+      },
+      select: { role: true },
+    });
+
+    if (!userGroup || userGroup.role !== GroupRole.ADMIN) {
+      return {
+        message: "Você não tem permissão para adicionar membros a este grupo.",
+        isSuccess: false,
+      };
+    }
+
+    const validatedFields = AddMemberSchema.safeParse({
+      email: formData.get("email"),
+      role: formData.get("role") || GroupRole.USER,
+    });
+
+    if (!validatedFields.success) {
+      return {
+        message: z
+          .treeifyError(validatedFields.error)
+          .errors.map((e) => e)
+          .join(", "),
+        errors: z.flattenError(validatedFields.error).fieldErrors,
+        isSuccess: false,
+      };
+    }
+
     const { email, role } = validatedFields.data;
 
     const userToAdd = await prisma.user.findUnique({
       where: { email },
+      select: { id: true },
     });
 
     if (!userToAdd) {
       return {
         message: "Email não encontrado.",
-        success: false,
+        isSuccess: false,
       };
     }
 
@@ -82,7 +86,7 @@ export async function addMember(
     if (existingMember) {
       return {
         message: "Usuário já é membro do grupo.",
-        success: false,
+        isSuccess: false,
       };
     }
 
@@ -98,12 +102,12 @@ export async function addMember(
 
     return {
       message: "Membro adicionado com sucesso.",
-      success: true,
+      isSuccess: true,
     };
   } catch (error) {
     return {
       message: "Erro inesperado no servidor. Tente novamente.",
-      success: false,
+      isSuccess: false,
     };
   }
 }

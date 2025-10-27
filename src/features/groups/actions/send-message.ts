@@ -4,7 +4,7 @@ import {
   SendMessageSchema,
   SendMessageFormState,
 } from "@/features/groups/form-schema/send-message";
-import { getCurrentUser } from "@/features/session/queries/get-current-user";
+import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -14,67 +14,70 @@ export async function sendMessage(
   state: SendMessageFormState | undefined,
   formData: FormData
 ): Promise<SendMessageFormState> {
-  const currentUser = await getCurrentUser();
+  const userIdResult = await getCurrentUserId();
 
-  if (!currentUser) {
+  if (userIdResult.isFailure) {
     return {
-      message: "Você precisa estar logado para enviar mensagens.",
-      success: false,
+      message: userIdResult.error,
+      isSuccess: false,
     };
   }
 
-  const userGroup = await prisma.userGroup.findUnique({
-    where: {
-      userId_groupId: {
-        userId: currentUser.id,
-        groupId: groupId,
-      },
-    },
-  });
-
-  if (!userGroup) {
-    return {
-      message: "Você precisa ser membro deste grupo para enviar mensagens.",
-      success: false,
-    };
-  }
-
-  const validatedFields = SendMessageSchema.safeParse({
-    content: formData.get("content"),
-  });
-
-  if (!validatedFields.success) {
-    return {
-      message: z
-        .treeifyError(validatedFields.error)
-        .errors.map((e) => e)
-        .join(", "),
-      errors: z.flattenError(validatedFields.error).fieldErrors,
-      success: false,
-    };
-  }
+  const currentUserId = userIdResult.getValue();
 
   try {
+    const userGroup = await prisma.userGroup.findUnique({
+      where: {
+        userId_groupId: {
+          userId: currentUserId,
+          groupId: groupId,
+        },
+      },
+      select: { userId: true },
+    });
+
+    if (!userGroup) {
+      return {
+        message: "Você precisa ser membro deste grupo para enviar mensagens.",
+        isSuccess: false,
+      };
+    }
+
+    const validatedFields = SendMessageSchema.safeParse({
+      content: formData.get("content"),
+    });
+
+    if (!validatedFields.success) {
+      return {
+        message: z
+          .treeifyError(validatedFields.error)
+          .errors.map((e) => e)
+          .join(", "),
+        errors: z.flattenError(validatedFields.error).fieldErrors,
+        isSuccess: false,
+      };
+    }
+
     const { content } = validatedFields.data;
 
     await prisma.message.create({
       data: {
         body: content,
-        senderId: currentUser.id,
+        senderId: currentUserId,
         groupId: groupId,
       },
     });
 
-    revalidatePath(`/home/group/${groupId}`);
+    revalidatePath("/home/group/[id]", "page");
 
     return {
       message: "Mensagem enviada com sucesso.",
-      success: true,
+      isSuccess: true,
     };
   } catch (error) {
     return {
       message: "Erro inesperado no servidor. Tente novamente.",
-      success: false,
+      isSuccess: false,
     };
   }
 }

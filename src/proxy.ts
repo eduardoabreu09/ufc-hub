@@ -6,7 +6,23 @@ import { decrypt } from "@/lib/session";
 const protectedRoutes = ["/home"];
 const publicRoutes = ["/login", "/signup", "/"];
 
-export default async function middleware(req: NextRequest) {
+function isServerActionRequest(req: NextRequest): boolean {
+  if (req.method !== "POST") {
+    return false;
+  }
+
+  if (req.headers.has("next-action")) {
+    return true;
+  }
+
+  return req.nextUrl.searchParams.has("__nextAction");
+}
+
+export default async function proxy(req: NextRequest) {
+  if (isServerActionRequest(req)) {
+    return NextResponse.next();
+  }
+
   // 2. Check if the current route is protected or public
   const path = req.nextUrl.pathname;
   const isProtectedRoute = protectedRoutes.some((route) =>
@@ -38,5 +54,5 @@ export default async function middleware(req: NextRequest) {
 
 // Routes Middleware should not run on
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$).*)"],
 };

@@ -36,7 +36,13 @@ export default async function UserDropdown() {
 }
 
 async function UserLoadedDropdown() {
-  const user = await getCurrentUser();
+  const userResult = await getCurrentUser();
+
+  let user = { name: "Usuário", email: "Usuário" };
+
+  if (userResult.isSuccess) {
+    user = userResult.getValue();
+  }
 
   return (
     <DropdownMenu>

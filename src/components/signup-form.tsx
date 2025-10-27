@@ -1,15 +1,35 @@
 "use client";
 
 import { signup } from "@/features/session/actions/signup";
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Loader2, University } from "lucide-react";
+import { toast } from "sonner";
+import { redirect } from "next/navigation";
 
 export default function SignupForm() {
   const [state, action, isPending] = useActionState(signup, undefined);
+
+  const previousStateRef = useRef(state);
+
+  useEffect(() => {
+    if (state?.isSuccess && state !== previousStateRef.current) {
+      toast.success(state.message);
+      redirect("/home");
+    }
+    if (
+      !state?.isSuccess &&
+      state !== previousStateRef.current &&
+      state?.message
+    ) {
+      toast.error(state.message);
+    }
+    previousStateRef.current = state;
+  }, [state]);
+
   return (
     <div className="flex flex-col gap-6">
       <Card>
