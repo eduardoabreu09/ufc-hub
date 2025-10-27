@@ -7,26 +7,39 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, SendIcon } from "lucide-react";
-import { Group } from "@/types/group";
 import { sendMessage } from "@/features/groups/actions/send-message";
 import { useMessages } from "@/lib/fetcher";
+import { toast } from "sonner";
 
 interface GroupChatProps {
-  group: Group;
+  groupId: number;
   currentUserId: number | null;
 }
 
-export function GroupChat({ group, currentUserId }: GroupChatProps) {
+export function GroupChat({ groupId, currentUserId }: GroupChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [state, formAction, isPending] = useActionState(
-    sendMessage.bind(null, group.id),
+    sendMessage.bind(null, groupId),
     undefined
   );
-  const { messages, isLoading, isError } = useMessages(group.id);
+  const { messages, isLoading } = useMessages(groupId);
+
+  const previousStateRef = useRef(state);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    if (
+      !state?.isSuccess &&
+      state !== previousStateRef.current &&
+      state?.message
+    ) {
+      toast.error(state.message);
+    }
+    previousStateRef.current = state;
+  }, [state]);
 
   function scrollToBottom() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

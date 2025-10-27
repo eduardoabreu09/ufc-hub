@@ -4,30 +4,37 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
 import { revalidatePath } from "next/cache";
 import { GroupRole } from "@prisma/client";
+import { GeneralFormState } from "@/types/form";
 
-export async function removeMember(groupId: number, memberUserId: number) {
+export async function removeMember(
+  groupId: number,
+  memberUserId: number
+): Promise<GeneralFormState> {
+  const userIdResult = await getCurrentUserId();
+
+  if (userIdResult.isFailure) {
+    return {
+      message: userIdResult.error,
+      isSuccess: false,
+    };
+  }
+
+  const currentUserId = userIdResult.getValue();
+
   try {
-    const currentUserId = await getCurrentUserId();
-
-    if (!currentUserId) {
-      return {
-        success: false,
-        message: "Você precisa estar logado para remover membros.",
-      };
-    }
-
     const currentUserGroup = await prisma.userGroup.findFirst({
       where: {
         groupId: groupId,
         userId: currentUserId,
         role: GroupRole.ADMIN,
       },
+      select: { userId: true },
     });
 
     if (!currentUserGroup) {
       return {
-        success: false,
         message: "Você não tem permissão para remover membros deste grupo.",
+        isSuccess: false,
       };
     }
 
@@ -36,29 +43,25 @@ export async function removeMember(groupId: number, memberUserId: number) {
         groupId: groupId,
         userId: memberUserId,
       },
+      select: {
+        userId: true,
+        role: true,
+        group: { select: { creatorId: true } },
+      },
     });
 
     if (!memberToRemove) {
       return {
-        success: false,
         message: "Usuário não encontrado no grupo.",
+        isSuccess: false,
       };
     }
 
-    if (memberUserId === currentUserId) {
-      const adminCount = await prisma.userGroup.count({
-        where: {
-          groupId: groupId,
-          role: GroupRole.ADMIN,
-        },
-      });
-
-      if (adminCount <= 1) {
-        return {
-          success: false,
-          message: "Você não pode se remover sendo o único admin do grupo.",
-        };
-      }
+    if (memberUserId === memberToRemove.group.creatorId) {
+      return {
+        message: "Você não pode remover o criador do grupo.",
+        isSuccess: false,
+      };
     }
 
     await prisma.userGroup.delete({
@@ -70,16 +73,16 @@ export async function removeMember(groupId: number, memberUserId: number) {
       },
     });
 
-    revalidatePath(`/home/group/${groupId}`);
+    revalidatePath("/home/group/[id]", "page");
 
     return {
-      success: true,
       message: "Membro removido com sucesso.",
+      isSuccess: true,
     };
   } catch (error) {
     return {
       message: "Erro inesperado no servidor. Tente novamente.",
-      success: false,
+      isSuccess: false,
     };
   }
 }

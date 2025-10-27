@@ -7,15 +7,15 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { UsersIcon, MessageCircleIcon, CalendarIcon } from "lucide-react";
-import { Group } from "@/types/group";
 import Link from "next/link";
+import { GroupDTO } from "@/types/group";
 
 interface GroupCardProps {
-  group: Group;
+  group: GroupDTO;
 }
 
 export function GroupCard({ group }: GroupCardProps) {
-  const memberCount = group._count?.users || group.users.length;
+  const memberCount = group._count?.users;
 
   return (
     <Card className="hover:shadow-lg transition-shadow duration-200">

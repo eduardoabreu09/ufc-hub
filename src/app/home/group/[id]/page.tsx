@@ -99,12 +99,12 @@ function LoadingChat() {
 }
 
 async function GroupNameHeader({ groupId }: { groupId: number }) {
-  const [group, currentUserId] = await Promise.all([
+  const [groupResult, userIdResult] = await Promise.all([
     getGroupById(groupId),
     getCurrentUserId(),
   ]);
 
-  if (!group) {
+  if (groupResult.isFailure || userIdResult.isFailure) {
     // TODO: Redirect to 404 page
     return (
       <div className="container mx-auto px-4 py-8">
@@ -112,6 +112,8 @@ async function GroupNameHeader({ groupId }: { groupId: number }) {
       </div>
     );
   }
+  const group = groupResult.getValue();
+  const currentUserId = userIdResult.getValue();
 
   const isAdmin = group.users.some(
     (ug) => ug.userId === currentUserId && ug.role === GroupRole.ADMIN
@@ -193,12 +195,9 @@ async function GroupNameHeader({ groupId }: { groupId: number }) {
 }
 
 async function GroupBody({ groupId }: { groupId: number }) {
-  const [group, currentUserId] = await Promise.all([
-    getGroupById(groupId),
-    getCurrentUserId(),
-  ]);
+  const userIdResult = await getCurrentUserId();
 
-  if (!group) {
+  if (userIdResult.isFailure) {
     // TODO: Redirect to 404 page
     return (
       <div className="container mx-auto px-4 py-8">
@@ -206,6 +205,7 @@ async function GroupBody({ groupId }: { groupId: number }) {
       </div>
     );
   }
+  const currentUserId = userIdResult.getValue();
 
-  return <GroupChat group={group} currentUserId={currentUserId} />;
+  return <GroupChat groupId={groupId} currentUserId={currentUserId} />;
 }

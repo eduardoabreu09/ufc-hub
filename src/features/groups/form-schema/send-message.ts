@@ -1,3 +1,4 @@
+import { GeneralFormState } from "@/types/form";
 import { z } from "zod";
 
 export const SendMessageSchema = z.object({
@@ -8,10 +9,8 @@ export const SendMessageSchema = z.object({
     .max(1000, { message: "Limite máximo de 1000 caracteres" }),
 });
 
-export type SendMessageFormState = {
-  message?: string;
+export interface SendMessageFormState extends GeneralFormState {
   errors?: {
     content?: string[];
   };
-  success?: boolean;
-};
+}

@@ -36,18 +36,16 @@ export default function AddMemberDialog({ groupId }: AddMemberDialogProps) {
     addMember.bind(null, groupId),
     undefined
   );
-  const formRef = useRef<HTMLFormElement>(null);
 
   const previousStateRef = useRef(state);
 
   useEffect(() => {
-    if (state?.success && state !== previousStateRef.current) {
+    if (state?.isSuccess && state !== previousStateRef.current) {
       toast.success(state.message);
       setOpen(false);
-      formRef.current?.reset();
     }
     if (
-      !state?.success &&
+      !state?.isSuccess &&
       state !== previousStateRef.current &&
       state?.message
     ) {

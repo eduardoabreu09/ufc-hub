@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Loader2, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface DeleteGroupDialogProps {
   groupId: number;
@@ -26,20 +27,17 @@ export default function DeleteGroupDialog({
 }: DeleteGroupDialogProps) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const handleDelete = () => {
     startTransition(async () => {
-      try {
-        const result = await deleteGroup(groupId);
-
-        if (result.success) {
-          toast.success(result.message);
-          setOpen(false);
-        } else {
-          toast.error(result.message);
-        }
-      } catch (error) {
-        toast.error("Erro inesperado ao deletar grupo.");
+      const result = await deleteGroup(groupId);
+      if (result.isSuccess) {
+        toast.success(result.message);
+        router.push("/home/group");
+      } else {
+        toast.error(result.message);
+        setOpen(false);
       }
     });
   };
@@ -56,23 +54,25 @@ export default function DeleteGroupDialog({
         <DialogHeader>
           <DialogTitle>Deletar Grupo</DialogTitle>
         </DialogHeader>
-        <DialogDescription className="flex flex-col gap-2">
-          <p>
-            Tem certeza que deseja deletar o grupo{" "}
-            <strong>
-              {`"`}
-              {groupName}
-              {`"`}
-            </strong>
-            ?
-          </p>
-          <p className="text-red-600 font-medium">
-            Esta ação é irreversível e irá:
-          </p>
-          <div className="flex flex-col text-red-600 gap-1">
-            <p>- Remover todos os membros do grupo</p>
-            <p>- Deletar todas as mensagens do grupo</p>
-            <p>- Excluir permanentemente o grupo</p>
+        <DialogDescription asChild>
+          <div className="flex flex-col gap-2">
+            <p>
+              Tem certeza que deseja deletar o grupo{" "}
+              <strong>
+                {`"`}
+                {groupName}
+                {`"`}
+              </strong>
+              ?
+            </p>
+            <p className="text-red-600 font-medium">
+              Esta ação é irreversível e irá:
+            </p>
+            <div className="flex flex-col text-red-600 gap-1">
+              <p>- Remover todos os membros do grupo</p>
+              <p>- Deletar todas as mensagens do grupo</p>
+              <p>- Excluir permanentemente o grupo</p>
+            </div>
           </div>
         </DialogDescription>
         <DialogFooter>

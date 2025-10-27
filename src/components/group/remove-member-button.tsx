@@ -31,18 +31,13 @@ export default function RemoveMemberButton({
 
   const handleDelete = () => {
     startTransition(async () => {
-      try {
-        const result = await removeMember(groupId, memberId);
-
-        if (result.success) {
-          toast.success(result.message);
-          setOpen(false);
-        } else {
-          toast.error(result.message);
-        }
-      } catch (error) {
-        toast.error("Erro inesperado ao deletar grupo.");
+      const result = await removeMember(groupId, memberId);
+      if (result.isSuccess) {
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
       }
+      setOpen(false);
     });
   };
 

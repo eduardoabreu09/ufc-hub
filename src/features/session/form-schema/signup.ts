@@ -1,3 +1,4 @@
+import { GeneralFormState } from "@/types/form";
 import { z } from "zod";
 
 export const SignupFormSchema = z.object({
@@ -18,13 +19,11 @@ export const SignupFormSchema = z.object({
     .trim(),
 });
 
-export type SignUpFormState = {
+export interface SignUpFormState extends GeneralFormState {
   errors?: {
     name?: string[];
     course?: string[];
     email?: string[];
     password?: string[];
   };
-  message?: string;
-  payload?: FormData;
-};
+}

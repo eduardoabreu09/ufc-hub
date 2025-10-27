@@ -12,8 +12,3 @@ export const LoginSchema = z.object({
     })
     .trim(),
 });
-
-export type LoginFormState = {
-  message?: string;
-  payload?: FormData;
-};

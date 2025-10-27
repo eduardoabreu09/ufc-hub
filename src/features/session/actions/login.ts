@@ -1,18 +1,15 @@
 "use server";
 
-import {
-  LoginFormState,
-  LoginSchema,
-} from "@/features/session/form-schema/login";
+import { LoginSchema } from "@/features/session/form-schema/login";
 import { prisma } from "@/lib/prisma";
 import { createSession } from "@/lib/session";
-import { redirect } from "next/navigation";
 import bcrypt from "bcrypt";
+import { GeneralFormState } from "@/types/form";
 
 export async function login(
-  state: LoginFormState | undefined,
+  state: GeneralFormState | undefined,
   formData: FormData
-): Promise<LoginFormState> {
+): Promise<GeneralFormState> {
   const validatedFields = LoginSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -22,31 +19,45 @@ export async function login(
     return {
       message: "Senha inválida",
       payload: formData,
+      isSuccess: false,
     };
   }
 
   const { email, password } = validatedFields.data;
 
-  const user = await prisma.user.findUnique({
-    where: { email },
-  });
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
 
-  if (!user) {
+    if (!user) {
+      return {
+        message: "Email ou senha incorretos",
+        payload: formData,
+        isSuccess: false,
+      };
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordCorrect) {
+      return {
+        message: "Email ou senha incorretos",
+        payload: formData,
+        isSuccess: false,
+      };
+    }
+    await createSession(user.id, user.email);
     return {
-      message: "Email ou senha incorretos",
+      message: "Login realizado com sucesso!",
       payload: formData,
+      isSuccess: true,
+    };
+  } catch (error) {
+    return {
+      message: "Erro no servidor.",
+      payload: formData,
+      isSuccess: false,
     };
   }
-
-  const isPasswordCorrect = await bcrypt.compare(password, user.password);
-
-  if (!isPasswordCorrect) {
-    return {
-      message: "Email ou senha incorretos",
-      payload: formData,
-    };
-  }
-
-  await createSession(user.id, user.email);
-  redirect("/home");
 }
