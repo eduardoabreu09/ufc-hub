@@ -7,7 +7,6 @@ import {
 import { prisma } from "@/lib/prisma";
 import { createSession } from "@/lib/session";
 import bcrypt from "bcrypt";
-import { redirect } from "next/navigation";
 import z from "zod";
 
 export async function signup(
@@ -29,40 +28,47 @@ export async function signup(
         .errors.map((e) => e)
         .join(", "),
       payload: formData,
+      isSuccess: false,
     };
   }
 
   const { name, course, email, password } = validatedFields.data;
 
-  const checkSameEmail = await prisma.user.findFirst({
-    where: { email },
-  });
+  try {
+    const checkSameEmail = await prisma.user.findFirst({
+      where: { email },
+    });
 
-  if (checkSameEmail) {
+    if (checkSameEmail) {
+      return {
+        errors: { email: ["Email já cadastrado"] },
+        payload: formData,
+        isSuccess: false,
+      };
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        name,
+        course,
+        email,
+        password: hashedPassword,
+      },
+    });
+
+    await createSession(user.id, user.email);
     return {
-      errors: { email: ["Email já cadastrado"] },
+      message: "Cadastro realizado com sucesso!",
       payload: formData,
+      isSuccess: true,
+    };
+  } catch (error) {
+    return {
+      message: "Erro no servidor.",
+      payload: formData,
+      isSuccess: false,
     };
   }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = await prisma.user.create({
-    data: {
-      name,
-      course,
-      email,
-      password: hashedPassword,
-    },
-  });
-
-  if (!user) {
-    return {
-      message: "An error occurred while creating your account.",
-      payload: formData,
-    };
-  }
-
-  await createSession(user.id, user.email);
-  redirect("/home");
 }

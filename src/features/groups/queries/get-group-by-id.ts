@@ -1,17 +1,17 @@
 import "server-only";
 
 import { prisma } from "@/lib/prisma";
-import { Group } from "@/types/group";
 import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
 import { cache } from "react";
+import { GroupMessagesDTO } from "@/types/group";
+import { Result } from "@/lib/results";
 
 export const getGroupById = cache(
-  async (groupId: number): Promise<Group | null> => {
-    const userId = await getCurrentUserId();
+  async (groupId: number): Promise<Result<GroupMessagesDTO>> => {
+    const userIdResult = await getCurrentUserId();
 
-    if (!userId) {
-      //TODO: Redirect to login page clear cookies or show a message
-      return null;
+    if (userIdResult.error && userIdResult.isFailure) {
+      return Result.failure(userIdResult.error);
     }
 
     try {
@@ -27,10 +27,14 @@ export const getGroupById = cache(
           },
           */
         },
-
-        include: {
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          createdAt: true,
+          creatorId: true,
           createdBy: {
-            select: { id: true, name: true, email: true },
+            select: { id: true, name: true, email: true, course: true },
           },
           users: {
             include: {
@@ -45,10 +49,13 @@ export const getGroupById = cache(
         },
       });
 
-      return group;
+      if (!group) {
+        return Result.failure("Grupo não encontrado.");
+      }
+
+      return Result.success(group);
     } catch (error) {
-      console.error("Failed to fetch groups:", error);
-      return null;
+      return Result.failure("Erro ao buscar o grupo.");
     }
   }
 );

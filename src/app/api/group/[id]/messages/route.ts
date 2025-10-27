@@ -9,9 +9,13 @@ export async function GET(
     const { id } = await params;
     const groupId = parseInt(id);
 
-    const messages = await getGroupMessages(groupId);
+    const messagesResult = await getGroupMessages(groupId);
 
-    return NextResponse.json(messages);
+    if (messagesResult.isFailure) {
+      throw new Error("Failed to fetch messages");
+    }
+
+    return NextResponse.json(messagesResult.getValue());
   } catch (error) {
     console.error("Error fetching group messages:", error);
     return NextResponse.json(

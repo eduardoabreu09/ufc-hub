@@ -2,13 +2,16 @@ import "server-only";
 
 import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
 import { prisma } from "@/lib/prisma";
+import { MessageDTO } from "@/types/message";
+import { Result } from "@/lib/results";
 
-export async function getGroupMessages(groupId: number) {
-  const userId = await getCurrentUserId();
+export async function getGroupMessages(
+  groupId: number
+): Promise<Result<MessageDTO[]>> {
+  const userIdResult = await getCurrentUserId();
 
-  if (!userId) {
-    //TODO: Redirect to login page clear cookies or show a message
-    return [];
+  if (userIdResult.error && userIdResult.isFailure) {
+    return Result.failure(userIdResult.error);
   }
 
   try {
@@ -32,18 +35,20 @@ export async function getGroupMessages(groupId: number) {
       where: {
         groupId: groupId,
       },
-      include: {
-        sentBy: {
-          select: { id: true, name: true, email: true, course: true },
-        },
+      select: {
+        id: true,
+        body: true,
+        groupId: true,
+        createdAt: true,
+        senderId: true,
+        sentBy: { select: { id: true, name: true, email: true, course: true } },
       },
       orderBy: { createdAt: "asc" },
       take: 100, // Limit to last 100 messages
     });
 
-    return messages;
+    return Result.success(messages);
   } catch (error) {
-    console.error("Failed to fetch group messages:", error);
-    return [];
+    return Result.failure("Erro ao buscar as mensagens do grupo.");
   }
 }

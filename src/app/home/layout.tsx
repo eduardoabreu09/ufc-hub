@@ -35,7 +35,9 @@ export default function HomeLayout({
           </div>
           <div className="flex gap-3 ml-auto">
             <FeedbackDialog />
-            <UserDropdown />
+            {
+              // <UserDropdown />
+            }
           </div>
         </header>
         {children}
