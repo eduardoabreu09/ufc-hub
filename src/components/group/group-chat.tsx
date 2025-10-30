@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, SendIcon } from "lucide-react";
 import { sendMessage } from "@/features/groups/actions/send-message";
-import { useMessages } from "@/lib/fetcher";
+import { useMessages } from "@/hooks/use-messages";
 import { toast } from "sonner";
 
 interface GroupChatProps {
