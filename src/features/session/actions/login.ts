@@ -17,7 +17,7 @@ export async function login(
 
   if (!validatedFields.success) {
     return {
-      message: "Senha inválida",
+      message: "Email ou senha incorretos",
       payload: formData,
       isSuccess: false,
     };

@@ -22,11 +22,8 @@ export async function signup(
 
   if (!validatedFields.success) {
     return {
+      message: validatedFields.error.issues[0].message,
       errors: z.flattenError(validatedFields.error).fieldErrors,
-      message: z
-        .treeifyError(validatedFields.error)
-        .errors.map((e) => e)
-        .join(", "),
       payload: formData,
       isSuccess: false,
     };

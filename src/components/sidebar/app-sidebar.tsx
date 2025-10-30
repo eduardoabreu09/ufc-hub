@@ -20,6 +20,7 @@ import { useActionState, useCallback, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { CalendarDays, Home, LogOut, Settings, Users } from "lucide-react";
+import { useSession } from "@/context/session-context";
 
 // This is sample data.
 const data = {
