@@ -1,4 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+"use client";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,40 +10,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getCurrentUser } from "@/features/session/queries/get-current-user";
 
 import { Settings } from "lucide-react";
-import { Suspense } from "react";
-import SignOutButton from "./sign-out-button";
+import SignOutButton from "../ui/sign-out-button";
+import { useSession } from "@/context/session-context";
 
-export default async function UserDropdown() {
-  return (
-    <Suspense
-      fallback={
-        <Avatar className="size-8">
-          <AvatarImage
-            src="/default-avatar.jpg"
-            width={32}
-            height={32}
-            alt="Profile image"
-          />
-          <AvatarFallback>Oi</AvatarFallback>
-        </Avatar>
-      }
-    >
-      <UserLoadedDropdown />
-    </Suspense>
-  );
-}
-
-async function UserLoadedDropdown() {
-  const userResult = await getCurrentUser();
-
-  let user = { name: "Usuário", email: "Usuário" };
-
-  if (userResult.isSuccess) {
-    user = userResult.getValue();
-  }
+export default function UserDropdown() {
+  const { user } = useSession();
 
   return (
     <DropdownMenu>

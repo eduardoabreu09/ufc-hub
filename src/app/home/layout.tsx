@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { Separator } from "@radix-ui/react-separator";
-import { AppSidebar } from "@/components/ui/app-sidebar";
-import FeedbackDialog from "@/components/ui/feedback-dialog";
-import UserDropdown from "@/components/ui/user-dropdown";
-import { AppBreadcrumb } from "@/components/app-breadcrumb";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { SessionProvider } from "@/context/session-context";
+import AppHeader from "@/components/header/app-header";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -21,27 +15,14 @@ export default function HomeLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset className="overflow-hidden px-4 md:px-6 lg:px-8">
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b">
-          <div className="flex flex-1 items-center gap-2 px-3">
-            <SidebarTrigger className="-ms-4" />
-            <Separator
-              orientation="vertical"
-              className="mr-2 data-[orientation=vertical]:h-4"
-            />
-            <AppBreadcrumb />
-          </div>
-          <div className="flex gap-3 ml-auto">
-            <FeedbackDialog />
-            {
-              // <UserDropdown />
-            }
-          </div>
-        </header>
-        {children}
-      </SidebarInset>
-    </SidebarProvider>
+    <SessionProvider>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset className="overflow-hidden px-4 md:px-6 lg:px-8">
+          <AppHeader />
+          {children}
+        </SidebarInset>
+      </SidebarProvider>
+    </SessionProvider>
   );
 }

@@ -51,10 +51,7 @@ export async function addMember(
 
     if (!validatedFields.success) {
       return {
-        message: z
-          .treeifyError(validatedFields.error)
-          .errors.map((e) => e)
-          .join(", "),
+        message: validatedFields.error.issues[0].message,
         errors: z.flattenError(validatedFields.error).fieldErrors,
         isSuccess: false,
       };
