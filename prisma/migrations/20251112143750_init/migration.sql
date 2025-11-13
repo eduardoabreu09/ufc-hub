@@ -46,10 +46,11 @@ CREATE TABLE "Event" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "title" TEXT NOT NULL,
-    "description" TEXT,
-    "body" TEXT,
-    "location" TEXT,
-    "eventDate" TIMESTAMP(3),
+    "description" TEXT NOT NULL,
+    "body" TEXT NOT NULL,
+    "location" TEXT NOT NULL,
+    "eventDate" TIMESTAMP(3) NOT NULL,
+    "imageUrl" TEXT,
     "creatorId" INTEGER NOT NULL,
     "groupId" INTEGER,
 
@@ -95,31 +96,23 @@ CREATE TABLE "BlogPost" (
 );
 
 -- CreateTable
-CREATE TABLE "Tag" (
-    "id" SERIAL NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+CREATE TABLE "BlogTag" (
+    "blogId" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
 
-    CONSTRAINT "Tag_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "BlogTag_pkey" PRIMARY KEY ("blogId","name")
 );
 
 -- CreateTable
-CREATE TABLE "_BlogPostToTag" (
-    "A" INTEGER NOT NULL,
-    "B" INTEGER NOT NULL,
+CREATE TABLE "EventTag" (
+    "eventId" INTEGER NOT NULL,
+    "name" TEXT NOT NULL,
 
-    CONSTRAINT "_BlogPostToTag_AB_pkey" PRIMARY KEY ("A","B")
+    CONSTRAINT "EventTag_pkey" PRIMARY KEY ("eventId","name")
 );
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Tag_name_key" ON "Tag"("name");
-
--- CreateIndex
-CREATE INDEX "_BlogPostToTag_B_index" ON "_BlogPostToTag"("B");
 
 -- AddForeignKey
 ALTER TABLE "Group" ADD CONSTRAINT "Group_creatorId_fkey" FOREIGN KEY ("creatorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -158,7 +151,7 @@ ALTER TABLE "Message" ADD CONSTRAINT "Message_blogPostId_fkey" FOREIGN KEY ("blo
 ALTER TABLE "BlogPost" ADD CONSTRAINT "BlogPost_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_BlogPostToTag" ADD CONSTRAINT "_BlogPostToTag_A_fkey" FOREIGN KEY ("A") REFERENCES "BlogPost"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "BlogTag" ADD CONSTRAINT "BlogTag_blogId_fkey" FOREIGN KEY ("blogId") REFERENCES "BlogPost"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_BlogPostToTag" ADD CONSTRAINT "_BlogPostToTag_B_fkey" FOREIGN KEY ("B") REFERENCES "Tag"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "EventTag" ADD CONSTRAINT "EventTag_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "Event"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

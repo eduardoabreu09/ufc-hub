@@ -1,18 +1,50 @@
-import { GroupDTO } from "./group";
+import { Participation } from "@prisma/client";
 import { MessageDTO } from "./message";
 import { UserDTO } from "./user";
 
 export interface EventDTO {
   id: number;
-  createdAt: Date;
-  updatedAt: Date;
   title: string;
-  description?: string;
-  body?: string;
-  location?: string;
+  description: string;
+  body: string;
+  createdAt: Date;
   eventDate: Date;
-
+  location: string;
   createdBy: UserDTO;
-  group?: GroupDTO;
-  messages: MessageDTO[];
+  imageUrl: string | null;
+  participations: EventPaticipationSimpleDTO[];
+  tags: EventTagDTO[];
+  _count?: {
+    participations: number;
+  };
+}
+
+export interface EventTagDTO {
+  name: string;
+}
+
+export interface EventPaticipationSimpleDTO {
+  userId: number;
+  participation: Participation;
+}
+
+export interface EventMessageDTO {
+  id: number;
+  title: string;
+  description: string | null;
+  body: string | null;
+  createdAt: Date;
+  eventDate: Date | null;
+  location: string | null;
+  createdBy: UserDTO;
+
+  messages?: MessageDTO[];
+  participations?: EventParticipationDTO[];
+}
+
+export interface EventParticipationDTO {
+  userId: number;
+  eventId: number;
+  participation: Participation | null;
+  user: UserDTO;
 }
