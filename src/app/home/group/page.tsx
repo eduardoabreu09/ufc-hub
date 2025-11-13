@@ -1,25 +1,21 @@
 import { CreateGroupDialog } from "@/components/group/create-group-dialog";
 import { GroupCard } from "@/components/group/group-card";
+import PageHeader from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getGroups } from "@/features/groups/queries/get-groups";
 import { Suspense } from "react";
 
 export default function GroupsPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold">Grupos</h1>
-          <p className="text-muted-foreground mt-2">
-            Crie e participe de grupos para colaborar com outros colegas
-          </p>
-        </div>
-        <CreateGroupDialog />
-      </div>
+    <PageHeader
+      title="Grupos"
+      description="Crie e participe de grupos para colaborar com outros colegas"
+      DialogComponent={CreateGroupDialog}
+    >
       <Suspense fallback={<Loading />}>
         <GroupList />
       </Suspense>
-    </div>
+    </PageHeader>
   );
 }
 
