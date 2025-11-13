@@ -69,14 +69,15 @@ model UserGroup {
 }
 
 model Event {
-    id          Int       @id @default(autoincrement())
-    createdAt   DateTime  @default(now())
-    updatedAt   DateTime  @updatedAt
+    id          Int      @id @default(autoincrement())
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
     title       String
-    description String?
-    body        String?
-    location    String?
-    eventDate   DateTime?
+    description String
+    body        String
+    location    String
+    eventDate   DateTime
+    imageUrl    String?
 
     createdBy User   @relation(fields: [creatorId], references: [id])
     creatorId Int
@@ -85,12 +86,14 @@ model Event {
 
     messages       Message[]
     participations EventParticipation[]
+
+    tags EventTag[]
 }
 
 model EventParticipation {
-    createdAt     DateTime       @default(now())
-    updatedAt     DateTime       @updatedAt
-    participation Participation?
+    createdAt     DateTime      @default(now())
+    updatedAt     DateTime      @updatedAt
+    participation Participation
 
     user    User  @relation(fields: [userId], references: [id])
     userId  Int
@@ -127,15 +130,22 @@ model BlogPost {
     author   User @relation(fields: [authorId], references: [id])
     authorId Int
 
-    tags     Tag[]
     messages Message[]
+    tags     BlogTag[]
 }
 
-model Tag {
-    id        Int      @id @default(autoincrement())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    name      String   @unique
+model BlogTag {
+    blog   BlogPost @relation(fields: [blogId], references: [id])
+    blogId Int
+    name   String
 
-    blogPosts BlogPost[]
+    @@id([blogId, name])
+}
+
+model EventTag {
+    event   Event  @relation(fields: [eventId], references: [id])
+    eventId Int
+    name    String
+
+    @@id([eventId, name])
 }
