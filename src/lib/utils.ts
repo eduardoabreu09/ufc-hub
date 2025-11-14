@@ -155,3 +155,19 @@ export function addHoursToDate(date: Date, hours: number): Date {
   result.setHours(result.getHours() + hours);
   return result;
 }
+
+export function formatDateTime(
+  value: Date | null,
+  options?: Intl.DateTimeFormatOptions
+) {
+  if (!value) {
+    return "Data não informada";
+  }
+
+  return value.toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    ...options,
+  });
+}

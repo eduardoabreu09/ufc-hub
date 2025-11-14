@@ -38,6 +38,11 @@ export const getEventsById = cache(
           createdBy: {
             select: { id: true, name: true, email: true, course: true },
           },
+          tags: {
+            select: {
+              name: true,
+            },
+          },
           participations: {
             select: {
               userId: true,
@@ -79,7 +84,7 @@ export const getEventsById = cache(
 
       return Result.success(event);
     } catch (error) {
-      return Result.failure("Erro ao buscar o grupo.");
+      return Result.failure("Erro ao buscar o evento.");
     }
   }
 );

@@ -1,9 +1,9 @@
+import Link from "next/link";
 import { UserRound, CalendarDays, ArrowRight } from "lucide-react";
-import { Card, CardFooter } from "../ui/card";
+import { Card } from "../ui/card";
 import { EventDTO } from "@/types/event";
 import { Badge } from "../ui/badge";
 import ParticipateDialog from "./participate-dialog";
-import { Participation } from "@prisma/client";
 
 interface EventCardProps {
   event: EventDTO;
@@ -27,9 +27,9 @@ export default function EventCard({ event }: EventCardProps) {
             </div>
           </div>
           <h3 className="text-xl font-semibold md:text-2xl lg:text-3xl">
-            <a target="_blank" className="hover:underline">
+            <Link href={`/home/event/${event.id}`} className="hover:underline">
               {event.title}
-            </a>
+            </Link>
           </h3>
           <p className="mt-4 text-muted-foreground md:mt-5">
             {event.description}
@@ -73,13 +73,13 @@ export default function EventCard({ event }: EventCardProps) {
           </div>
 
           <div className="mt-6 flex items-center space-x-2 md:mt-8">
-            <a
-              target="_blank"
+            <Link
+              href={`/home/event/${event.id}`}
               className="inline-flex items-center font-semibold hover:underline md:text-base"
             >
               <span>Ver Mais</span>
               <ArrowRight className="ml-2 size-4 transition-transform" />
-            </a>
+            </Link>
           </div>
         </div>
         <div className="order-first sm:order-last sm:col-span-5">
