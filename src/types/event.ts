@@ -31,20 +31,21 @@ export interface EventPaticipationSimpleDTO {
 export interface EventMessageDTO {
   id: number;
   title: string;
-  description: string | null;
-  body: string | null;
+  description: string;
+  body: string;
   createdAt: Date;
-  eventDate: Date | null;
-  location: string | null;
+  eventDate: Date;
+  location: string;
   createdBy: UserDTO;
 
   messages?: MessageDTO[];
+  tags: EventTagDTO[];
   participations?: EventParticipationDTO[];
 }
 
 export interface EventParticipationDTO {
   userId: number;
   eventId: number;
-  participation: Participation | null;
+  participation: Participation;
   user: UserDTO;
 }
