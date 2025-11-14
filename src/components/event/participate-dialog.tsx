@@ -112,7 +112,7 @@ export default function ParticipateDialog({
       <DialogTrigger asChild>{renderTriggerButton()}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Confirmar participação</DialogTitle>
+          <DialogTitle>{config.label}</DialogTitle>
           <DialogDescription>{config.description}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
