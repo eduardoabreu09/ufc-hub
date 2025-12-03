@@ -6,9 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Loader2, University } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { redirect } from "next/navigation";
+import Image from "next/image";
 
 export default function SignupForm() {
   const [state, action, isPending] = useActionState(signup, undefined);
@@ -35,9 +36,13 @@ export default function SignupForm() {
       <Card>
         <CardHeader className=" flex-row items-center justify-center">
           <div className="flex justify-center items-center mb-2">
-            <div className="bg-primary text-primary-foreground flex size-14 items-center justify-center rounded-md">
-              <University className="size-12" />
-            </div>
+            <Image
+              src={"/logo.svg"}
+              height={60}
+              width={60}
+              alt="UFC Hub Logo"
+              priority
+            />
           </div>
           <CardTitle className=" text-2xl">Crie sua conta</CardTitle>
         </CardHeader>
