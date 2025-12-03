@@ -1,7 +1,6 @@
 "use client";
 
 import { SearchForm } from "@/components/ui/search-form";
-import { TeamSwitcher } from "@/components/ui/team-switcher";
 import {
   Sidebar,
   SidebarContent,
@@ -19,60 +18,55 @@ import { logout } from "@/features/session/actions/logout";
 import { useActionState, useCallback, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { CalendarDays, Home, LogOut, Settings, Users } from "lucide-react";
-import { useSession } from "@/context/session-context";
+import {
+  Calendar1Icon,
+  CalendarDays,
+  Home,
+  LogOut,
+  Settings,
+  Users,
+} from "lucide-react";
+import Image from "next/image";
 
-// This is sample data.
-const data = {
-  teams: [
-    {
-      name: "InnovaCraft",
-      logo: "https://raw.githubusercontent.com/origin-space/origin-images/refs/heads/main/exp1/logo-01_kp2j8x.png",
-    },
-    {
-      name: "Acme Corp.",
-      logo: "https://raw.githubusercontent.com/origin-space/origin-images/refs/heads/main/exp1/logo-01_kp2j8x.png",
-    },
-    {
-      name: "Evil Corp.",
-      logo: "https://raw.githubusercontent.com/origin-space/origin-images/refs/heads/main/exp1/logo-01_kp2j8x.png",
-    },
-  ],
-  navMain: [
-    {
-      title: "Seções",
-      url: "/",
-      items: [
-        {
-          title: "Home",
-          url: "/home",
-          icon: Home,
-        },
-        {
-          title: "Grupos",
-          url: "/home/group",
-          icon: Users,
-        },
-        {
-          title: "Eventos",
-          url: "/home/event",
-          icon: CalendarDays,
-        },
-      ],
-    },
-    {
-      title: "Outros",
-      url: "#",
-      items: [
-        {
-          title: "Configurações",
-          url: "#",
-          icon: Settings,
-        },
-      ],
-    },
-  ],
-};
+const navigation = [
+  {
+    title: "Seções",
+    url: "/",
+    items: [
+      {
+        title: "Home",
+        url: "/home",
+        icon: Home,
+      },
+      {
+        title: "Grupos",
+        url: "/home/group",
+        icon: Users,
+      },
+      {
+        title: "Eventos",
+        url: "/home/event",
+        icon: CalendarDays,
+      },
+      {
+        title: "Calendário",
+        url: "/home/calendar",
+        icon: Calendar1Icon,
+      },
+    ],
+  },
+  {
+    title: "Outros",
+    url: "#",
+    items: [
+      {
+        title: "Configurações",
+        url: "#",
+        icon: Settings,
+      },
+    ],
+  },
+];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [state, action, isPending] = useActionState(logout, undefined);
@@ -96,19 +90,38 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       }
       return clientPathname === url;
     },
-    [clientPathname]
+    [clientPathname],
   );
 
   return (
     <Sidebar {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              size="lg"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-3 [&>svg]:size-auto"
+            >
+              <div className="flex aspect-square size-8 items-center justify-center rounded-md overflow-hidden bg-sidebar-primary text-sidebar-primary-foreground">
+                <Image
+                  src={"/logo.svg"}
+                  height={60}
+                  width={60}
+                  alt="UFC Hub Logo"
+                  priority
+                />
+              </div>
+              <div className="grid flex-1 text-left text-base leading-tight">
+                <span className="truncate font-medium">UFC Hub</span>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
         <hr className="border-t border-border mx-2 -mt-px" />
-        <SearchForm className="mt-3" />
+        {/*<SearchForm className="mt-3" />*/}
       </SidebarHeader>
       <SidebarContent>
-        {/* We create a SidebarGroup for each parent. */}
-        {data.navMain.map((item) => (
+        {navigation.map((item) => (
           <SidebarGroup key={item.title}>
             <SidebarGroupLabel className="uppercase text-muted-foreground/60">
               {item.title}

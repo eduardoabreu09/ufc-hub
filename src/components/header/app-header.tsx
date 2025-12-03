@@ -1,7 +1,6 @@
 import { SidebarTrigger } from "../ui/sidebar";
 import { Separator } from "@radix-ui/react-separator";
 import { AppBreadcrumb } from "./app-breadcrumb";
-import FeedbackDialog from "./feedback-dialog";
 import UserDropdown from "./user-dropdown";
 
 export default function AppHeader() {
@@ -16,7 +15,6 @@ export default function AppHeader() {
         <AppBreadcrumb />
       </div>
       <div className="flex gap-3 ml-auto">
-        <FeedbackDialog />
         <UserDropdown />
       </div>
     </header>
