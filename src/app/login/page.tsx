@@ -1,5 +1,3 @@
-import { GalleryVerticalEnd } from "lucide-react";
-
 import LoginForm from "@/components/login-form";
 import Image from "next/image";
 import {
@@ -16,7 +14,13 @@ export default function LoginPage() {
         <div className="flex justify-center gap-2 md:justify-start">
           <a href="#" className="flex items-center gap-2 font-medium">
             <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
-              <GalleryVerticalEnd className="size-4" />
+              <Image
+                src={"/logo.svg"}
+                height={30}
+                width={30}
+                alt="UFC Hub Logo"
+                priority
+              />
             </div>
             UFC Hub
           </a>
@@ -35,47 +39,43 @@ export default function LoginPage() {
             className="w-md p-6 text-primary-foreground"
           >
             <AccordionItem value="item-1">
-              <AccordionTrigger>Product Information</AccordionTrigger>
+              <AccordionTrigger>Colabore com seus grupos</AccordionTrigger>
               <AccordionContent className="flex flex-col gap-4 text-balance">
                 <p>
-                  Our flagship product combines cutting-edge technology with
-                  sleek design. Built with premium materials, it offers
-                  unparalleled performance and reliability.
+                  Crie e organize grupos com colegas da universidade para
+                  discutir disciplinas, compartilhar materiais e acompanhar
+                  atividades em equipe.
                 </p>
                 <p>
-                  Key features include advanced processing capabilities, and an
-                  intuitive user interface designed for both beginners and
-                  experts.
+                  Gerencie membros, envie mensagens em tempo real e centralize
+                  tudo o que o seu grupo precisa em um único espaço.
                 </p>
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-2">
-              <AccordionTrigger>Shipping Details</AccordionTrigger>
+              <AccordionTrigger>Participe de eventos</AccordionTrigger>
               <AccordionContent className="flex flex-col gap-4 text-balance">
                 <p>
-                  We offer worldwide shipping through trusted courier partners.
-                  Standard delivery takes 3-5 business days, while express
-                  shipping ensures delivery within 1-2 business days.
+                  Descubra eventos acadêmicos e culturais da UFC, confirme sua
+                  presença ou marque como &quot;Talvez&quot; em segundos.
                 </p>
                 <p>
-                  All orders are carefully packaged and fully insured. Track
-                  your shipment in real-time through our dedicated tracking
-                  portal.
+                  Crie seus próprios eventos, convide colegas e acompanhe quem
+                  já confirmou participação para planejar melhor cada encontro.
                 </p>
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-3">
-              <AccordionTrigger>Return Policy</AccordionTrigger>
+              <AccordionTrigger>Organize sua agenda</AccordionTrigger>
               <AccordionContent className="flex flex-col gap-4 text-balance">
                 <p>
-                  We stand behind our products with a comprehensive 30-day
-                  return policy. If you&apos;re not completely satisfied, simply
-                  return the item in its original condition.
+                  Visualize seu calendário semanal com todos os eventos e
+                  compromissos acadêmicos para manter sua rotina sob controle.
                 </p>
                 <p>
-                  Our hassle-free return process includes free return shipping
-                  and full refunds processed within 48 hours of receiving the
-                  returned item.
+                  Receba lembretes, veja conflitos de horário e adapte sua
+                  agenda rapidamente para não perder nenhuma atividade
+                  importante.
                 </p>
               </AccordionContent>
             </AccordionItem>

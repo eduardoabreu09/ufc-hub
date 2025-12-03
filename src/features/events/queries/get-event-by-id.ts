@@ -6,7 +6,7 @@ import { cache } from "react";
 import { Result } from "@/lib/results";
 import { EventMessageDTO } from "@/types/event";
 
-export const getEventsById = cache(
+export const getEventById = cache(
   async (eventId: number): Promise<Result<EventMessageDTO>> => {
     const userIdResult = await getCurrentUserId();
 

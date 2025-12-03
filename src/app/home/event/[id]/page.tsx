@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { CalendarDays, MapPin, UserRound } from "lucide-react";
-import { getEventsById } from "@/features/events/queries/get-event-by-id";
+import { getEventById } from "@/features/events/queries/get-event-by-id";
 import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
 import ParticipateDialog from "@/components/event/participate-dialog";
 import { EventCommentForm } from "@/components/event/event-comment-form";
@@ -129,7 +129,7 @@ function LoadingEventBody() {
 
 async function EventBody({ eventId }: { eventId: number }) {
   const [eventResult, userIdResult] = await Promise.all([
-    getEventsById(eventId),
+    getEventById(eventId),
     getCurrentUserId(),
   ]);
 
