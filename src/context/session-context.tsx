@@ -28,13 +28,18 @@ const fetcher = (...args: Parameters<typeof fetch>) =>
 function SessionProvider({ children }: SessionProviderProps) {
   const { data, error, isLoading, mutate } = useSWR<UserDTO>(
     `/api/session`,
-    fetcher
+    fetcher,
+    {
+      refreshInterval: 60000 * 60, // 1 hour
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    },
   );
   const contextValue = useMemo<SessionContext>(
     () => ({
       user: data ?? null,
     }),
-    [data]
+    [data],
   );
 
   return (
