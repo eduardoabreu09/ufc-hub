@@ -1,7 +1,9 @@
-import AddMemberDialog from "@/components/group/add-member-dialog";
-import DeleteGroupDialog from "@/components/group/delete-group-dialog";
 import { GroupChat } from "@/components/group/group-chat";
-import RemoveMemberButton from "@/components/group/remove-member-button";
+import {
+  GroupAdminBadge,
+  GroupHeaderActions,
+  GroupMemberRemoveButton,
+} from "@/components/group/group-details-client";
 import {
   Accordion,
   AccordionContent,
@@ -15,7 +17,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getGroupById } from "@/features/groups/queries/get-group-by-id";
-import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
 import { GroupRole } from "@prisma/client";
 import { ArrowLeftIcon, SendIcon } from "lucide-react";
 import Link from "next/link";
@@ -33,9 +34,7 @@ export default async function GroupChatPage({
       <Suspense fallback={<LoadingHeader />}>
         <GroupNameHeader groupId={Number(id)} />
       </Suspense>
-      <Suspense fallback={<LoadingChat />}>
-        <GroupBody groupId={Number(id)} />
-      </Suspense>
+      <GroupChat groupId={Number(id)} />
     </div>
   );
 }
@@ -99,12 +98,9 @@ function LoadingChat() {
 }
 
 async function GroupNameHeader({ groupId }: { groupId: number }) {
-  const [groupResult, userIdResult] = await Promise.all([
-    getGroupById(groupId),
-    getCurrentUserId(),
-  ]);
+  const groupResult = await getGroupById(groupId);
 
-  if (groupResult.isFailure || userIdResult.isFailure) {
+  if (groupResult.isFailure) {
     // TODO: Redirect to 404 page
     return (
       <div className="container mx-auto px-4 py-8">
@@ -113,13 +109,6 @@ async function GroupNameHeader({ groupId }: { groupId: number }) {
     );
   }
   const group = groupResult.getValue();
-  const currentUserId = userIdResult.getValue();
-
-  const isAdmin = group.users.some(
-    (ug) => ug.userId === currentUserId && ug.role === GroupRole.ADMIN
-  );
-
-  const isOwner = group.creatorId === currentUserId;
 
   return (
     <>
@@ -136,19 +125,14 @@ async function GroupNameHeader({ groupId }: { groupId: number }) {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   {group.name}
-                  {isAdmin && <Badge variant="secondary">Admin</Badge>}
+                  <GroupAdminBadge group={group} />
                 </CardTitle>
                 <p className="text-sm text-muted-foreground mt-1">
                   {group.description}
                 </p>
               </div>
             </div>
-            <div className="flex gap-2 max-sm:flex-col">
-              {isAdmin && <AddMemberDialog groupId={group.id} />}
-              {isOwner && (
-                <DeleteGroupDialog groupId={group.id} groupName={group.name} />
-              )}
-            </div>
+            <GroupHeaderActions group={group} />
           </div>
         </CardContent>
       </Card>
@@ -173,15 +157,11 @@ async function GroupNameHeader({ groupId }: { groupId: number }) {
                         {userGroup.user.name}
                         {userGroup.role === GroupRole.ADMIN && " (Admin)"}
                       </Badge>
-                      {currentUserId &&
-                        userGroup.userId !== currentUserId &&
-                        isAdmin && (
-                          <RemoveMemberButton
-                            groupId={group.id}
-                            memberId={userGroup.userId}
-                            memberName={userGroup.user.name}
-                          />
-                        )}
+                      <GroupMemberRemoveButton
+                        group={group}
+                        memberId={userGroup.userId}
+                        memberName={userGroup.user.name}
+                      />
                     </div>
                   ))}
                 </div>
@@ -192,20 +172,4 @@ async function GroupNameHeader({ groupId }: { groupId: number }) {
       </Card>
     </>
   );
-}
-
-async function GroupBody({ groupId }: { groupId: number }) {
-  const userIdResult = await getCurrentUserId();
-
-  if (userIdResult.isFailure) {
-    // TODO: Redirect to 404 page
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <p>Esse grupo não existe ou você não tem acesso.</p>
-      </div>
-    );
-  }
-  const currentUserId = userIdResult.getValue();
-
-  return <GroupChat groupId={groupId} currentUserId={currentUserId} />;
 }

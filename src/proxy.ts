@@ -19,14 +19,14 @@ function isServerActionRequest(req: NextRequest): boolean {
 }
 
 export default async function proxy(req: NextRequest) {
-  if (isServerActionRequest(req)) {
-    return NextResponse.next();
-  }
+  // if (isServerActionRequest(req)) {
+  //   return NextResponse.next();
+  // }
 
   // 2. Check if the current route is protected or public
   const path = req.nextUrl.pathname;
   const isProtectedRoute = protectedRoutes.some((route) =>
-    path.startsWith(route)
+    path.startsWith(route),
   );
   const isPublicRoute = publicRoutes.includes(path);
 
