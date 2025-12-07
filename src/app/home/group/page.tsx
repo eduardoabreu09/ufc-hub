@@ -1,63 +1,36 @@
-import { CreateGroupDialog } from "@/components/group/create-group-dialog";
-import { GroupCard } from "@/components/group/group-card";
-import PageHeader from "@/components/page-header";
-import { Skeleton } from "@/components/ui/skeleton";
+import { GroupSidebar } from "@/components/group/group-sidebar";
+import { GroupSidebarSkeleton } from "@/components/group/group-sidebar-skeleton";
 import { getGroups } from "@/features/groups/queries/get-groups";
+import { MessageCircleIcon } from "lucide-react";
 import { Suspense } from "react";
 
 export default function GroupsPage() {
   return (
-    <PageHeader
-      title="Grupos"
-      description="Crie e participe de grupos para colaborar com outros colegas"
-      DialogComponent={CreateGroupDialog}
-    >
-      <Suspense fallback={<Loading />}>
-        <GroupList />
-      </Suspense>
-    </PageHeader>
-  );
-}
-
-async function GroupList() {
-  const groupsResult = await getGroups();
-
-  if (groupsResult.isFailure) {
-    return (
-      <div className="text-center py-12">
-        <div className="text-muted-foreground mb-4">
-          No groups yet. Create your first group to get started!
-        </div>
+    <>
+      <div className="flex md:hidden h-full w-full shrink-0">
+        <Suspense fallback={<GroupSidebarSkeleton />}>
+          <GroupsSide />
+        </Suspense>
       </div>
-    );
-  }
-
-  const groups = groupsResult.getValue();
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {groups.map((group) => (
-        <GroupCard key={group.id} group={group} />
-      ))}
-    </div>
+      <div className="hidden md:flex flex-col items-center justify-center h-full text-center p-8 text-muted-foreground">
+        <div className="bg-muted/30 p-6 rounded-full mb-4">
+          <MessageCircleIcon className="h-12 w-12 opacity-50" />
+        </div>
+        <h3 className="text-xl font-semibold text-foreground">
+          Selecione um grupo
+        </h3>
+        <p className="max-w-sm mt-2">
+          Escolha um grupo na barra lateral para ver as mensagens, participantes
+          e mais.
+        </p>
+      </div>
+    </>
   );
 }
 
-function Loading() {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {[...Array(6)].map((_, i) => (
-        <div key={i} className="border rounded-lg p-6 space-y-4">
-          <Skeleton className="h-6 w-3/4"></Skeleton>
-          <Skeleton className="h-4 w-full"></Skeleton>
-          <Skeleton className="h-4 w-2/3"></Skeleton>
-          <div className="flex gap-4">
-            <Skeleton className="h-4 w-20"></Skeleton>
-            <Skeleton className="h-4 w-24"></Skeleton>
-          </div>
-          <Skeleton className="h-9 w-full"></Skeleton>
-        </div>
-      ))}
-    </div>
-  );
+async function GroupsSide() {
+  const groupsResult = await getGroups();
+  const groups = groupsResult.isSuccess ? groupsResult.getValue() : [];
+
+  return <GroupSidebar groups={groups} />;
 }
