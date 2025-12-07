@@ -2,10 +2,15 @@ import { Avatar, AvatarFallback } from "./ui/avatar";
 
 interface AvatarNameProps {
   name: string;
+  textSize?: "text-sm" | "text-md" | "text-lg" | "text-2xl" | "text-4xl";
   className?: string;
 }
 
-export default function AvatarName({ name, className }: AvatarNameProps) {
+export default function AvatarName({
+  name,
+  className,
+  textSize,
+}: AvatarNameProps) {
   const initials = name
     .split(" ")
     .filter(Boolean)
@@ -14,7 +19,7 @@ export default function AvatarName({ name, className }: AvatarNameProps) {
     .join("");
   return (
     <Avatar className={className}>
-      <AvatarFallback>{initials}</AvatarFallback>
+      <AvatarFallback className={textSize}>{initials}</AvatarFallback>
     </Avatar>
   );
 }
