@@ -13,6 +13,9 @@ export async function getGroups(): Promise<Result<GroupDTO[]>> {
   }
 
   try {
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+
     const groups = await prisma.group.findMany({
       /*
       TODO: Uncomment to fetch only groups the user is a member of
@@ -30,7 +33,19 @@ export async function getGroups(): Promise<Result<GroupDTO[]>> {
         description: true,
         createdAt: true,
         _count: {
-          select: { users: true, messages: true },
+          select: {
+            users: true,
+            messages: {
+              where: {
+                createdAt: {
+                  gte: today,
+                },
+                senderId: {
+                  not: userIdResult.getValue(),
+                },
+              },
+            },
+          },
         },
       },
       orderBy: { createdAt: "desc" },

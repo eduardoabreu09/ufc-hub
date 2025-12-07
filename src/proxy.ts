@@ -6,23 +6,7 @@ import { decrypt } from "@/lib/session";
 const protectedRoutes = ["/home"];
 const publicRoutes = ["/login", "/signup", "/"];
 
-function isServerActionRequest(req: NextRequest): boolean {
-  if (req.method !== "POST") {
-    return false;
-  }
-
-  if (req.headers.has("next-action")) {
-    return true;
-  }
-
-  return req.nextUrl.searchParams.has("__nextAction");
-}
-
 export default async function proxy(req: NextRequest) {
-  // if (isServerActionRequest(req)) {
-  //   return NextResponse.next();
-  // }
-
   // 2. Check if the current route is protected or public
   const path = req.nextUrl.pathname;
   const isProtectedRoute = protectedRoutes.some((route) =>

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useActionState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -47,11 +47,8 @@ export function GroupChat({ groupId }: GroupChatProps) {
   }
 
   return (
-    <Card className="flex flex-col h-[500px]">
-      <CardHeader className="flex-shrink-0">
-        <CardTitle className="text-lg">Chat</CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1 flex flex-col min-h-0">
+    <Card className="flex flex-col h-full border-0 shadow-none rounded-none">
+      <CardContent className="flex-1 flex flex-col min-h-0 p-4">
         {isLoading && (
           <div className="flex justify-center items-center h-full">
             <p className="flex flex-row">
