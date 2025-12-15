@@ -10,7 +10,8 @@ import {
 } from "@/components/ui/sheet";
 import {
   GroupHeaderActions,
-  GroupMemberRemoveButton,
+  GroupMemberManager,
+  IsYouBadge,
 } from "./group-details-client";
 import { GroupRole } from "@prisma/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -18,6 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import { getGroupById } from "@/features/groups/queries/get-group-by-id";
 import { notFound } from "next/navigation";
 import AvatarName from "../avatar-name";
+import { Badge } from "../ui/badge";
 
 interface GroupHeaderProps {
   groupId: number;
@@ -85,9 +87,7 @@ export async function GroupHeader({ groupId }: GroupHeaderProps) {
                 </h4>
               </div>
 
-              <div className="flex justify-start">
-                <GroupHeaderActions group={group} />
-              </div>
+              <GroupHeaderActions group={group} />
 
               <ScrollArea className="h-[300px] pr-4">
                 <div className="space-y-4">
@@ -105,10 +105,13 @@ export async function GroupHeader({ groupId }: GroupHeaderProps) {
                           <p className="text-sm font-medium leading-none">
                             {userGroup.user.name}
                             {userGroup.role === GroupRole.ADMIN && (
-                              <span className="ml-2 text-xs text-muted-foreground">
-                                (Admin)
+                              <span className="ml-2">
+                                <Badge>Admin</Badge>
                               </span>
                             )}
+                            <span className="ml-2">
+                              <IsYouBadge userId={userGroup.userId} />
+                            </span>
                           </p>
                           {userGroup.user.course && (
                             <p className="text-xs text-muted-foreground">
@@ -117,7 +120,7 @@ export async function GroupHeader({ groupId }: GroupHeaderProps) {
                           )}
                         </div>
                       </div>
-                      <GroupMemberRemoveButton
+                      <GroupMemberManager
                         group={group}
                         memberId={userGroup.userId}
                         memberName={userGroup.user.name}

@@ -4,25 +4,25 @@ import {
   CreateGroupSchema,
   CreateGroupFormState,
 } from "@/features/groups/form-schema/create-group";
-import { getCurrentUser } from "@/features/session/queries/get-current-user";
+import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
 import { prisma } from "@/lib/prisma";
-import { GroupRole } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-export async function createGroup(
+export async function updateGroup(
+  groupId: number,
   formData: FormData
 ): Promise<CreateGroupFormState> {
-  const userResult = await getCurrentUser();
+  const userIdResult = await getCurrentUserId();
 
-  if (userResult.isFailure) {
+  if (userIdResult.isFailure) {
     return {
-      message: userResult.error,
+      message: userIdResult.error,
       isSuccess: false,
     };
   }
 
-  const currentUser = userResult.getValue();
+  const currentUserId = userIdResult.getValue();
 
   const validatedFields = CreateGroupSchema.safeParse({
     name: formData.get("name"),
@@ -40,27 +40,44 @@ export async function createGroup(
   try {
     const { name, description } = validatedFields.data;
 
-    await prisma.group.create({
+    // Check if group exists and user is creator
+    const group = await prisma.group.findUnique({
+      where: { id: groupId },
+      select: { creatorId: true },
+    });
+
+    if (!group) {
+      return {
+        message: "Grupo não encontrado.",
+        isSuccess: false,
+      };
+    }
+
+    if (group.creatorId !== currentUserId) {
+      return {
+        message:
+          "Você não tem permissão para editar este grupo. Apenas o criador pode editar.",
+        isSuccess: false,
+      };
+    }
+
+    await prisma.group.update({
+      where: { id: groupId },
       data: {
         name,
         description,
-        creatorId: currentUser.id,
-        users: {
-          create: {
-            userId: currentUser.id,
-            role: GroupRole.ADMIN,
-          },
-        },
       },
     });
 
+    revalidatePath("/home/group/[id]", "page");
     revalidatePath("/home/group");
 
     return {
-      message: "Grupo criado com sucesso.",
+      message: "Grupo atualizado com sucesso.",
       isSuccess: true,
     };
   } catch (error) {
+    console.error("Error updating group:", error);
     return {
       message: "Erro inesperado no servidor. Tente novamente.",
       isSuccess: false,

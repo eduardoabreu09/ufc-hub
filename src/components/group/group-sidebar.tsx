@@ -23,11 +23,11 @@ export function GroupSidebar({ groups }: GroupSidebarProps) {
   const filteredGroups = groups.filter(
     (group) =>
       group.name.toLowerCase().includes(search.toLowerCase()) ||
-      group.description?.toLowerCase().includes(search.toLowerCase()),
+      group.description?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <div className="flex flex-col h-full border-r bg-background w-full md:w-80 lg:w-96">
+    <div className="flex flex-col h-full md:border-r bg-background w-full md:w-80 lg:w-96">
       <div className="p-4 border-b space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold">Grupos</h2>
@@ -57,7 +57,7 @@ export function GroupSidebar({ groups }: GroupSidebarProps) {
                 href={`/home/group/${group.id}`}
                 className={cn(
                   "flex items-center gap-3 p-4 hover:bg-accent transition-colors border-b last:border-0",
-                  pathname === `/home/group/${group.id}` && "bg-accent",
+                  pathname === `/home/group/${group.id}` && "bg-accent"
                 )}
                 onClick={() => setOpen(false)}
               >

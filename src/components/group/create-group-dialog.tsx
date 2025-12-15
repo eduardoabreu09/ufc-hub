@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useActionState } from "react";
+import { FormEvent, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,27 +17,29 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2, PlusIcon } from "lucide-react";
 import { createGroup } from "@/features/groups/actions/create-group";
 import { toast } from "sonner";
+import { CreateGroupFormState } from "@/features/groups/form-schema/create-group";
 
 export function CreateGroupDialog() {
   const [open, setOpen] = useState(false);
-  const [state, formAction, isPending] = useActionState(createGroup, undefined);
+  const [state, setState] = useState<CreateGroupFormState>();
+  const [isPending, startTransition] = useTransition();
 
-  const previousStateRef = useRef(state);
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
 
-  useEffect(() => {
-    if (state?.isSuccess && state !== previousStateRef.current) {
-      toast.success(state.message);
-      setOpen(false);
-    }
-    if (
-      !state?.isSuccess &&
-      state !== previousStateRef.current &&
-      state?.message
-    ) {
-      toast.error(state.message);
-    }
-    previousStateRef.current = state;
-  }, [state]);
+    startTransition(async () => {
+      const result = await createGroup(formData);
+      setState(result);
+
+      if (result.isSuccess) {
+        toast.success(result.message);
+        setOpen(false);
+      } else if (result.message) {
+        toast.error(result.message);
+      }
+    });
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -49,7 +50,7 @@ export function CreateGroupDialog() {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
-        <form action={formAction}>
+        <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Criar Novo Grupo</DialogTitle>
             <DialogDescription>

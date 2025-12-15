@@ -12,7 +12,6 @@ import { getCurrentUserId } from "@/features/session/queries/get-current-user-id
 
 export async function addMember(
   groupId: number,
-  state: AddMemberFormState | undefined,
   formData: FormData
 ): Promise<AddMemberFormState> {
   const userIdResult = await getCurrentUserId();

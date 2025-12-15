@@ -20,12 +20,16 @@ export function GroupChat({ groupId }: GroupChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [state, formAction, isPending] = useActionState(
     sendMessage.bind(null, groupId),
-    undefined,
+    undefined
   );
   const { messages, isLoading } = useMessages(groupId);
   const { user } = useSession();
 
   const previousStateRef = useRef(state);
+
+  function scrollToBottom() {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }
 
   useEffect(() => {
     scrollToBottom();
@@ -41,10 +45,6 @@ export function GroupChat({ groupId }: GroupChatProps) {
     }
     previousStateRef.current = state;
   }, [state]);
-
-  function scrollToBottom() {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }
 
   return (
     <Card className="flex flex-col h-full border-0 shadow-none rounded-none">
@@ -95,7 +95,7 @@ export function GroupChat({ groupId }: GroupChatProps) {
                           month: "2-digit",
                           hour: "2-digit",
                           minute: "2-digit",
-                        },
+                        }
                       )}
                     </div>
                   </div>
