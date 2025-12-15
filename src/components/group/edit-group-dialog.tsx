@@ -12,27 +12,26 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Loader2, UserPlusIcon } from "lucide-react";
-import { addMember } from "@/features/groups/actions/add-member";
-import { GroupRole } from "@prisma/client";
+import { Textarea } from "@/components/ui/textarea";
+import { Loader2, PencilIcon } from "lucide-react";
+import { updateGroup } from "@/features/groups/actions/update-group";
 import { toast } from "sonner";
-import { AddMemberFormState } from "@/features/groups/form-schema/add-member";
+import { CreateGroupFormState } from "@/features/groups/form-schema/create-group";
 
-interface AddMemberDialogProps {
+interface EditGroupDialogProps {
   groupId: number;
+  defaultName: string;
+  defaultDescription?: string | null;
 }
 
-export default function AddMemberDialog({ groupId }: AddMemberDialogProps) {
+export function EditGroupDialog({
+  groupId,
+  defaultName,
+  defaultDescription,
+}: EditGroupDialogProps) {
   const [open, setOpen] = useState(false);
-  const [state, setState] = useState<AddMemberFormState>();
+  const [state, setState] = useState<CreateGroupFormState>();
   const [isPending, startTransition] = useTransition();
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -40,7 +39,7 @@ export default function AddMemberDialog({ groupId }: AddMemberDialogProps) {
     const formData = new FormData(event.currentTarget);
 
     startTransition(async () => {
-      const result = await addMember(groupId, formData);
+      const result = await updateGroup(groupId, formData);
       setState(result);
 
       if (result.isSuccess) {
@@ -56,45 +55,45 @@ export default function AddMemberDialog({ groupId }: AddMemberDialogProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
-          <UserPlusIcon className="h-4 w-4 mr-2" />
-          Adicionar
+          <PencilIcon className="h-4 w-4 mr-2" />
+          Editar
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Adicionar Membro</DialogTitle>
+            <DialogTitle>Editar Grupo</DialogTitle>
             <DialogDescription>
-              Adicione um novo membro ao grupo usando o email.
+              Faça alterações no nome e descrição do grupo.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email do Usuário</Label>
+              <Label htmlFor="name">Nome</Label>
               <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="Email"
+                id="name"
+                name="name"
+                defaultValue={defaultName}
+                placeholder="Nome do Grupo"
                 required
               />
-              {state?.errors?.email && (
-                <p className="text-sm text-red-600">{state.errors.email[0]}</p>
+              {state?.errors?.name && (
+                <p className="text-sm text-red-600">{state.errors.name[0]}</p>
               )}
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="role">Função</Label>
-              <Select name="role" defaultValue={GroupRole.USER}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={GroupRole.USER}>Membro</SelectItem>
-                  <SelectItem value={GroupRole.ADMIN}>Admin</SelectItem>
-                </SelectContent>
-              </Select>
-              {state?.errors?.role && (
-                <p className="text-sm text-red-600">{state.errors.role[0]}</p>
+              <Label htmlFor="description">Descrição (Opcional)</Label>
+              <Textarea
+                id="description"
+                name="description"
+                defaultValue={defaultDescription || ""}
+                placeholder="Uma breve descrição do que será discutido no grupo"
+                rows={4}
+              />
+              {state?.errors?.description && (
+                <p className="text-sm text-red-600">
+                  {state.errors.description[0]}
+                </p>
               )}
             </div>
           </div>
@@ -108,10 +107,10 @@ export default function AddMemberDialog({ groupId }: AddMemberDialogProps) {
             </Button>
             {isPending && (
               <Button type="submit" disabled>
-                <Loader2 className=" animate-spin" /> Adicionando...
+                <Loader2 className=" animate-spin" /> Salvando...
               </Button>
             )}
-            {!isPending && <Button type="submit">Adicionar</Button>}
+            {!isPending && <Button type="submit">Salvar Alterações</Button>}
           </DialogFooter>
         </form>
       </DialogContent>

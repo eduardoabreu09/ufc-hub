@@ -49,6 +49,21 @@ export const getGroupById = cache(
         },
       });
 
+      const currentUserId = userIdResult.getValue();
+
+      group?.users.sort((a, b) => {
+        const weight = (member: (typeof group.users)[number]) => {
+          if (member.userId === currentUserId) return 0; // current user always on top
+          if (member.role === "ADMIN") return 1; // admins next
+          return 2; // regular users last
+        };
+
+        const weightDiff = weight(a) - weight(b);
+        if (weightDiff !== 0) return weightDiff;
+
+        return a.user.name.localeCompare(b.user.name);
+      });
+
       if (!group) {
         return Result.failure("Grupo não encontrado.");
       }

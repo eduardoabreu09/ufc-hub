@@ -18,8 +18,10 @@
 10. Usuário deve conseguir criar uma postagem no blog, editar e deletar se for criado por ele.
 11. Usuário deve conseguir comentar e "curtir" uma postagem feita por outro usuário.
 12. Usuário visitante deve conseguir visualizar as postagens, porém não pode realizar nenhuma ação.
+### Perfil
+13. Usuário deve conseguir consultar a a detalhes de outros usuários como: Nome, Curso, Eventos criados, grupos em comum, posts feitos no blog e quantos eventos já participou.
 ### Home
-13. Usuário deve conseguir visualizar postagens e eventos "em alta".
+14. Usuário deve conseguir visualizar postagens e eventos "em alta".
 
 ## Requisitos Não Funcionais
 
