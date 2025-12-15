@@ -7,9 +7,9 @@ import { z } from "zod";
 import { CreateEventFormSchema } from "../form-schema/create-event";
 
 const MAX_TAGS_LIMIT = 10;
+const TAG_LENGTH_LIMIT = 32;
 
 export async function createEvent(
-  state: CreateEventFormSchema | undefined,
   formData: FormData
 ): Promise<CreateEventFormSchema> {
   const userResult = await getCurrentUser();
@@ -69,6 +69,14 @@ export async function createEvent(
     if (uniqueTags.length === 0) {
       return {
         message: "Por favor, insira pelo menos uma tag válida para o evento.",
+        isSuccess: false,
+        payload: formData,
+      };
+    }
+
+    if (uniqueTags.some((tag) => tag.length > TAG_LENGTH_LIMIT)) {
+      return {
+        message: `Cada tag deve ter no máximo ${TAG_LENGTH_LIMIT} caracteres.`,
         isSuccess: false,
         payload: formData,
       };
