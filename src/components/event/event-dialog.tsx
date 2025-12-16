@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, FormEvent, useMemo } from "react";
+import { FormEvent, useMemo, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,9 +14,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, PlusIcon } from "lucide-react";
+import { Loader2, PencilIcon, PlusIcon } from "lucide-react";
 import { toast } from "sonner";
 import { createEvent } from "@/features/events/actions/create-event";
+import { updateEvent } from "@/features/events/actions/update-event";
 import DatePicker from "../ui/date-picker";
 import { CreateEventFormSchema } from "@/features/events/form-schema/create-event";
 import { EndHour, StartHour } from "@/types/calendar";
@@ -30,15 +31,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { EventMessageDTO } from "@/types/event";
 
-export function CreateEventDialog() {
+type EventDialogMode = "create" | "edit";
+
+interface EventDialogProps {
+  mode: EventDialogMode;
+  event?: EventMessageDTO;
+}
+
+export function EventDialog({ mode, event }: EventDialogProps) {
   const [open, setOpen] = useState(false);
   const [state, setState] = useState<CreateEventFormSchema>();
   const [isPending, startTransition] = useTransition();
 
-  // Memoize time options so they're only calculated once
+  const defaultStartTime = useMemo(() => {
+    if (!event) return "09:00";
+    return format(new Date(event.eventDate), "HH:mm");
+  }, [event]);
+
+  const defaultTags = useMemo(
+    () => event?.tags.map((tag) => tag.name).join(", ") ?? "",
+    [event]
+  );
+
   const timeOptions = useMemo(() => {
-    const options = [];
+    const options: { value: string; label: string }[] = [];
     for (let hour = StartHour; hour <= EndHour; hour++) {
       for (let minute = 0; minute < 60; minute += 15) {
         const date = new Date(2000, 0, 1, hour, minute);
@@ -47,14 +65,18 @@ export function CreateEventDialog() {
       }
     }
     return options;
-  }, []); // Empty dependency array ensures this only runs once
+  }, []);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+  function handleSubmit(formEvent: FormEvent<HTMLFormElement>) {
+    formEvent.preventDefault();
+    const formData = new FormData(formEvent.currentTarget);
 
     startTransition(async () => {
-      const result = await createEvent(formData);
+      const result =
+        mode === "create" && !event
+          ? await createEvent(formData)
+          : await updateEvent(event!.id, formData);
+
       setState(result);
 
       if (result.isSuccess) {
@@ -66,21 +88,36 @@ export function CreateEventDialog() {
     });
   }
 
+  const isEdit = mode === "edit";
+  const title = isEdit ? "Editar Evento" : "Criar Novo Evento";
+  const description = isEdit
+    ? "Atualize as informações do seu evento."
+    : "Crie um novo evento e compartilhe com seus colegas.";
+  const submitLabel = isEdit ? "Salvar alterações" : "Criar Evento";
+  const pendingLabel = isEdit ? "Salvando..." : "Criando...";
+
+  const defaultTrigger = isEdit ? (
+    <Button variant="outline" size="sm">
+      <PencilIcon className="h-4 w-4 mr-2" />
+      Editar
+    </Button>
+  ) : (
+    <Button>
+      <PlusIcon className="h-4 w-4 mr-2" />
+      Criar Evento
+    </Button>
+  );
+
+  if (isEdit && !event) return null;
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <PlusIcon className="h-4 w-4 mr-2" />
-          Criar Evento
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{defaultTrigger}</DialogTrigger>
       <DialogContent className="w-full sm:max-w-[520px] md:max-w-2xl max-h-[calc(100svh-2rem)] overflow-y-auto">
         <form onSubmit={handleSubmit} className="space-y-6">
           <DialogHeader>
-            <DialogTitle>Criar Novo Evento</DialogTitle>
-            <DialogDescription>
-              Crie um novo evento e compartilhe com seus colegas.
-            </DialogDescription>
+            <DialogTitle>{title}</DialogTitle>
+            <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-6">
             <div className="grid gap-2">
@@ -89,6 +126,7 @@ export function CreateEventDialog() {
                 id="title"
                 name="title"
                 placeholder="Título do evento"
+                defaultValue={event?.title}
                 required
               />
             </div>
@@ -99,6 +137,7 @@ export function CreateEventDialog() {
                 id="location"
                 name="location"
                 placeholder="Ex.: Auditório Central, Bloco 3"
+                defaultValue={event?.location}
                 required
               />
             </div>
@@ -110,13 +149,14 @@ export function CreateEventDialog() {
                   name="eventDate"
                   id="eventDate"
                   required
+                  defaultValue={event?.eventDate}
                   className="w-full"
                 />
               </div>
               <div className="flex gap-6">
                 <div className="grid gap-2">
-                  <Label htmlFor="eventDate">Início</Label>
-                  <Select defaultValue="09:00" name="startTime">
+                  <Label htmlFor="startTime">Início</Label>
+                  <Select defaultValue={defaultStartTime} name="startTime">
                     <SelectTrigger id="startTime">
                       <SelectValue placeholder="Select time" />
                     </SelectTrigger>
@@ -139,6 +179,7 @@ export function CreateEventDialog() {
                     name="duration"
                     placeholder="60"
                     type="number"
+                    defaultValue={event?.duration}
                     required
                   />
                 </div>
@@ -151,6 +192,7 @@ export function CreateEventDialog() {
                 id="description"
                 name="description"
                 placeholder="Uma breve descrição do evento"
+                defaultValue={event?.description}
                 rows={3}
                 required
               />
@@ -162,6 +204,7 @@ export function CreateEventDialog() {
                 id="body"
                 name="body"
                 placeholder="Descreva o evento, incluindo agenda, tema, instruções e links úteis."
+                defaultValue={event?.body}
                 rows={6}
                 required
               />
@@ -173,6 +216,7 @@ export function CreateEventDialog() {
                 id="imageUrl"
                 name="imageUrl"
                 placeholder="Ex.: https://www.ufc.br/images/img.png"
+                defaultValue={event?.imageUrl ?? ""}
               />
             </div>
 
@@ -182,6 +226,7 @@ export function CreateEventDialog() {
                 id="tags"
                 name="tags"
                 placeholder="Ex.: Tecnologia, Saúde, Networking, Engenharia"
+                defaultValue={defaultTags}
                 required
               />
             </div>
@@ -194,15 +239,24 @@ export function CreateEventDialog() {
             >
               Voltar
             </Button>
-            {isPending && (
+            {isPending ? (
               <Button type="submit" disabled>
-                <Loader2 className=" animate-spin" /> Criando...
+                <Loader2 className="animate-spin" /> {pendingLabel}
               </Button>
+            ) : (
+              <Button type="submit">{submitLabel}</Button>
             )}
-            {!isPending && <Button type="submit">Criar Evento</Button>}
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
   );
+}
+
+export function CreateEventDialog() {
+  return <EventDialog mode="create" />;
+}
+
+export function EditEventDialog({ event }: { event: EventMessageDTO }) {
+  return <EventDialog mode="edit" event={event} />;
 }

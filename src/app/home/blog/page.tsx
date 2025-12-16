@@ -1,4 +1,4 @@
-import { CreatePostDialog } from "@/components/blog/create-post-dialog";
+import { CreatePostDialog } from "@/components/blog/blog-dialog";
 import { PostCard } from "@/components/blog/post-card";
 import PageHeader from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";

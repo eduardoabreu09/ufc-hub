@@ -3,7 +3,7 @@
 import AddMemberDialog from "@/components/group/add-member-dialog";
 import DeleteGroupDialog from "@/components/group/delete-group-dialog";
 import { Badge } from "@/components/ui/badge";
-import { EditGroupDialog } from "./edit-group-dialog";
+import { EditGroupDialog } from "./group-dialog";
 import { MemberActionsMenu } from "./member-actions-menu";
 import { useSession } from "@/context/session-context";
 import { GroupMessagesDTO } from "@/types/group";
@@ -42,9 +42,11 @@ export function GroupHeaderActions({ group }: GroupProps) {
       {isOwner && (
         <>
           <EditGroupDialog
-            groupId={group.id}
-            defaultName={group.name}
-            defaultDescription={group.description}
+            group={{
+              id: group.id,
+              name: group.name,
+              description: group.description,
+            }}
           />
           <DeleteGroupDialog groupId={group.id} groupName={group.name} />
         </>
