@@ -9,8 +9,10 @@ export interface EventDTO {
   body: string;
   createdAt: Date;
   eventDate: Date;
+  duration: number;
   location: string;
   createdBy: UserDTO;
+  creatorId: number;
   imageUrl: string | null;
   participations: EventPaticipationSimpleDTO[];
   tags: EventTagDTO[];
@@ -35,8 +37,11 @@ export interface EventMessageDTO {
   body: string;
   createdAt: Date;
   eventDate: Date;
+  duration: number;
   location: string;
   createdBy: UserDTO;
+  creatorId: number;
+  imageUrl: string | null;
 
   messages?: MessageDTO[];
   tags: EventTagDTO[];

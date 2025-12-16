@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { UserRound, CalendarDays, ArrowRight } from "lucide-react";
+import { UserRound, CalendarDays, MapPin, Clock } from "lucide-react";
 import { Card } from "../ui/card";
 import { EventDTO } from "@/types/event";
 import { Badge } from "../ui/badge";
+import { formatDateTime } from "@/lib/utils";
 import ParticipateDialog from "./participate-dialog";
 
 interface EventCardProps {
@@ -26,6 +27,15 @@ export default function EventCard({ event }: EventCardProps) {
               ))}
             </div>
           </div>
+          <div className="flex gap-1 items-center text-sm text-muted-foreground mb-4 md:text-base">
+            <CalendarDays size={16} />
+            <span>
+              {formatDateTime(event.eventDate, {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
+          </div>
           <h3 className="text-xl font-semibold md:text-2xl lg:text-3xl">
             <Link href={`/home/event/${event.id}`} className="hover:underline">
               {event.title}
@@ -34,60 +44,67 @@ export default function EventCard({ event }: EventCardProps) {
           <p className="mt-4 text-muted-foreground md:mt-5">
             {event.description}
           </p>
-          <div className="mt-6 text-sm md:mt-8">
-            <div className="flex flex-wrap items-center gap-3 text-muted-foreground">
-              <div className="flex  items-center">
+          <div className="mt-6 md:mt-8">
+            <div className="flex flex-wrap items-center gap-3 text-muted-foreground text-sm">
+              <div className="flex gap-1 items-center">
+                <MapPin size={16} />
+                <span>{event.location}</span>
+              </div>
+              <div className="flex gap-1 items-center">
+                <Clock size={16} />
+                <span>Duração: {event.duration} minutos</span>
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 md:mt-6">
+            <div className="flex flex-wrap items-center gap-3 text-muted-foreground text-sm">
+              <div className="flex gap-1 items-center">
                 <UserRound size={16} />
-                <span className="mr-3 ml-1">{event.createdBy.name}</span>
-                <CalendarDays size={16} />
-                <span className="ml-1">
-                  {event.createdAt.toLocaleDateString()}
-                </span>
+                <span>{event.createdBy.name}</span>
               </div>
-              <span>{event._count?.participations} Participantes</span>
-            </div>
-          </div>
-          <div className="mt-6 flex flex-wrap gap-3 md:mt-8 items-center">
-            <div className="flex flex-col max-w-80 rounded-lg border border-border bg-muted/40 p-4 gap-3 ">
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Confirme sua participação
-              </p>
-              <div className="flex justify-around items-center gap-2">
-                <ParticipateDialog
-                  eventId={event.id}
-                  type="YES"
-                  selected={selectedParticipation}
-                />
-                <ParticipateDialog
-                  eventId={event.id}
-                  type="NO"
-                  selected={selectedParticipation}
-                />
-                <ParticipateDialog
-                  eventId={event.id}
-                  type="MAYBE"
-                  selected={selectedParticipation}
-                />
+              <div className="flex gap-1 items-center">
+                <span>{event._count?.participations} Participantes</span>
               </div>
             </div>
           </div>
-
-          <div className="mt-6 flex items-center space-x-2 md:mt-8">
-            <Link
-              href={`/home/event/${event.id}`}
-              className="inline-flex items-center font-semibold hover:underline md:text-base"
-            >
-              <span>Ver Mais</span>
-              <ArrowRight className="ml-2 size-4 transition-transform" />
-            </Link>
+          <div className="flex flex-col w-full mt-4 md:mt-6 md:max-w-70 rounded-lg border border-border bg-muted/40 p-4 gap-3 ">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Confirme sua participação
+            </p>
+            <div className="flex justify-around items-center gap-2">
+              <ParticipateDialog
+                eventId={event.id}
+                type="YES"
+                selected={selectedParticipation}
+              />
+              <ParticipateDialog
+                eventId={event.id}
+                type="NO"
+                selected={selectedParticipation}
+              />
+              <ParticipateDialog
+                eventId={event.id}
+                type="MAYBE"
+                selected={selectedParticipation}
+              />
+            </div>
           </div>
         </div>
         <div className="order-first sm:order-last sm:col-span-5">
-          <div className="aspect-16/9 overflow-clip rounded-lg border border-border">
-            <img
-              src={event.imageUrl || "/portrait.png"}
-              className="h-full w-full object-cover transition-opacity duration-200 fade-in hover:opacity-70"
-            />
+          <div className="relative aspect-16/9 overflow-clip rounded-lg border border-border bg-muted">
+            {event.imageUrl ? (
+              <img
+                src={event.imageUrl}
+                className="h-full w-full object-cover transition-opacity duration-200 fade-in hover:opacity-70"
+              />
+            ) : (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted-foreground/10">
+                  <CalendarDays size={24} />
+                </div>
+                <span className="text-sm font-medium">Imagem indisponível</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -25,6 +25,7 @@ import {
   LogOut,
   Settings,
   Users,
+  FileText,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -33,26 +34,31 @@ const navigation = [
     title: "Seções",
     url: "/",
     items: [
-      {
-        title: "Home",
-        url: "/home",
-        icon: Home,
-      },
+      // {
+      //   title: "Home",
+      //   url: "/home",
+      //   icon: Home,
+      // },
       {
         title: "Grupos",
         url: "/home/group",
         icon: Users,
       },
       {
+        title: "Blog",
+        url: "/home/blog",
+        icon: FileText,
+      },
+      {
         title: "Eventos",
         url: "/home/event",
         icon: CalendarDays,
       },
-      {
-        title: "Calendário",
-        url: "/home/calendar",
-        icon: Calendar1Icon,
-      },
+      // {
+      //   title: "Calendário",
+      //   url: "/home/calendar",
+      //   icon: Calendar1Icon,
+      // },
     ],
   },
   {
@@ -90,7 +96,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       }
       return clientPathname === url;
     },
-    [clientPathname],
+    [clientPathname]
   );
 
   return (
