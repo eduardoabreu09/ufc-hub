@@ -2,7 +2,7 @@
 
 import { useSession } from "@/context/session-context";
 import { EventMessageDTO } from "@/types/event";
-import { EditEventDialog } from "./edit-event-dialog";
+import { EditEventDialog } from "./event-dialog";
 import { DeleteEventDialog } from "./delete-event-dialog";
 
 interface EventProps {

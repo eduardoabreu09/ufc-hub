@@ -7,7 +7,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { SearchIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { CreateGroupDialog } from "./create-group-dialog";
+import { CreateGroupDialog } from "./group-dialog";
 import { useSidebar } from "../ui/sidebar";
 import AvatarName from "../avatar-name";
 

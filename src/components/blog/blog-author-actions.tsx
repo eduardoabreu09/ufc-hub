@@ -2,7 +2,7 @@
 
 import { useSession } from "@/context/session-context";
 import { BlogPostWithMessagesDTO } from "@/types/blog-post";
-import { EditPostDialog } from "./edit-post-dialog";
+import { EditPostDialog } from "./blog-dialog";
 import { DeletePostDialog } from "./delete-post-dialog";
 
 interface BlogProps {
@@ -21,11 +21,13 @@ export function BlogAuthorActions({ post }: BlogProps) {
   return (
     <div className="flex items-center gap-2">
       <EditPostDialog
-        postId={post.id}
-        defaultTitle={post.title}
-        defaultBody={post.body}
-        defaultContent={post.content}
-        defaultTags={post.tags?.map((tag) => tag.name).join(", ") || ""}
+        post={{
+          id: post.id,
+          title: post.title,
+          body: post.body,
+          content: post.content,
+          tags: post.tags?.map((tag) => tag.name).join(", ") || "",
+        }}
       />
       <DeletePostDialog postId={post.id} postTitle={post.title} />
     </div>
