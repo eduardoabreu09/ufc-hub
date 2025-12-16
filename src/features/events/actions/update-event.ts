@@ -1,6 +1,6 @@
 "use server";
 
-import { getCurrentUser } from "@/features/session/queries/get-current-user";
+import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -9,20 +9,21 @@ import { CreateEventFormSchema } from "../form-schema/create-event";
 const MAX_TAGS_LIMIT = 10;
 const TAG_LENGTH_LIMIT = 32;
 
-export async function createEvent(
+export async function updateEvent(
+  eventId: number,
   formData: FormData
 ): Promise<CreateEventFormSchema> {
-  const userResult = await getCurrentUser();
+  const userIdResult = await getCurrentUserId();
 
-  if (userResult.isFailure) {
+  if (userIdResult.isFailure) {
     return {
-      message: userResult.error,
+      message: userIdResult.error,
       isSuccess: false,
       payload: formData,
     };
   }
 
-  const currentUser = userResult.getValue();
+  const currentUserId = userIdResult.getValue();
 
   const validatedFields = CreateEventFormSchema.safeParse({
     title: formData.get("title"),
@@ -46,6 +47,27 @@ export async function createEvent(
   }
 
   try {
+    const existingEvent = await prisma.event.findUnique({
+      where: { id: eventId },
+      select: { creatorId: true },
+    });
+
+    if (!existingEvent) {
+      return {
+        message: "Evento não encontrado.",
+        isSuccess: false,
+        payload: formData,
+      };
+    }
+
+    if (existingEvent.creatorId !== currentUserId) {
+      return {
+        message: "Você não tem permissão para editar este evento.",
+        isSuccess: false,
+        payload: formData,
+      };
+    }
+
     const {
       title,
       description,
@@ -66,10 +88,10 @@ export async function createEvent(
       };
     }
 
-    const splitedStartTime = startTime.split(":");
+    const [startHour, startMinute] = startTime.split(":");
     const eventDateValue = new Date(eventDate);
-    eventDateValue.setHours(Number(splitedStartTime[0]));
-    eventDateValue.setMinutes(Number(splitedStartTime[1]));
+    eventDateValue.setHours(Number(startHour));
+    eventDateValue.setMinutes(Number(startMinute));
 
     if (eventDateValue <= new Date()) {
       return {
@@ -112,32 +134,37 @@ export async function createEvent(
       };
     }
 
-    await prisma.event.create({
-      data: {
-        title,
-        description: description,
-        body: body,
-        eventDate: eventDateValue,
-        location: location,
-        duration: duration,
-        creatorId: currentUser.id,
-        imageUrl: imageUrl || null,
-        tags:
-          uniqueTags.length > 0
-            ? {
-                create: uniqueTags.map((name) => ({ name })),
-              }
-            : undefined,
-      },
-    });
+    await prisma.$transaction([
+      prisma.eventTag.deleteMany({ where: { eventId } }),
+      prisma.event.update({
+        where: { id: eventId },
+        data: {
+          title,
+          description,
+          body,
+          eventDate: eventDateValue,
+          duration,
+          location,
+          imageUrl: imageUrl || null,
+          tags:
+            uniqueTags.length > 0
+              ? {
+                  create: uniqueTags.map((name) => ({ name })),
+                }
+              : undefined,
+        },
+      }),
+    ]);
 
     revalidatePath("/home/event");
+    revalidatePath("/home/event/[id]", "page");
 
     return {
-      message: "Evento criado com sucesso!",
+      message: "Evento atualizado com sucesso.",
       isSuccess: true,
     };
   } catch (error) {
+    console.error("Error updating event:", error);
     return {
       message: "Erro inesperado no servidor. Tente novamente.",
       isSuccess: false,

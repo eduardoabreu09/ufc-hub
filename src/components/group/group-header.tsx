@@ -63,7 +63,7 @@ export async function GroupHeader({ groupId }: GroupHeaderProps) {
               <SheetTitle>Detalhes do grupo</SheetTitle>
             </SheetHeader>
 
-            <div className="flex flex-col items-center py-4 gap-4">
+            <div className="flex flex-col items-center p-4 gap-4">
               <AvatarName
                 name={group.name}
                 className="h-24 w-24"

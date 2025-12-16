@@ -35,10 +35,12 @@ export async function getEvents(): Promise<Result<EventDTO[]>> {
         createdAt: true,
         eventDate: true,
         location: true,
+        duration: true,
         imageUrl: true,
         createdBy: {
           select: { id: true, name: true, email: true, course: true },
         },
+        creatorId: true,
         participations: {
           where: { userId: currentUserId },
           select: { userId: true, participation: true },

@@ -35,9 +35,12 @@ export const getEventById = cache(
           createdAt: true,
           eventDate: true,
           location: true,
+          duration: true,
+          imageUrl: true,
           createdBy: {
             select: { id: true, name: true, email: true, course: true },
           },
+          creatorId: true,
           tags: {
             select: {
               name: true,

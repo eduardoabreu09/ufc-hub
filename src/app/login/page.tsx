@@ -57,7 +57,7 @@ export default function LoginPage() {
               <AccordionContent className="flex flex-col gap-4 text-balance">
                 <p>
                   Descubra eventos acadêmicos e culturais da UFC, confirme sua
-                  presença ou marque como &quot;Talvez&quot; em segundos.
+                  presença em segundos.
                 </p>
                 <p>
                   Crie seus próprios eventos, convide colegas e acompanhe quem
@@ -73,9 +73,8 @@ export default function LoginPage() {
                   compromissos acadêmicos para manter sua rotina sob controle.
                 </p>
                 <p>
-                  Receba lembretes, veja conflitos de horário e adapte sua
-                  agenda rapidamente para não perder nenhuma atividade
-                  importante.
+                  Veja conflitos de horário e adapte sua agenda rapidamente para
+                  não perder nenhuma atividade importante.
                 </p>
               </AccordionContent>
             </AccordionItem>

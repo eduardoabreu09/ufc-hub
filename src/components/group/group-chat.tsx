@@ -11,6 +11,7 @@ import { sendMessage } from "@/features/groups/actions/send-message";
 import { useMessages } from "@/hooks/use-messages";
 import { toast } from "sonner";
 import { useSession } from "@/context/session-context";
+import { formatDateTime } from "@/lib/utils";
 
 interface GroupChatProps {
   groupId: number;
@@ -88,15 +89,13 @@ export function GroupChat({ groupId }: GroupChatProps) {
                     )}
                     <div className="break-words">{message.body}</div>
                     <div className="text-xs opacity-70 mt-1">
-                      {new Date(message.createdAt).toLocaleTimeString(
-                        undefined,
-                        {
-                          day: "2-digit",
-                          month: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        }
-                      )}
+                      {formatDateTime(new Date(message.createdAt), {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </div>
                   </div>
                 </div>

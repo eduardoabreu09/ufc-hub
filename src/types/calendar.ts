@@ -32,7 +32,7 @@ export const AgendaDaysToShow = 30;
 
 // Start and end hours for the week and day views
 export const StartHour = 0;
-export const EndHour = 24;
+export const EndHour = 23;
 
 // Default start and end times
 export const DefaultStartHour = 9; // 9 AM
