@@ -1,7 +1,7 @@
 import { getEvents } from "@/features/events/queries/get-events";
 import { Suspense } from "react";
 import PageHeader from "@/components/page-header";
-import { CreateEventDialog } from "@/components/event/create-event-dialog";
+import { CreateEventDialog } from "@/components/event/event-dialog";
 import EventCard from "@/components/event/event-card";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
