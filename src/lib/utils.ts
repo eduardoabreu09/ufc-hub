@@ -164,10 +164,10 @@ export function formatDateTime(
     return "Data não informada";
   }
 
-  return value.toLocaleString("pt-BR", {
+  return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "long",
     year: "numeric",
     ...options,
-  });
+  }).format(value);
 }

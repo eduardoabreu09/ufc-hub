@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, FormEvent, useMemo } from "react";
+import { FormEvent, useMemo, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,13 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, PlusIcon } from "lucide-react";
-import { toast } from "sonner";
-import { createEvent } from "@/features/events/actions/create-event";
-import DatePicker from "../ui/date-picker";
-import { CreateEventFormSchema } from "@/features/events/form-schema/create-event";
-import { EndHour, StartHour } from "@/types/calendar";
-import { format } from "date-fns";
+import DatePicker from "@/components/ui/date-picker";
 import {
   Select,
   SelectContent,
@@ -29,16 +23,36 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "@/components/ui/select";
+import { Loader2, PencilIcon } from "lucide-react";
+import { format } from "date-fns";
+import { toast } from "sonner";
+import { updateEvent } from "@/features/events/actions/update-event";
+import { CreateEventFormSchema } from "@/features/events/form-schema/create-event";
+import { EndHour, StartHour } from "@/types/calendar";
+import { EventMessageDTO } from "@/types/event";
 
-export function CreateEventDialog() {
+interface EditEventDialogProps {
+  event: EventMessageDTO;
+}
+
+export function EditEventDialog({ event }: EditEventDialogProps) {
   const [open, setOpen] = useState(false);
   const [state, setState] = useState<CreateEventFormSchema>();
   const [isPending, startTransition] = useTransition();
 
-  // Memoize time options so they're only calculated once
+  const defaultStartTime = useMemo(
+    () => format(new Date(event.eventDate), "HH:mm"),
+    [event.eventDate]
+  );
+
+  const defaultTags = useMemo(
+    () => event.tags.map((tag) => tag.name).join(", "),
+    [event.tags]
+  );
+
   const timeOptions = useMemo(() => {
-    const options = [];
+    const options = [] as { value: string; label: string }[];
     for (let hour = StartHour; hour <= EndHour; hour++) {
       for (let minute = 0; minute < 60; minute += 15) {
         const date = new Date(2000, 0, 1, hour, minute);
@@ -47,14 +61,14 @@ export function CreateEventDialog() {
       }
     }
     return options;
-  }, []); // Empty dependency array ensures this only runs once
+  }, []);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+  function handleSubmit(formEvent: FormEvent<HTMLFormElement>) {
+    formEvent.preventDefault();
+    const formData = new FormData(formEvent.currentTarget);
 
     startTransition(async () => {
-      const result = await createEvent(formData);
+      const result = await updateEvent(event.id, formData);
       setState(result);
 
       if (result.isSuccess) {
@@ -69,17 +83,17 @@ export function CreateEventDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <PlusIcon className="h-4 w-4 mr-2" />
-          Criar Evento
+        <Button variant="outline" size="sm">
+          <PencilIcon className="h-4 w-4 mr-2" />
+          Editar
         </Button>
       </DialogTrigger>
       <DialogContent className="w-full sm:max-w-[520px] md:max-w-2xl max-h-[calc(100svh-2rem)] overflow-y-auto">
         <form onSubmit={handleSubmit} className="space-y-6">
           <DialogHeader>
-            <DialogTitle>Criar Novo Evento</DialogTitle>
+            <DialogTitle>Editar Evento</DialogTitle>
             <DialogDescription>
-              Crie um novo evento e compartilhe com seus colegas.
+              Atualize as informações do seu evento.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-6">
@@ -88,6 +102,7 @@ export function CreateEventDialog() {
               <Input
                 id="title"
                 name="title"
+                defaultValue={event.title}
                 placeholder="Título do evento"
                 required
               />
@@ -98,6 +113,7 @@ export function CreateEventDialog() {
               <Input
                 id="location"
                 name="location"
+                defaultValue={event.location}
                 placeholder="Ex.: Auditório Central, Bloco 3"
                 required
               />
@@ -110,15 +126,16 @@ export function CreateEventDialog() {
                   name="eventDate"
                   id="eventDate"
                   required
+                  defaultValue={event.eventDate}
                   className="w-full"
                 />
               </div>
               <div className="flex gap-6">
                 <div className="grid gap-2">
-                  <Label htmlFor="eventDate">Início</Label>
-                  <Select defaultValue="09:00" name="startTime">
+                  <Label htmlFor="startTime">Início</Label>
+                  <Select defaultValue={defaultStartTime} name="startTime">
                     <SelectTrigger id="startTime">
-                      <SelectValue placeholder="Select time" />
+                      <SelectValue placeholder="Selecione um horário" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
@@ -137,6 +154,7 @@ export function CreateEventDialog() {
                   <Input
                     id="duration"
                     name="duration"
+                    defaultValue={event.duration}
                     placeholder="60"
                     type="number"
                     required
@@ -150,6 +168,7 @@ export function CreateEventDialog() {
               <Textarea
                 id="description"
                 name="description"
+                defaultValue={event.description}
                 placeholder="Uma breve descrição do evento"
                 rows={3}
                 required
@@ -161,6 +180,7 @@ export function CreateEventDialog() {
               <Textarea
                 id="body"
                 name="body"
+                defaultValue={event.body}
                 placeholder="Descreva o evento, incluindo agenda, tema, instruções e links úteis."
                 rows={6}
                 required
@@ -172,6 +192,7 @@ export function CreateEventDialog() {
               <Input
                 id="imageUrl"
                 name="imageUrl"
+                defaultValue={event.imageUrl ?? ""}
                 placeholder="Ex.: https://www.ufc.br/images/img.png"
               />
             </div>
@@ -181,6 +202,7 @@ export function CreateEventDialog() {
               <Input
                 id="tags"
                 name="tags"
+                defaultValue={defaultTags}
                 placeholder="Ex.: Tecnologia, Saúde, Networking, Engenharia"
                 required
               />
@@ -192,14 +214,15 @@ export function CreateEventDialog() {
               variant="outline"
               onClick={() => setOpen(false)}
             >
-              Voltar
+              Cancelar
             </Button>
-            {isPending && (
+            {isPending ? (
               <Button type="submit" disabled>
-                <Loader2 className=" animate-spin" /> Criando...
+                <Loader2 className="animate-spin" /> Salvando...
               </Button>
+            ) : (
+              <Button type="submit">Salvar alterações</Button>
             )}
-            {!isPending && <Button type="submit">Criar Evento</Button>}
           </DialogFooter>
         </form>
       </DialogContent>

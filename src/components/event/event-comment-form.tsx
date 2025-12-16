@@ -13,7 +13,7 @@ interface EventCommentFormProps {
 export function EventCommentForm({ eventId }: EventCommentFormProps) {
   const [state, formAction, isPending] = useActionState(
     commentOnEvent.bind(null, eventId),
-    undefined
+    undefined,
   );
   const formRef = useRef<HTMLFormElement>(null);
   const previousStateRef = useRef(state);

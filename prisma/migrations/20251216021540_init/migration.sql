@@ -50,6 +50,7 @@ CREATE TABLE "Event" (
     "body" TEXT NOT NULL,
     "location" TEXT NOT NULL,
     "eventDate" TIMESTAMP(3) NOT NULL,
+    "duration" INTEGER NOT NULL,
     "imageUrl" TEXT,
     "creatorId" INTEGER NOT NULL,
     "groupId" INTEGER,
@@ -61,7 +62,7 @@ CREATE TABLE "Event" (
 CREATE TABLE "EventParticipation" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "participation" "Participation",
+    "participation" "Participation" NOT NULL,
     "userId" INTEGER NOT NULL,
     "eventId" INTEGER NOT NULL,
 
@@ -111,6 +112,16 @@ CREATE TABLE "EventTag" (
     CONSTRAINT "EventTag_pkey" PRIMARY KEY ("eventId","name")
 );
 
+-- CreateTable
+CREATE TABLE "Like" (
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "blogPostId" INTEGER,
+    "eventId" INTEGER,
+
+    CONSTRAINT "Like_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -155,3 +166,12 @@ ALTER TABLE "BlogTag" ADD CONSTRAINT "BlogTag_blogId_fkey" FOREIGN KEY ("blogId"
 
 -- AddForeignKey
 ALTER TABLE "EventTag" ADD CONSTRAINT "EventTag_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "Event"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Like" ADD CONSTRAINT "Like_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Like" ADD CONSTRAINT "Like_blogPostId_fkey" FOREIGN KEY ("blogPostId") REFERENCES "BlogPost"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Like" ADD CONSTRAINT "Like_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "Event"("id") ON DELETE SET NULL ON UPDATE CASCADE;

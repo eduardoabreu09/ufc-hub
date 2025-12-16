@@ -38,6 +38,7 @@ model User {
     event_participations EventParticipation[]
     messages             Message[]
     blog_posts           BlogPost[]
+    likes                Like[]
 }
 
 model Group {
@@ -77,6 +78,7 @@ model Event {
     body        String
     location    String
     eventDate   DateTime
+    duration    Int
     imageUrl    String?
 
     createdBy User   @relation(fields: [creatorId], references: [id])
@@ -86,6 +88,7 @@ model Event {
 
     messages       Message[]
     participations EventParticipation[]
+    likes          Like[]
 
     tags EventTag[]
 }
@@ -132,6 +135,7 @@ model BlogPost {
 
     messages Message[]
     tags     BlogTag[]
+    likes    Like[]
 }
 
 model BlogTag {
@@ -148,4 +152,17 @@ model EventTag {
     name    String
 
     @@id([eventId, name])
+}
+
+model Like {
+    id Int @id @default(autoincrement())
+
+    user   User @relation(fields: [userId], references: [id])
+    userId Int
+
+    blogPost   BlogPost? @relation(fields: [blogPostId], references: [id])
+    blogPostId Int?
+
+    event   Event? @relation(fields: [eventId], references: [id])
+    eventId Int?
 }
