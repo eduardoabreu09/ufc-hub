@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState, useTransition, type ReactNode } from "react";
+import { FormEvent, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -40,14 +40,13 @@ interface BlogDialogProps {
 
 export function BlogDialog({ mode, post }: BlogDialogProps) {
   const isEdit = mode === "edit";
-
-  if (isEdit && !post) return null;
-
   const [open, setOpen] = useState(false);
   const [state, setState] = useState<CreatePostFormState>();
   const [isPending, startTransition] = useTransition();
   const [contentPreview, setContentPreview] = useState(post?.content ?? "");
   const [tagsValue, setTagsValue] = useState(post?.tags ?? "");
+
+  if (isEdit && !post) return null;
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -193,7 +192,8 @@ export function BlogDialog({ mode, post }: BlogDialogProps) {
             </Button>
             {isPending ? (
               <Button type="submit" disabled>
-                <Loader2 className=" animate-spin" /> {pendingLabel}
+                <Loader2 className="animate-spin" />
+                {pendingLabel}
               </Button>
             ) : (
               <Button type="submit">{submitLabel}</Button>

@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 interface PageHeaderProps {
   title: string;
   description: string;
-  DialogComponent: () => ReactNode;
+  DialogComponent?: () => ReactNode;
   children?: ReactNode;
 }
 
@@ -20,7 +20,7 @@ export default function PageHeader({
           <h1 className="text-3xl font-bold">{title}</h1>
           <p className="text-muted-foreground mt-2">{description}</p>
         </div>
-        <DialogComponent />
+        {DialogComponent && <DialogComponent />}
       </div>
       {children}
     </div>

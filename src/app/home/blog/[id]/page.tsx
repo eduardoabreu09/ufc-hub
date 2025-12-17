@@ -105,9 +105,7 @@ async function BlogDetails({ postId }: { postId: number }) {
                 <span>•</span>
                 <div className="flex flex-wrap items-center gap-2">
                   {post.tags.map((tag) => (
-                    <Badge key={tag.name} className="text-xs">
-                      {tag.name.toUpperCase()}
-                    </Badge>
+                    <Badge key={tag.name}>{tag.name.toUpperCase()}</Badge>
                   ))}
                 </div>
               </>
