@@ -35,11 +35,11 @@ interface GroupDialogProps {
 
 export function GroupDialog({ mode, group }: GroupDialogProps) {
   const isEdit = mode === "edit";
-  if (isEdit && !group) return null;
-
   const [open, setOpen] = useState(false);
   const [state, setState] = useState<CreateGroupFormState>();
   const [isPending, startTransition] = useTransition();
+
+  if (isEdit && !group) return null;
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

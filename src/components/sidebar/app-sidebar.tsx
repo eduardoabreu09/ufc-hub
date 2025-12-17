@@ -34,11 +34,11 @@ const navigation = [
     title: "Seções",
     url: "/",
     items: [
-      // {
-      //   title: "Home",
-      //   url: "/home",
-      //   icon: Home,
-      // },
+      {
+        title: "Home",
+        url: "/home",
+        icon: Home,
+      },
       {
         title: "Grupos",
         url: "/home/group",

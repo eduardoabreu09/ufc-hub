@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { UsersIcon, MessageCircleIcon, CalendarIcon } from "lucide-react";
 import Link from "next/link";
 import { GroupDTO } from "@/types/group";
@@ -36,8 +37,15 @@ export function GroupCard({ group }: GroupCardProps) {
             <span>{memberCount} membros</span>
           </div>
           <div className="flex items-center gap-1">
-            <MessageCircleIcon className="h-4 w-4" />
-            <span>{group._count?.messages || 0} mensagens</span>
+            <MessageCircleIcon className="h-4 w-4 text-primary" />
+            {group._count?.messages ? (
+              <Badge variant="secondary">
+                {group._count.messages}{" "}
+                {group._count.messages === 1 ? "nova" : "novas"}
+              </Badge>
+            ) : (
+              <span>Nenhuma mensagem nova</span>
+            )}
           </div>
         </div>
 
