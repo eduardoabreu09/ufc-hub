@@ -72,7 +72,7 @@ export async function createPost(
       };
     }
 
-    await prisma.blogPost.create({
+    const post = await prisma.blogPost.create({
       data: {
         title,
         body,
@@ -90,6 +90,7 @@ export async function createPost(
     });
 
     revalidatePath("/home/blog");
+    revalidatePath(`/home/blog/${post.id}`);
 
     return {
       message: "Postagem criada com sucesso.",

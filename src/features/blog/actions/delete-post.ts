@@ -49,6 +49,8 @@ export async function deletePost(postId: number): Promise<GeneralFormState> {
     ]);
 
     revalidatePath("/home/blog");
+    revalidatePath(`/home/blog/${postId}`);
+
     return { isSuccess: true, message: "Postagem deletada com sucesso." };
   } catch (error) {
     console.error("Error deleting post:", error);

@@ -94,7 +94,7 @@ export async function addMember(
       },
     });
 
-    revalidatePath("/home/group/[id]", "page");
+    revalidatePath(`/home/group/${groupId}`);
 
     return {
       message: "Membro adicionado com sucesso.",

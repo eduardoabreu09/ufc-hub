@@ -37,7 +37,8 @@ export async function participateInEvent(
     });
 
     revalidatePath("/home/event");
-    revalidatePath("/home/event/[id]", "page");
+    revalidatePath(`/home/event/${eventId}`);
+
     return { isSuccess: true, message: "Participação confirmada" };
   } catch (error) {
     console.error("Error participating in event:", error);

@@ -65,7 +65,8 @@ export async function sendMessage(
       },
     });
 
-    revalidatePath("/home/group/[id]", "page");
+    // TODO: See if we want to revalidate group page after sending message
+    // revalidatePath(`/home/group/${groupId}`);
 
     return {
       message: "Mensagem enviada com sucesso.",

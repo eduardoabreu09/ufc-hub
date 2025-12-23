@@ -1,12 +1,12 @@
 "use client";
 
 import { useSession } from "@/context/session-context";
-import { EventMessageDTO } from "@/types/event";
 import { EditEventDialog } from "./event-dialog";
 import { DeleteEventDialog } from "./delete-event-dialog";
+import { EventDetailsDTO } from "@/types/event";
 
 interface EventProps {
-  event: EventMessageDTO;
+  event: EventDetailsDTO;
 }
 
 export function EventAuthorActions({ event }: EventProps) {

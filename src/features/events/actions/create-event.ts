@@ -112,7 +112,7 @@ export async function createEvent(
       };
     }
 
-    await prisma.event.create({
+    const event = await prisma.event.create({
       data: {
         title,
         description: description,
@@ -132,6 +132,7 @@ export async function createEvent(
     });
 
     revalidatePath("/home/event");
+    revalidatePath(`/home/event/${event.id}`);
 
     return {
       message: "Evento criado com sucesso!",

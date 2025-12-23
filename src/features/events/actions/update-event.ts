@@ -157,7 +157,7 @@ export async function updateEvent(
     ]);
 
     revalidatePath("/home/event");
-    revalidatePath("/home/event/[id]", "page");
+    revalidatePath(`/home/event/${eventId}`);
 
     return {
       message: "Evento atualizado com sucesso.",

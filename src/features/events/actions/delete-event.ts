@@ -43,7 +43,7 @@ export async function deleteEvent(eventId: number): Promise<GeneralFormState> {
     ]);
 
     revalidatePath("/home/event");
-    revalidatePath("/home/event/[id]", "page");
+    revalidatePath(`/home/event/${eventId}`);
 
     return { isSuccess: true, message: "Evento deletado com sucesso." };
   } catch (error) {

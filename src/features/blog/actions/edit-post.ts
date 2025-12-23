@@ -112,8 +112,8 @@ export async function editPost(
       }),
     ]);
 
-    revalidatePath(`/home/blog/${postId}`);
     revalidatePath("/home/blog");
+    revalidatePath(`/home/blog/${postId}`);
 
     return {
       message: "Postagem atualizada com sucesso.",

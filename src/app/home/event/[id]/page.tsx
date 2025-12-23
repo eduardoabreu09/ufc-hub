@@ -1,23 +1,18 @@
-import { notFound } from "next/navigation";
-import { getEventById } from "@/features/events/queries/get-event-by-id";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { EventDetails } from "./event-details";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default async function EventDetailPage({
+export default function EventDetailPage({
   params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  const eventId = Number(id);
-
+}: PageProps<"/home/event/[id]">) {
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
       <Suspense fallback={<LoadingEventBody />}>
-        <EventBody eventId={eventId} />
+        {params.then(({ id }) => (
+          <EventDetails eventId={Number(id)} />
+        ))}
       </Suspense>
     </div>
   );
@@ -106,16 +101,4 @@ function LoadingEventBody() {
       </Card>
     </div>
   );
-}
-
-async function EventBody({ eventId }: { eventId: number }) {
-  const eventResult = await getEventById(eventId);
-
-  if (eventResult.isFailure) {
-    notFound();
-  }
-
-  const event = eventResult.getValue();
-
-  return <EventDetails event={event} />;
 }

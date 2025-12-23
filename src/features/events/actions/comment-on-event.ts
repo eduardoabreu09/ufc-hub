@@ -60,7 +60,7 @@ export async function commentOnEvent(
       },
     });
 
-    revalidatePath("/home/event/[id]", "page");
+    revalidatePath(`/home/event/${event.id}`);
 
     return {
       message: "Comentário enviado com sucesso.",

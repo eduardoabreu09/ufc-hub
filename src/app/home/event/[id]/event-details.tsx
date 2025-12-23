@@ -11,10 +11,14 @@ import { Separator } from "@/components/ui/separator";
 import type { Participation } from "@prisma/client";
 import { formatDateTime } from "@/lib/utils";
 import AvatarName from "@/components/avatar-name";
-import { EventMessageDTO, EventParticipationDTO } from "@/types/event";
+import { EventParticipationDTO } from "@/types/event";
 import { EventParticipationActions } from "./event-participation-actions";
 import { CommentSection } from "@/components/comment-section";
 import { EventAuthorActions } from "@/components/event/event-author-actions";
+import { getEventCommentsById } from "@/features/events/queries/get-event-comments";
+import { Suspense } from "react";
+import { getEventById } from "@/features/events/queries/get-event-by-id";
+import { notFound } from "next/navigation";
 
 const PARTICIPATION_SECTION_LABELS: Record<Participation, string> = {
   YES: "Confirmados",
@@ -22,12 +26,17 @@ const PARTICIPATION_SECTION_LABELS: Record<Participation, string> = {
   MAYBE: "Talvez",
 };
 
-interface EventDetailsProps {
-  event: EventMessageDTO;
-}
+export async function EventDetails({ eventId }: { eventId: number }) {
+  const eventResult = await getEventById(eventId);
 
-export function EventDetails({ event }: EventDetailsProps) {
+  if (eventResult.isFailure) {
+    notFound();
+  }
+
+  const event = eventResult.getValue();
+
   const participations = event.participations ?? [];
+  const commentsPromise = getEventCommentsById(event.id);
 
   const participationGroups: Record<Participation, EventParticipationDTO[]> = {
     YES: [],
@@ -40,12 +49,6 @@ export function EventDetails({ event }: EventDetailsProps) {
       participationGroups[participation.participation].push(participation);
     }
   });
-
-  const sortedMessages = [...(event.messages ?? [])].sort(
-    (messageA, messageB) =>
-      new Date(messageA.createdAt).getTime() -
-      new Date(messageB.createdAt).getTime()
-  );
 
   return (
     <>
@@ -163,12 +166,17 @@ export function EventDetails({ event }: EventDetailsProps) {
       </div>
       <Separator />
 
-      <CommentSection
-        id={event.id}
-        comments={sortedMessages}
-        showInput={true}
-        type="event"
-      />
+      {
+        // TODO Remove mock Loading... text
+      }
+      <Suspense fallback={<div>Loading...</div>}>
+        <CommentSection
+          id={event.id}
+          commentsPromise={commentsPromise}
+          showInput={true}
+          type="event"
+        />
+      </Suspense>
     </>
   );
 }

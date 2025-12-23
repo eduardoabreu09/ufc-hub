@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { use, useActionState, useEffect, useRef } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -14,18 +14,19 @@ import { commentOnEvent } from "@/features/events/actions/comment-on-event";
 
 interface CommentSectionProps {
   id: number;
-  comments: MessageDTO[];
   showInput?: boolean;
   type: "event" | "blog";
+  commentsPromise: Promise<MessageDTO[]>;
 }
 
 export function CommentSection({
   id,
-  comments,
   showInput,
   type,
+  commentsPromise,
 }: CommentSectionProps) {
   const formRef = useRef<HTMLFormElement>(null);
+  const comments = use(commentsPromise);
   const commentOnCurrent =
     type === "blog"
       ? commentOnPost.bind(null, id)
