@@ -12,28 +12,8 @@ import { CommentSection } from "@/components/comment-section";
 import { BlogAuthorActions } from "@/components/blog/blog-author-actions";
 import { Suspense } from "react";
 import { getPostCommentsById } from "@/features/blog/queries/get-post-comments";
-import { getPosts } from "@/features/blog/queries/get-posts";
-
-// Generate static params for all existing posts
-export async function generateStaticParams() {
-  const postsResult = await getPosts();
-
-  if (!postsResult.isSuccess) {
-    return [];
-  }
-
-  const posts = postsResult.getValue();
-
-  return posts.map((post) => ({
-    id: post.id.toString(),
-  }));
-}
-
-// Allow new posts to be statically generated on-demand
-export const dynamicParams = true;
-
-// Revalidate every hour
-export const revalidate = 3600;
+import { cacheLife, cacheTag } from "next/cache";
+import CommentSectionSkeleton from "@/components/comment-section-skeleton";
 
 export default function BlogPostPage({ params }: PageProps<"/home/blog/[id]">) {
   return (
@@ -41,6 +21,11 @@ export default function BlogPostPage({ params }: PageProps<"/home/blog/[id]">) {
       <Suspense fallback={<LoadingPost />}>
         {params.then(({ id }) => (
           <BlogDetails postId={Number(id)} />
+        ))}
+      </Suspense>
+      <Suspense fallback={<CommentSectionSkeleton showInput />}>
+        {params.then(({ id }) => (
+          <BlogComments postId={Number(id)} />
         ))}
       </Suspense>
     </div>
@@ -101,8 +86,9 @@ function LoadingPost() {
 }
 
 async function BlogDetails({ postId }: { postId: number }) {
+  "use cache";
+  cacheTag("post-details");
   const postResult = await getPostById(postId);
-  const commentsPromise = getPostCommentsById(postId);
 
   if (!postResult.isSuccess) {
     notFound();
@@ -164,20 +150,26 @@ async function BlogDetails({ postId }: { postId: number }) {
           {post.content}
         </ReactMarkdown>
       </article>
+    </>
+  );
+}
 
+async function BlogComments({ postId }: { postId: number }) {
+  "use cache";
+  cacheLife("seconds");
+  cacheTag("post-comments");
+  const comments = await getPostCommentsById(postId);
+
+  return (
+    <>
       <Separator />
 
-      {
-        // TODO Remove mock Loading... text
-      }
-      <Suspense fallback={<div>Loading...</div>}>
-        <CommentSection
-          id={post.id}
-          commentsPromise={commentsPromise}
-          showInput={true}
-          type="blog"
-        />
-      </Suspense>
+      <CommentSection
+        id={postId}
+        comments={comments}
+        showInput={true}
+        type="blog"
+      />
     </>
   );
 }

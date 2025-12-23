@@ -33,13 +33,13 @@ function SessionProvider({ children }: SessionProviderProps) {
       refreshInterval: 60000 * 60, // 1 hour
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-    },
+    }
   );
   const contextValue = useMemo<SessionContext>(
     () => ({
       user: data ?? null,
     }),
-    [data],
+    [data]
   );
 
   return (

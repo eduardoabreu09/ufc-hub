@@ -19,6 +19,7 @@ import { getEventCommentsById } from "@/features/events/queries/get-event-commen
 import { Suspense } from "react";
 import { getEventById } from "@/features/events/queries/get-event-by-id";
 import { notFound } from "next/navigation";
+import CommentSectionSkeleton from "@/components/comment-section-skeleton";
 
 const PARTICIPATION_SECTION_LABELS: Record<Participation, string> = {
   YES: "Confirmados",
@@ -36,7 +37,6 @@ export async function EventDetails({ eventId }: { eventId: number }) {
   const event = eventResult.getValue();
 
   const participations = event.participations ?? [];
-  const commentsPromise = getEventCommentsById(event.id);
 
   const participationGroups: Record<Participation, EventParticipationDTO[]> = {
     YES: [],
@@ -166,17 +166,22 @@ export async function EventDetails({ eventId }: { eventId: number }) {
       </div>
       <Separator />
 
-      {
-        // TODO Remove mock Loading... text
-      }
-      <Suspense fallback={<div>Loading...</div>}>
-        <CommentSection
-          id={event.id}
-          commentsPromise={commentsPromise}
-          showInput={true}
-          type="event"
-        />
+      <Suspense fallback={<CommentSectionSkeleton showInput />}>
+        <EventComments eventId={eventId} />
       </Suspense>
     </>
+  );
+}
+
+async function EventComments({ eventId }: { eventId: number }) {
+  const comments = await getEventCommentsById(eventId);
+
+  return (
+    <CommentSection
+      id={eventId}
+      comments={comments}
+      showInput={true}
+      type="event"
+    />
   );
 }

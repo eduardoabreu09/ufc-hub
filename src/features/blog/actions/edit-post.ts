@@ -6,7 +6,7 @@ import {
 } from "@/features/blog/form-schema/create-post";
 import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag, updateTag } from "next/cache";
 import { z } from "zod";
 
 const MAX_TAGS_LIMIT = 10;
@@ -112,8 +112,8 @@ export async function editPost(
       }),
     ]);
 
-    revalidatePath("/home/blog");
-    revalidatePath(`/home/blog/${postId}`);
+    updateTag("post-details");
+    updateTag("post-list");
 
     return {
       message: "Postagem atualizada com sucesso.",

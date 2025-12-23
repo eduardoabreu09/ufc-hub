@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -16,17 +16,16 @@ interface CommentSectionProps {
   id: number;
   showInput?: boolean;
   type: "event" | "blog";
-  commentsPromise: Promise<MessageDTO[]>;
+  comments: MessageDTO[];
 }
 
 export function CommentSection({
   id,
   showInput,
   type,
-  commentsPromise,
+  comments,
 }: CommentSectionProps) {
   const formRef = useRef<HTMLFormElement>(null);
-  const comments = use(commentsPromise);
   const commentOnCurrent =
     type === "blog"
       ? commentOnPost.bind(null, id)
