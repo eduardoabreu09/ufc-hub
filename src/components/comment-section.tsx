@@ -35,15 +35,17 @@ export function CommentSection({
     undefined
   );
 
-  useEffect(() => {
-    if (!state) return;
+  const previousStateRef = useRef(state);
 
-    if (state.isSuccess) {
-      toast.success(state.message);
-      formRef.current?.reset();
-    } else if (state.message) {
+  useEffect(() => {
+    if (
+      !state?.isSuccess &&
+      state !== previousStateRef.current &&
+      state?.message
+    ) {
       toast.error(state.message);
     }
+    previousStateRef.current = state;
   }, [state]);
 
   return (

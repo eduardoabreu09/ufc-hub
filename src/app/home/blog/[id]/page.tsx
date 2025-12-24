@@ -15,19 +15,33 @@ import { getPostCommentsById } from "@/features/blog/queries/get-post-comments";
 import { cacheTag } from "next/cache";
 import CommentSectionSkeleton from "@/components/comment-section-skeleton";
 import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
+import { getPosts } from "@/features/blog/queries/get-posts";
 
-export default function BlogPostPage({ params }: PageProps<"/home/blog/[id]">) {
+export async function generateStaticParams() {
+  const postsResult = await getPosts();
+
+  if (postsResult.isFailure) {
+    return [];
+  }
+
+  const posts = postsResult.getValue();
+
+  return posts.map((post) => ({
+    id: post.id.toString(),
+  }));
+}
+
+export default async function BlogPostPage({
+  params,
+}: PageProps<"/home/blog/[id]">) {
+  const { id } = await params;
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
       <Suspense fallback={<LoadingPost />}>
-        {params.then(({ id }) => (
-          <BlogDetails postId={Number(id)} />
-        ))}
+        <BlogDetails postId={Number(id)} />
       </Suspense>
       <Suspense fallback={<CommentSectionSkeleton showInput />}>
-        {params.then(({ id }) => (
-          <BlogComments postId={Number(id)} />
-        ))}
+        <BlogComments postId={Number(id)} />
       </Suspense>
     </div>
   );
