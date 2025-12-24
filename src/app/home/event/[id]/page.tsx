@@ -3,6 +3,10 @@ import { Separator } from "@/components/ui/separator";
 import { EventDetails } from "./event-details";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import CommentSectionSkeleton from "@/components/comment-section-skeleton";
+import { getEventCommentsById } from "@/features/events/queries/get-event-comments";
+import { CommentSection } from "@/components/comment-section";
+import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
 
 export default function EventDetailPage({
   params,
@@ -12,6 +16,11 @@ export default function EventDetailPage({
       <Suspense fallback={<LoadingEventBody />}>
         {params.then(({ id }) => (
           <EventDetails eventId={Number(id)} />
+        ))}
+      </Suspense>
+      <Suspense fallback={<CommentSectionSkeleton showInput />}>
+        {params.then(({ id }) => (
+          <EventComments eventId={Number(id)} />
         ))}
       </Suspense>
     </div>
@@ -100,5 +109,21 @@ function LoadingEventBody() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+async function EventComments({ eventId }: { eventId: number }) {
+  const [comments, currentUserResult] = await Promise.all([
+    getEventCommentsById(eventId),
+    getCurrentUserId(),
+  ]);
+
+  return (
+    <CommentSection
+      id={eventId}
+      comments={comments}
+      showInput={currentUserResult.isSuccess}
+      type="event"
+    />
   );
 }

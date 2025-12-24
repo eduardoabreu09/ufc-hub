@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// TODO: Add metadata in all pages
 export const metadata: Metadata = {
   title: "UFC Hub",
   description: "Plataforma de colaboração para estudantes da UFC",

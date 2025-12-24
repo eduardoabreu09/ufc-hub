@@ -12,8 +12,9 @@ import { CommentSection } from "@/components/comment-section";
 import { BlogAuthorActions } from "@/components/blog/blog-author-actions";
 import { Suspense } from "react";
 import { getPostCommentsById } from "@/features/blog/queries/get-post-comments";
-import { cacheLife, cacheTag } from "next/cache";
+import { cacheTag } from "next/cache";
 import CommentSectionSkeleton from "@/components/comment-section-skeleton";
+import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
 
 export default function BlogPostPage({ params }: PageProps<"/home/blog/[id]">) {
   return (
@@ -96,7 +97,7 @@ async function BlogDetails({ postId }: { postId: number }) {
 
   const post = postResult.getValue();
   return (
-    <>
+    <div className="space-y-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-3 max-w-3xl">
           <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
@@ -150,26 +151,23 @@ async function BlogDetails({ postId }: { postId: number }) {
           {post.content}
         </ReactMarkdown>
       </article>
-    </>
+      <Separator />
+    </div>
   );
 }
 
 async function BlogComments({ postId }: { postId: number }) {
-  "use cache";
-  cacheLife("seconds");
-  cacheTag("post-comments");
-  const comments = await getPostCommentsById(postId);
+  const [comments, currentUserResult] = await Promise.all([
+    getPostCommentsById(postId),
+    getCurrentUserId(),
+  ]);
 
   return (
-    <>
-      <Separator />
-
-      <CommentSection
-        id={postId}
-        comments={comments}
-        showInput={true}
-        type="blog"
-      />
-    </>
+    <CommentSection
+      id={postId}
+      comments={comments}
+      showInput={currentUserResult.isSuccess}
+      type="blog"
+    />
   );
 }
