@@ -1,20 +1,26 @@
-"use client";
-
-import { useSession } from "@/context/session-context";
-import { BlogPostWithMessagesDTO } from "@/types/blog-post";
 import { EditPostDialog } from "./blog-dialog";
 import { DeletePostDialog } from "./delete-post-dialog";
+import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
+import { getPostById } from "@/features/blog/queries/get-post-by-id";
 
-interface BlogProps {
-  post: BlogPostWithMessagesDTO;
-}
+export default async function BlogAuthorActions({
+  postId,
+}: {
+  postId: number;
+}) {
+  const [postResult, currentUserIdResult] = await Promise.all([
+    getPostById(postId),
+    getCurrentUserId(),
+  ]);
 
-export function BlogAuthorActions({ post }: BlogProps) {
-  const { user } = useSession();
+  if (postResult.isFailure || currentUserIdResult.isFailure) {
+    return null;
+  }
 
-  if (!user) return null;
+  const post = postResult.getValue();
+  const currentUserId = currentUserIdResult.getValue();
 
-  const isOwner = post.authorId === user.id;
+  const isOwner = post.authorId === currentUserId;
 
   if (!isOwner) return null;
 

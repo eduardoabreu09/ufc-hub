@@ -2,10 +2,15 @@ import "server-only";
 
 import { prisma } from "@/lib/prisma";
 import { MessageDTO } from "@/types/message";
+import { cacheLife, cacheTag } from "next/cache";
 
 export async function getPostCommentsById(
   postId: number
 ): Promise<MessageDTO[]> {
+  "use cache";
+  cacheLife("seconds");
+  cacheTag("post-comments");
+
   try {
     const messages = await prisma.message.findMany({
       where: {

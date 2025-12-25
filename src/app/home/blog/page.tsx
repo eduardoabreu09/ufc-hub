@@ -4,7 +4,6 @@ import PageHeader from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getPosts } from "@/features/blog/queries/get-posts";
 import type { BlogPostDTO } from "@/types/blog-post";
-import { cacheTag } from "next/cache";
 import { Suspense } from "react";
 
 export default function BlogPage() {
@@ -59,8 +58,8 @@ function LoadingPosts() {
 }
 
 async function PostList() {
-  "use cache";
-  cacheTag("post-list");
+  // This is Dynamic data.
+  // TODO: Add search params, search bar and navigation later.
   const postsResult = await getPosts();
 
   if (!postsResult.isSuccess) {

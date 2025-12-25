@@ -6,7 +6,7 @@ import {
 } from "@/features/blog/form-schema/create-post";
 import { getCurrentUser } from "@/features/session/queries/get-current-user";
 import { prisma } from "@/lib/prisma";
-import { revalidatePath, revalidateTag, updateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 const MAX_TAGS_LIMIT = 10;
@@ -89,7 +89,7 @@ export async function createPost(
       },
     });
 
-    updateTag("post-list");
+    revalidatePath("/home/blog");
 
     return {
       message: "Postagem criada com sucesso.",

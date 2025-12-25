@@ -113,7 +113,7 @@ export async function editPost(
     ]);
 
     updateTag("post-details");
-    updateTag("post-list");
+    revalidatePath("/home/blog");
 
     return {
       message: "Postagem atualizada com sucesso.",

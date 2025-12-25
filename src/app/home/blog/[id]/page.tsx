@@ -1,21 +1,20 @@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
 import { getPostById } from "@/features/blog/queries/get-post-by-id";
 import { CalendarIcon, UserIcon } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
-import { notFound } from "next/navigation";
 import { formatDateTime } from "@/lib/utils";
 import { CommentSection } from "@/components/comment-section";
-import { BlogAuthorActions } from "@/components/blog/blog-author-actions";
+import BlogAuthorActions from "@/components/blog/blog-author-actions";
 import { Suspense } from "react";
 import { getPostCommentsById } from "@/features/blog/queries/get-post-comments";
 import { cacheTag } from "next/cache";
 import CommentSectionSkeleton from "@/components/comment-section-skeleton";
 import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
 import { getPosts } from "@/features/blog/queries/get-posts";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export async function generateStaticParams() {
   const postsResult = await getPosts();
@@ -37,9 +36,7 @@ export default async function BlogPostPage({
   const { id } = await params;
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
-      <Suspense fallback={<LoadingPost />}>
-        <BlogDetails postId={Number(id)} />
-      </Suspense>
+      <BlogDetails postId={Number(id)} />
       <Suspense fallback={<CommentSectionSkeleton showInput />}>
         <BlogComments postId={Number(id)} />
       </Suspense>
@@ -47,108 +44,21 @@ export default async function BlogPostPage({
   );
 }
 
-function LoadingPost() {
-  return (
-    <div className="space-y-8">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="space-y-3 max-w-3xl w-full">
-          <div className="flex flex-wrap items-center gap-2">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-4 w-2" />
-            <div className="flex flex-wrap items-center gap-2">
-              <Skeleton className="h-5 w-16" />
-              <Skeleton className="h-5 w-14" />
-              <Skeleton className="h-5 w-12" />
-            </div>
-          </div>
-
-          <Skeleton className="h-10 w-3/4" />
-          <Skeleton className="h-6 w-full" />
-
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-9 w-32 rounded-full" />
-            <Skeleton className="h-4 w-20" />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-9 w-24" />
-          <Skeleton className="h-9 w-24" />
-        </div>
-      </div>
-
-      <Separator />
-
-      <div className="space-y-3">
-        <Skeleton className="h-5 w-11/12" />
-        <Skeleton className="h-5 w-full" />
-        <Skeleton className="h-5 w-10/12" />
-        <Skeleton className="h-64 w-full" />
-      </div>
-
-      <Separator />
-
-      <div className="space-y-3">
-        <Skeleton className="h-6 w-40" />
-        <div className="space-y-2">
-          <Skeleton className="h-5 w-full" />
-          <Skeleton className="h-5 w-11/12" />
-          <Skeleton className="h-5 w-9/12" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 async function BlogDetails({ postId }: { postId: number }) {
-  "use cache";
-  cacheTag("post-details");
-  const postResult = await getPostById(postId);
-
-  if (!postResult.isSuccess) {
-    notFound();
-  }
-
-  const post = postResult.getValue();
   return (
     <div className="space-y-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="space-y-3 max-w-3xl">
-          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <CalendarIcon className="h-4 w-4" />
-              {formatDateTime(post.createdAt)}
-            </span>
-            {post.tags && post.tags.length > 0 && (
-              <>
-                <span>•</span>
-                <div className="flex flex-wrap items-center gap-2">
-                  {post.tags.map((tag) => (
-                    <Badge key={tag.name}>{tag.name.toUpperCase()}</Badge>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-
-          <h1 className="text-4xl font-bold tracking-tight">{post.title}</h1>
-          <p className="text-lg text-muted-foreground">{post.body}</p>
-
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-foreground">
-              <UserIcon className="h-4 w-4" />
-              <span className="font-medium">{post.author.name}</span>
+        <PostBody postId={postId} />
+        <Suspense
+          fallback={
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-9 w-24" />
+              <Skeleton className="h-9 w-24" />
             </div>
-            {post.author.course && (
-              <>
-                <span>•</span>
-                <span className="font-medium">{post.author.course}</span>
-              </>
-            )}
-          </div>
-        </div>
-
-        <BlogAuthorActions post={post} />
+          }
+        >
+          <BlogAuthorActions postId={postId} />
+        </Suspense>
       </div>
 
       <Separator />
@@ -161,12 +71,79 @@ async function BlogDetails({ postId }: { postId: number }) {
         prose-pre:bg-muted prose-pre:rounded-lg prose-pre:shadow-md
         prose-code:text-foreground"
       >
-        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-          {post.content}
-        </ReactMarkdown>
+        <PostContent postId={postId} />
       </article>
       <Separator />
     </div>
+  );
+}
+
+async function PostBody({ postId }: { postId: number }) {
+  "use cache";
+  cacheTag("post-details");
+
+  const postResult = await getPostById(postId);
+
+  if (postResult.isFailure) {
+    return null;
+  }
+
+  const post = postResult.getValue();
+
+  return (
+    <div className="space-y-3 max-w-3xl">
+      <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+        <span className="flex items-center gap-1">
+          <CalendarIcon className="h-4 w-4" />
+          {formatDateTime(post.createdAt)}
+        </span>
+        {post.tags && post.tags.length > 0 && (
+          <>
+            <span>•</span>
+            <div className="flex flex-wrap items-center gap-2">
+              {post.tags.map((tag) => (
+                <Badge key={tag.name}>{tag.name.toUpperCase()}</Badge>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      <h1 className="text-4xl font-bold tracking-tight">{post.title}</h1>
+      <p className="text-lg text-muted-foreground">{post.body}</p>
+
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-foreground">
+          <UserIcon className="h-4 w-4" />
+          <span className="font-medium">{post.author.name}</span>
+        </div>
+        {post.author.course && (
+          <>
+            <span>•</span>
+            <span className="font-medium">{post.author.course}</span>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+async function PostContent({ postId }: { postId: number }) {
+  "use cache";
+  cacheTag("post-details");
+
+  const postResult = await getPostById(postId);
+
+  if (postResult.isFailure) {
+    return null;
+  }
+
+  const post = postResult.getValue();
+
+  return (
+    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+      {post.content}
+    </ReactMarkdown>
   );
 }
 
