@@ -1,12 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card, CardFooter, CardHeader } from "@/components/ui/card";
 import type { BlogPostDTO } from "@/types/blog-post";
 import { CalendarDays, MessageSquareIcon, UserIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";

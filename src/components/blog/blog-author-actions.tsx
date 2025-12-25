@@ -2,12 +2,14 @@ import { EditPostDialog } from "./blog-dialog";
 import { DeletePostDialog } from "./delete-post-dialog";
 import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
 import { getPostById } from "@/features/blog/queries/get-post-by-id";
+import { connection } from "next/server";
 
 export default async function BlogAuthorActions({
   postId,
 }: {
   postId: number;
 }) {
+  await connection();
   const [postResult, currentUserIdResult] = await Promise.all([
     getPostById(postId),
     getCurrentUserId(),

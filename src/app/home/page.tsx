@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getPosts } from "@/features/blog/queries/get-posts";
 import { getEvents } from "@/features/events/queries/get-events";
 import { getGroups } from "@/features/groups/queries/get-groups";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 export default function Home() {
@@ -149,6 +150,7 @@ async function EventList() {
 }
 
 async function PostList() {
+  await connection();
   const postsResult = await getPosts();
 
   if (postsResult.isFailure) {

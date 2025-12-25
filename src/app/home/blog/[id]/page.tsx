@@ -10,7 +10,7 @@ import { CommentSection } from "@/components/comment-section";
 import BlogAuthorActions from "@/components/blog/blog-author-actions";
 import { Suspense } from "react";
 import { getPostCommentsById } from "@/features/blog/queries/get-post-comments";
-import { cacheTag } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import CommentSectionSkeleton from "@/components/comment-section-skeleton";
 import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
 import { getPosts } from "@/features/blog/queries/get-posts";
@@ -63,16 +63,8 @@ async function BlogDetails({ postId }: { postId: number }) {
 
       <Separator />
 
-      <article
-        className="prose prose-neutral max-w-none dark:prose-invert 
-        prose-img:rounded-xl prose-a:text-primary prose-li:text-foreground
-        prose-h1:font-bold prose-h1:border-b prose-h1:border-foreground/30 prose-h1:pb-2
-        prose-h2:border-b prose-h2:border-foreground/30 prose-h2:pb-2
-        prose-pre:bg-muted prose-pre:rounded-lg prose-pre:shadow-md
-        prose-code:text-foreground"
-      >
-        <PostContent postId={postId} />
-      </article>
+      <PostContent postId={postId} />
+
       <Separator />
     </div>
   );
@@ -81,6 +73,7 @@ async function BlogDetails({ postId }: { postId: number }) {
 async function PostBody({ postId }: { postId: number }) {
   "use cache";
   cacheTag("post-details");
+  cacheLife("days");
 
   const postResult = await getPostById(postId);
 
@@ -131,6 +124,7 @@ async function PostBody({ postId }: { postId: number }) {
 async function PostContent({ postId }: { postId: number }) {
   "use cache";
   cacheTag("post-details");
+  cacheLife("days");
 
   const postResult = await getPostById(postId);
 
@@ -141,9 +135,18 @@ async function PostContent({ postId }: { postId: number }) {
   const post = postResult.getValue();
 
   return (
-    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-      {post.content}
-    </ReactMarkdown>
+    <article
+      className="prose prose-neutral max-w-none dark:prose-invert 
+        prose-img:rounded-xl prose-a:text-primary prose-li:text-foreground
+        prose-h1:font-bold prose-h1:border-b prose-h1:border-foreground/30 prose-h1:pb-2
+        prose-h2:border-b prose-h2:border-foreground/30 prose-h2:pb-2
+        prose-pre:bg-muted prose-pre:rounded-lg prose-pre:shadow-md
+        prose-code:text-foreground"
+    >
+      <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+        {post.content}
+      </ReactMarkdown>
+    </article>
   );
 }
 

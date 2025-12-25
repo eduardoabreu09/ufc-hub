@@ -1,5 +1,4 @@
 import { Participation } from "@prisma/client";
-import { MessageDTO } from "./message";
 import { UserDTO } from "./user";
 import { TagDto } from "./tag";
 

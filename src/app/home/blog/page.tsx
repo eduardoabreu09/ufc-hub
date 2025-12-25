@@ -4,6 +4,7 @@ import PageHeader from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getPosts } from "@/features/blog/queries/get-posts";
 import type { BlogPostDTO } from "@/types/blog-post";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 export default function BlogPage() {
@@ -60,6 +61,7 @@ function LoadingPosts() {
 async function PostList() {
   // This is Dynamic data.
   // TODO: Add search params, search bar and navigation later.
+  await connection();
   const postsResult = await getPosts();
 
   if (!postsResult.isSuccess) {
