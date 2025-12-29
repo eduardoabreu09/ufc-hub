@@ -3,6 +3,9 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  experimental: {
+    inlineCss: true
+  },
   cacheComponents: true,
   reactCompiler: true,
   turbopack: {

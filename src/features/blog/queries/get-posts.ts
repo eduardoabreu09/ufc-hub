@@ -34,6 +34,7 @@ export async function getPosts(): Promise<Result<BlogPostDTO[]>> {
           },
         },
       },
+      take: 100,
       orderBy: { createdAt: "desc" },
     });
 
