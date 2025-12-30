@@ -1,27 +1,38 @@
+import "dotenv/config";
 import { GroupRole, Participation, PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcrypt";
+import { fakerPT_BR as faker } from "@faker-js/faker";
 
-const prisma = new PrismaClient();
+const connectionString = `${process.env.DATABASE_URL}`;
+const adapter = new PrismaPg({ connectionString });
+const prisma = new PrismaClient({ adapter });
 
-const bigText = `
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eleifend sapien a mauris viverra, at tempor diam finibus. Curabitur faucibus feugiat luctus. Duis arcu lacus, pellentesque eu imperdiet sit amet, volutpat id velit. Donec urna est, suscipit quis egestas in, accumsan sed dui. Vestibulum tristique cursus augue, vitae lacinia diam malesuada quis. Nam mattis viverra dictum. Donec tincidunt dolor a nisi iaculis, vitae dignissim orci euismod. Morbi luctus, magna sed congue commodo, lacus ipsum consequat ligula, vel tincidunt lacus libero sit amet nunc.
+const COURSES = [
+  "Engenharia de Computação",
+  "Engenharia Civil",
+  "Engenharia Elétrica",
+  "Medicina",
+  "Direito",
+  "Design",
+  "Administração",
+  "Psicologia",
+  "Arquitetura",
+  "Sistemas de Informação",
+  "Ciência da Computação",
+  "Letras",
+  "Filosofia",
+  "Física",
+  "Matemática",
+];
 
-Quisque imperdiet eu tellus sed scelerisque. Curabitur venenatis nunc est, at lacinia erat porta vitae. Donec auctor eros ac augue tincidunt dignissim. Quisque elementum nisi ut tincidunt porta. Donec consectetur viverra sodales. Morbi luctus urna eget dolor tincidunt pretium. Phasellus non dapibus turpis. Donec sed felis non risus semper finibus nec auctor nisl. Quisque fermentum ipsum nisl, at dapibus odio aliquet in. Vivamus sem urna, scelerisque feugiat ex nec, rhoncus vulputate metus.
-
-Vestibulum at libero gravida, varius turpis vel, laoreet dolor. Nulla eget ex placerat nisl volutpat dictum. Ut sit amet nisi ac urna venenatis ullamcorper. In eu sodales ante. Integer tempor enim neque, non faucibus orci finibus in. Cras iaculis leo sit amet risus elementum, at interdum odio dignissim. In hac habitasse platea dictumst. Nulla rhoncus vestibulum ligula ut egestas. Curabitur sagittis diam quis ipsum gravida, et cursus est dictum.
-
-Praesent auctor pellentesque mauris at molestie. Curabitur mollis ligula eget convallis tristique. Nam vitae justo vel sapien commodo euismod at a urna. Nulla iaculis molestie diam varius ultricies. Donec euismod elit eu laoreet feugiat. Etiam vestibulum aliquam enim, quis finibus sapien vulputate ac. Etiam iaculis viverra feugiat. Praesent eleifend, dui in vulputate pulvinar, nisl risus cursus felis, eu lobortis orci ex efficitur diam.
-
-Duis consectetur, ipsum ut gravida vulputate, orci odio aliquet massa, vel pellentesque purus orci non orci. Quisque posuere dolor at risus pellentesque, quis commodo nisl vestibulum. Sed ac pellentesque tortor. Cras non tincidunt ex, sed tristique mauris. Duis pharetra ipsum lectus, quis hendrerit tellus scelerisque eget. Mauris leo elit, iaculis ac volutpat vitae, mollis vitae nunc. Curabitur blandit volutpat odio nec dapibus. Curabitur viverra tincidunt magna sagittis rhoncus. Quisque eu porttitor ipsum. Proin libero tellus, dignissim ac sodales sit amet, auctor a massa.
-`;
-
-const daysFromNow = (days: number) => {
-  const now = new Date();
-  now.setDate(now.getDate() + days);
-  return now;
-};
+const TAGS = [
+  "Estudo", "Tecnologia", "Saúde", "Cinema", "Cultura", "Design", "Produto",
+  "Inovação", "Apoio", "Cálculo", "Programação", "Carreira", "Eventos", "UFC"
+];
 
 async function resetDatabase() {
+  console.log("Resetting database...");
   await prisma.$transaction([
     prisma.like.deleteMany(),
     prisma.message.deleteMany(),
@@ -36,389 +47,202 @@ async function resetDatabase() {
   ]);
 }
 
-async function seedUsers() {
+async function seedUsers(count: number) {
+  console.log(`Seeding ${count} users...`);
   const defaultPassword = await bcrypt.hash("@Admin123", 10);
+  
+  const usersData = Array.from({ length: count }).map(() => {
+    const firstName = faker.person.firstName();
+    const lastName = faker.person.lastName();
+    return {
+      name: `${firstName} ${lastName}`,
+      email: faker.internet.email({ firstName, lastName, provider: "ufc.br" }).toLowerCase(),
+      course: faker.helpers.arrayElement(COURSES),
+      password: defaultPassword,
+    };
+  });
 
-  const users = [
-    {
-      email: "ana.silva@ufc.br",
-      name: "Ana Silva",
-      course: "Engenharia Civil",
-      password: defaultPassword,
-    },
-    {
-      email: "joao.sousa@ufc.br",
-      name: "Joao Sousa",
-      course: "Engenharia de Computacao",
-      password: defaultPassword,
-    },
-    {
-      email: "maria.lima@ufc.br",
-      name: "Maria Lima",
-      course: "Medicina",
-      password: defaultPassword,
-    },
-    {
-      email: "bruno.costa@ufc.br",
-      name: "Bruno Costa",
-      course: "Design",
-      password: defaultPassword,
-    },
-    {
-      email: "clara.nunes@ufc.br",
-      name: "Clara Nunes",
-      course: "Direito",
-      password: defaultPassword,
-    },
-    {
-      email: "rafael.oliveira@ufc.br",
-      name: "Rafael Oliveira",
-      course: "Administracao",
-      password: defaultPassword,
-    },
-  ];
+  // Split into chunks to avoid memory issues or large transaction limits
+  const chunkSize = 1000;
+  for (let i = 0; i < usersData.length; i += chunkSize) {
+    await prisma.user.createMany({
+      data: usersData.slice(i, i + chunkSize),
+      skipDuplicates: true,
+    });
+  }
 
-  return Promise.all(users.map((user) => prisma.user.create({ data: user })));
+  const users = await prisma.user.findMany({ select: { id: true } });
+  return users.map(u => u.id);
 }
 
-async function seedGroups(users: Awaited<ReturnType<typeof seedUsers>>) {
-  const [ana, joao, maria, bruno, clara, rafael] = users;
+async function seedGroups(userIds: number[], count: number) {
+  console.log(`Seeding ${count} groups...`);
+  
+  const groupsData = Array.from({ length: count }).map(() => ({
+    name: faker.company.name(),
+    description: faker.lorem.sentence(),
+    creatorId: faker.helpers.arrayElement(userIds),
+  }));
 
-  const studyGroup = await prisma.group.create({
-    data: {
-      name: "Estudos de Calculo I",
-      description: "Listas comentadas, resumos e monitorias de Calculo I",
-      creatorId: ana.id,
-      users: {
-        create: [
-          { userId: ana.id, role: GroupRole.ADMIN },
-          { userId: joao.id, role: GroupRole.USER },
-          { userId: maria.id, role: GroupRole.USER },
-        ],
-      },
-      messages: {
-        create: [
-          { senderId: joao.id, body: "Alguem revisou a lista 3?" },
-          { senderId: ana.id, body: "Posto o gabarito ainda hoje." },
-        ],
-      },
-    },
-  });
+  await prisma.group.createMany({ data: groupsData });
+  const groups = await prisma.group.findMany({ select: { id: true, creatorId: true } });
+  const groupIds = groups.map(g => g.id);
 
-  const techGroup = await prisma.group.create({
-    data: {
-      name: "Liga de Tecnologia",
-      description: "Eventos, projetos e monitorias de computacao",
-      creatorId: joao.id,
-      users: {
-        create: [
-          { userId: joao.id, role: GroupRole.ADMIN },
-          { userId: bruno.id, role: GroupRole.ADMIN },
-          { userId: rafael.id, role: GroupRole.USER },
-        ],
-      },
-      messages: {
-        create: [
-          {
-            senderId: rafael.id,
-            body: "Precisamos de voluntarios para o hackathon.",
-          },
-          { senderId: joao.id, body: "Vou fechar as trilhas ate sexta." },
-        ],
-      },
-    },
-  });
+  console.log("Adding members to groups...");
+  const userGroupsData: { userId: number; groupId: number; role: GroupRole }[] = [];
+  
+  for (const group of groups) {
+    // Add creator as ADMIN
+    userGroupsData.push({
+      userId: group.creatorId,
+      groupId: group.id,
+      role: GroupRole.ADMIN,
+    });
 
-  const healthGroup = await prisma.group.create({
-    data: {
-      name: "Saude e Bem-Estar",
-      description:
-        "Discussao sobre bem-estar, pratica esportiva e apoio estudantil",
-      creatorId: maria.id,
-      users: {
-        create: [
-          { userId: maria.id, role: GroupRole.ADMIN },
-          { userId: clara.id, role: GroupRole.USER },
-          { userId: ana.id, role: GroupRole.USER },
-        ],
-      },
-      messages: {
-        create: [
-          {
-            senderId: clara.id,
-            body: "Podemos marcar uma caminhada no campus?",
-          },
-        ],
-      },
-    },
-  });
+    // Add 5-20 random members
+    const memberCount = faker.number.int({ min: 5, max: 20 });
+    const randomMembers = faker.helpers.arrayElements(userIds, memberCount);
+    
+    for (const memberId of randomMembers) {
+      if (memberId !== group.creatorId) {
+        userGroupsData.push({
+          userId: memberId,
+          groupId: group.id,
+          role: GroupRole.USER,
+        });
+      }
+    }
+  }
 
-  const cinemaGroup = await prisma.group.create({
-    data: {
-      name: "Cinema e Cultura",
-      description: "Cineclubes, debates e roteiros criativos",
-      creatorId: bruno.id,
-      users: {
-        create: [
-          { userId: bruno.id, role: GroupRole.ADMIN },
-          { userId: clara.id, role: GroupRole.USER },
-          { userId: rafael.id, role: GroupRole.USER },
-        ],
-      },
-      messages: {
-        create: [
-          { senderId: rafael.id, body: "Sugiro tarantino na proxima sessao." },
-          { senderId: bruno.id, body: "Fechado, escolho o filme hoje." },
-        ],
-      },
-    },
-  });
+  // Chunk UserGroup inserts
+  const chunkSize = 2000;
+  for (let i = 0; i < userGroupsData.length; i += chunkSize) {
+    await prisma.userGroup.createMany({
+      data: userGroupsData.slice(i, i + chunkSize),
+      skipDuplicates: true,
+    });
+  }
 
-  return { studyGroup, techGroup, healthGroup, cinemaGroup };
+  return groupIds;
 }
 
-async function seedEvents(
-  users: Awaited<ReturnType<typeof seedUsers>>,
-  groups: Awaited<ReturnType<typeof seedGroups>>
-) {
-  const [ana, joao, maria, bruno, clara, rafael] = users;
-  const { studyGroup, techGroup, healthGroup, cinemaGroup } = groups;
+async function seedEvents(userIds: number[], groupIds: number[], count: number) {
+  console.log(`Seeding ${count} events...`);
+  
+  const eventsData = Array.from({ length: count }).map(() => {
+    const eventDate = faker.date.future();
+    return {
+      title: faker.lorem.words({ min: 3, max: 6 }),
+      description: faker.lorem.sentence(),
+      body: faker.lorem.paragraphs(3),
+      location: faker.location.streetAddress(),
+      eventDate,
+      duration: faker.number.int({ min: 30, max: 480 }),
+      creatorId: faker.helpers.arrayElement(userIds),
+      groupId: faker.helpers.arrayElement([...groupIds, null]),
+      imageUrl: faker.image.url(),
+    };
+  });
 
-  return Promise.all([
-    prisma.event.create({
-      data: {
-        title: "Revisao para prova de Calculo",
-        description: "Encontro rapido para revisar integrais e limites",
-        body: bigText,
-        location: "Sala 201, Bloco 701",
-        duration: 90,
-        eventDate: daysFromNow(3),
-        creatorId: ana.id,
-        groupId: studyGroup.id,
-        tags: { create: [{ name: "Estudo" }, { name: "Calculo" }] },
-        participations: {
-          create: [
-            { userId: ana.id, participation: Participation.YES },
-            { userId: joao.id, participation: Participation.MAYBE },
-            { userId: maria.id, participation: Participation.YES },
-          ],
-        },
-        likes: { create: [{ userId: rafael.id }, { userId: clara.id }] },
-        messages: {
-          create: [
-            {
-              senderId: joao.id,
-              body: "Consigo levar um quadro de exercicios.",
-            },
-            { senderId: maria.id, body: "Vou focar em limites laterais." },
-          ],
-        },
-      },
-    }),
-    prisma.event.create({
-      data: {
-        title: "Hackathon Pici 2025",
-        description: "48h de maratona para resolver desafios da universidade",
-        body: bigText,
-        location: "Auditorio do Pici",
-        duration: 480,
-        imageUrl: "https://www.ufc.br/images/ft_251111_cearaawards1_gr.jpg",
-        eventDate: daysFromNow(14),
-        creatorId: joao.id,
-        groupId: techGroup.id,
-        tags: { create: [{ name: "Tecnologia" }, { name: "Inovacao" }] },
-        participations: {
-          create: [
-            { userId: joao.id, participation: Participation.YES },
-            { userId: bruno.id, participation: Participation.YES },
-            { userId: rafael.id, participation: Participation.MAYBE },
-          ],
-        },
-        likes: {
-          create: [
-            { userId: ana.id },
-            { userId: maria.id },
-            { userId: clara.id },
-          ],
-        },
-        messages: {
-          create: [
-            { senderId: bruno.id, body: "Podemos abrir uma trilha de design?" },
-            { senderId: rafael.id, body: "Tenho patrocinio para os lanches." },
-          ],
-        },
-      },
-    }),
-    prisma.event.create({
-      data: {
-        title: "Roda de conversa: Saude Mental",
-        description: "Espaco seguro para falar sobre rotina, sono e apoio",
-        body: bigText,
-        location: "Casa de Cultura",
-        duration: 120,
-        eventDate: daysFromNow(-2),
-        creatorId: maria.id,
-        groupId: healthGroup.id,
-        tags: { create: [{ name: "Saude" }, { name: "Apoio" }] },
-        participations: {
-          create: [
-            { userId: maria.id, participation: Participation.YES },
-            { userId: ana.id, participation: Participation.MAYBE },
-            { userId: clara.id, participation: Participation.YES },
-          ],
-        },
-        likes: { create: [{ userId: joao.id }] },
-        messages: {
-          create: [
-            {
-              senderId: clara.id,
-              body: "Vale trazer colegas de outros cursos?",
-            },
-          ],
-        },
-      },
-    }),
-    prisma.event.create({
-      data: {
-        title: "Sessao de cinema: Tarantino",
-        description: "Bate-papo apos exibicao de Pulp Fiction",
-        body: bigText,
-        location: "Sala multimidia do RU",
-        duration: 150,
-        eventDate: daysFromNow(5),
-        creatorId: bruno.id,
-        groupId: cinemaGroup.id,
-        tags: { create: [{ name: "Cinema" }, { name: "Cultura" }] },
-        participations: {
-          create: [
-            { userId: bruno.id, participation: Participation.YES },
-            { userId: clara.id, participation: Participation.YES },
-            { userId: rafael.id, participation: Participation.YES },
-          ],
-        },
-        likes: { create: [{ userId: maria.id }] },
-        messages: {
-          create: [{ senderId: rafael.id, body: "Alguem leva pipoca?" }],
-        },
-      },
-    }),
-    prisma.event.create({
-      data: {
-        title: "Aula aberta de UX e prototipacao",
-        description: "Figma, fluxos e handoff para devs",
-        body: bigText,
-        location: "Lab de Informatica 2",
-        duration: 120,
-        eventDate: daysFromNow(7),
-        creatorId: bruno.id,
-        groupId: techGroup.id,
-        tags: { create: [{ name: "Design" }, { name: "Produto" }] },
-        participations: {
-          create: [
-            { userId: bruno.id, participation: Participation.YES },
-            { userId: joao.id, participation: Participation.YES },
-            { userId: ana.id, participation: Participation.NO },
-          ],
-        },
-        likes: { create: [{ userId: clara.id }] },
-        messages: {
-          create: [
-            { senderId: bruno.id, body: "Tragam notebooks carregados." },
-          ],
-        },
-      },
-    }),
-  ]);
+  // createMany doesn't support nested creates for tags, so we'll do it in chunks
+  const chunkSize = 100;
+  for (let i = 0; i < eventsData.length; i += chunkSize) {
+    await prisma.event.createMany({
+      data: eventsData.slice(i, i + chunkSize),
+    });
+  }
+
+  const events = await prisma.event.findMany({ select: { id: true } });
+  const eventIds = events.map(e => e.id);
+
+  console.log("Seeding event tags and participations...");
+  const eventTagsData: { eventId: number; name: string }[] = [];
+  const participationsData: { userId: number; eventId: number; participation: Participation }[] = [];
+
+  for (const eventId of eventIds) {
+    // Tags
+    const tagCount = faker.number.int({ min: 1, max: 3 });
+    const selectedTags = faker.helpers.arrayElements(TAGS, tagCount);
+    for (const tagName of selectedTags) {
+      eventTagsData.push({ eventId, name: tagName });
+    }
+
+    // Participations (10-30 per event)
+    const partCount = faker.number.int({ min: 10, max: 30 });
+    const randomUsers = faker.helpers.arrayElements(userIds, partCount);
+    for (const userId of randomUsers) {
+      participationsData.push({
+        userId,
+        eventId,
+        participation: faker.helpers.arrayElement([Participation.YES, Participation.NO, Participation.MAYBE]),
+      });
+    }
+  }
+
+  await prisma.eventTag.createMany({ data: eventTagsData, skipDuplicates: true });
+  
+  const partChunkSize = 2000;
+  for (let i = 0; i < participationsData.length; i += partChunkSize) {
+    await prisma.eventParticipation.createMany({
+      data: participationsData.slice(i, i + partChunkSize),
+      skipDuplicates: true,
+    });
+  }
+
+  return eventIds;
 }
 
-async function seedBlogPosts(users: Awaited<ReturnType<typeof seedUsers>>) {
-  const [ana, joao, maria, bruno, clara, rafael] = users;
+async function seedBlogPosts(userIds: number[], count: number) {
+  console.log(`Seeding ${count} blog posts...`);
+  
+  const blogPostsData = Array.from({ length: count }).map(() => ({
+    title: faker.lorem.sentence(),
+    body: faker.lorem.sentences(2),
+    content: faker.lorem.paragraphs(5),
+    authorId: faker.helpers.arrayElement(userIds),
+  }));
 
-  return Promise.all([
-    prisma.blogPost.create({
-      data: {
-        title: "Como organizar seus estudos no semestre",
-        body: "Calendario semanal, revisoes e tecnicas rapidas.",
-        content: bigText,
-        authorId: joao.id,
-        tags: { create: [{ name: "Estudo" }, { name: "Rotina" }] },
-        likes: {
-          create: [
-            { userId: ana.id },
-            { userId: maria.id },
-            { userId: rafael.id },
-          ],
-        },
-        messages: {
-          create: [
-            { senderId: ana.id, body: "Usei o modelo de calendario e ajudou." },
-            { senderId: rafael.id, body: "Vou adaptar para estagio." },
-          ],
-        },
-      },
-    }),
-    prisma.blogPost.create({
-      data: {
-        title: "Checklist rapida para projetos de design",
-        body: "Como sair do briefing para um prototipo navegavel.",
-        content: bigText,
-        authorId: bruno.id,
-        tags: { create: [{ name: "Design" }, { name: "Produto" }] },
-        likes: { create: [{ userId: clara.id }, { userId: joao.id }] },
-        messages: {
-          create: [
-            { senderId: clara.id, body: "Adorei a parte de acessibilidade." },
-          ],
-        },
-      },
-    }),
-    prisma.blogPost.create({
-      data: {
-        title: "Pesquisa cientifica: primeiros passos",
-        body: "Referencias, grupos de pesquisa e biblioteca digital.",
-        content: bigText,
-        authorId: maria.id,
-        tags: { create: [{ name: "Pesquisa" }, { name: "Biblioteca" }] },
-        likes: { create: [{ userId: ana.id }, { userId: joao.id }] },
-        messages: {
-          create: [{ senderId: ana.id, body: "Vou indicar para a monitoria." }],
-        },
-      },
-    }),
-    prisma.blogPost.create({
-      data: {
-        title: "Guia de editais e bolsas",
-        body: "Onde acompanhar oportunidades e como se preparar.",
-        content: bigText,
-        authorId: clara.id,
-        tags: { create: [{ name: "Bolsa" }, { name: "Oportunidades" }] },
-        likes: { create: [{ userId: maria.id }, { userId: rafael.id }] },
-        messages: {
-          create: [
-            {
-              senderId: rafael.id,
-              body: "Tem edital de inovacao aberto este mes.",
-            },
-          ],
-        },
-      },
-    }),
-  ]);
+  const chunkSize = 100;
+  for (let i = 0; i < blogPostsData.length; i += chunkSize) {
+    await prisma.blogPost.createMany({
+      data: blogPostsData.slice(i, i + chunkSize),
+    });
+  }
+
+  const blogPosts = await prisma.blogPost.findMany({ select: { id: true } });
+  const blogPostIds = blogPosts.map(b => b.id);
+
+  console.log("Seeding blog tags...");
+  const blogTagsData: { blogId: number; name: string }[] = [];
+  for (const blogId of blogPostIds) {
+    const tagCount = faker.number.int({ min: 1, max: 3 });
+    const selectedTags = faker.helpers.arrayElements(TAGS, tagCount);
+    for (const tagName of selectedTags) {
+      blogTagsData.push({ blogId, name: tagName });
+    }
+  }
+
+  await prisma.blogTag.createMany({ data: blogTagsData, skipDuplicates: true });
+
+  return blogPostIds;
 }
 
 async function main() {
+  const startTime = Date.now();
+  
   await resetDatabase();
 
-  const users = await seedUsers();
-  const groups = await seedGroups(users);
-  const events = await seedEvents(users, groups);
-  const blogPosts = await seedBlogPosts(users);
+  const userIds = await seedUsers(10000);
+  const groupIds = await seedGroups(userIds, 300);
+  const eventIds = await seedEvents(userIds, groupIds, 800);
+  const blogPostIds = await seedBlogPosts(userIds, 600);
 
-  console.log("Seed completed", {
-    users: users.length,
-    groups: Object.keys(groups).length,
-    events: events.length,
-    blogPosts: blogPosts.length,
+  const duration = (Date.now() - startTime) / 1000;
+  console.log(`Seed completed in ${duration.toFixed(2)}s`, {
+    users: userIds.length,
+    groups: groupIds.length,
+    events: eventIds.length,
+    blogPosts: blogPostIds.length,
   });
 }
 

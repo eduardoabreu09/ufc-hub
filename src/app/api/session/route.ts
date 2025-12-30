@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { connection, NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/features/session/queries/get-current-user";
 
 export async function GET(request: NextRequest) {
+  await connection();
   try {
     const userResult = await getCurrentUser();
 

@@ -5,16 +5,28 @@ import { CreateEventDialog } from "@/components/event/event-dialog";
 import EventCard from "@/components/event/event-card";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import SearchFilter from "@/components/search-filter";
+import PaginationComponent from "@/components/pagination-component";
 
-export default function EventsPage() {
+export default function EventsPage({ searchParams }: PageProps<"/home/event">) {
   return (
     <PageHeader
       title="Eventos"
       description="Crie e participe de eventos da universidade."
       DialogComponent={CreateEventDialog}
     >
+      <Suspense>
+        {searchParams.then((params) => (
+          <SearchFilter label="Buscar Evento" key={params.query?.toString()} />
+        ))}
+      </Suspense>
       <Suspense fallback={<Loading />}>
-        <EventList />
+        <EventList searchParams={searchParams} />
+      </Suspense>
+      <Suspense>
+        {searchParams.then((params) => (
+          <PaginationComponent key={params.page?.toString()} />
+        ))}
       </Suspense>
     </PageHeader>
   );
@@ -70,8 +82,14 @@ function Loading() {
   );
 }
 
-async function EventList() {
-  const eventsResult = await getEvents();
+async function EventList({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const { query, page } = await searchParams;
+
+  const eventsResult = await getEvents(query?.toString(), page?.toString());
 
   if (eventsResult.isFailure) {
     return null;

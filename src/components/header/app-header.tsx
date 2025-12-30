@@ -1,7 +1,8 @@
-import { SidebarTrigger } from "../ui/sidebar";
 import { Separator } from "@radix-ui/react-separator";
 import { AppBreadcrumb } from "./app-breadcrumb";
 import UserDropdown from "./user-dropdown";
+import { Suspense } from "react";
+import { SidebarTrigger } from "../ui/sidebar";
 
 export default function AppHeader() {
   return (
@@ -12,7 +13,9 @@ export default function AppHeader() {
           orientation="vertical"
           className="mr-2 data-[orientation=vertical]:h-4"
         />
-        <AppBreadcrumb />
+        <Suspense>
+          <AppBreadcrumb />
+        </Suspense>
       </div>
       <div className="flex gap-3 ml-auto">
         <UserDropdown />

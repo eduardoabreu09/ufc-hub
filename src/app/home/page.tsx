@@ -3,9 +3,10 @@ import { GroupCard } from "@/components/group/group-card";
 import { EventGallery } from "@/components/home/event-carousel";
 import PageHeader from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getPosts } from "@/features/blog/queries/get-posts";
-import { getEvents } from "@/features/events/queries/get-events";
 import { getGroups } from "@/features/groups/queries/get-groups";
+import { getHomeEvents } from "@/features/home/queries/get-home-events";
+import { getHomePosts } from "@/features/home/queries/get-home-posts";
+import { cacheTag } from "next/cache";
 import { Suspense } from "react";
 
 export default function Home() {
@@ -15,85 +16,13 @@ export default function Home() {
       description="Seu portal central para eventos, notícias e recursos da universidade."
     >
       <div className="flex flex-col gap-10">
-        <Suspense fallback={<LoadingEvents />}>
-          <EventList />
-        </Suspense>
-        <Suspense fallback={<LoadingPosts />}>
-          <PostList />
-        </Suspense>
+        <EventList />
+        <PostList />
         <Suspense fallback={<LoadingGroupList />}>
           <GroupList />
         </Suspense>
       </div>
     </PageHeader>
-  );
-}
-
-function LoadingEvents() {
-  return (
-    <div className="space-y-4">
-      <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
-        <Skeleton className="h-8 w-56" />
-        <div className="flex shrink-0 items-center gap-2">
-          <Skeleton className="h-10 w-10 rounded-md" />
-          <Skeleton className="h-10 w-10 rounded-md" />
-        </div>
-      </div>
-
-      <div className="flex w-full gap-4 overflow-hidden">
-        {Array.from({ length: 3 }).map((_, index) => (
-          <div
-            key={index}
-            className="flex w-full shrink-0 flex-col md:max-w-[452px]"
-          >
-            <div className="aspect-3/2 overflow-hidden rounded-xl">
-              <Skeleton className="h-full w-full" />
-            </div>
-            <Skeleton className="mt-4 h-6 w-3/4" />
-            <Skeleton className="mt-2 h-4 w-full" />
-            <Skeleton className="mt-1 h-4 w-5/6" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function LoadingPosts() {
-  return (
-    <div className="flex w-full flex-col items-center justify-center gap-6">
-      {Array.from({ length: 3 }).map((_, index) => (
-        <div
-          key={index}
-          className="w-full rounded-xl border bg-card sm:max-w-2xl lg:max-w-3xl"
-        >
-          <div className="space-y-4 p-6">
-            <div className="flex flex-wrap gap-3">
-              <Skeleton className="h-6 w-16 rounded-full" />
-              <Skeleton className="h-6 w-20 rounded-full" />
-              <Skeleton className="h-6 w-14 rounded-full" />
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Skeleton className="h-4 w-20" />
-              <Skeleton className="h-4 w-14" />
-            </div>
-            <Skeleton className="h-7 w-3/4" />
-            <Skeleton className="h-6 w-full" />
-            <Skeleton className="h-6 w-5/6" />
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Skeleton className="h-4 w-6 rounded-full" />
-              <Skeleton className="h-4 w-32" />
-            </div>
-          </div>
-          <div className="border-t px-6 py-4">
-            <div className="flex items-center gap-2">
-              <Skeleton className="h-4 w-4 rounded-full" />
-              <Skeleton className="h-4 w-28" />
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
   );
 }
 
@@ -133,7 +62,10 @@ function LoadingGroupList() {
 }
 
 async function EventList() {
-  const eventsResult = await getEvents();
+  "use cache";
+  cacheTag("event-list");
+
+  const eventsResult = await getHomeEvents();
 
   if (eventsResult.isFailure) {
     return null;
@@ -149,7 +81,10 @@ async function EventList() {
 }
 
 async function PostList() {
-  const postsResult = await getPosts();
+  "use cache";
+  cacheTag("post-list");
+
+  const postsResult = await getHomePosts();
 
   if (postsResult.isFailure) {
     return null;
