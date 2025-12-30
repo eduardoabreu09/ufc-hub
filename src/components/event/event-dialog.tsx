@@ -31,13 +31,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { EventMessageDTO } from "@/types/event";
+import { EventDetailsDTO } from "@/types/event";
 
 type EventDialogMode = "create" | "edit";
 
 interface EventDialogProps {
   mode: EventDialogMode;
-  event?: EventMessageDTO;
+  event?: EventDetailsDTO;
 }
 
 export function EventDialog({ mode, event }: EventDialogProps) {
@@ -257,6 +257,6 @@ export function CreateEventDialog() {
   return <EventDialog mode="create" />;
 }
 
-export function EditEventDialog({ event }: { event: EventMessageDTO }) {
+export function EditEventDialog({ event }: { event: EventDetailsDTO }) {
   return <EventDialog mode="edit" event={event} />;
 }

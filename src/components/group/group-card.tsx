@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { UsersIcon, MessageCircleIcon, CalendarIcon } from "lucide-react";
 import Link from "next/link";
 import { GroupDTO } from "@/types/group";
+import { formatDateTime } from "@/lib/utils";
 
 interface GroupCardProps {
   group: GroupDTO;
@@ -51,9 +52,7 @@ export function GroupCard({ group }: GroupCardProps) {
 
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <CalendarIcon className="h-3 w-3" />
-          <span>
-            Criado em: {new Date(group.createdAt).toLocaleDateString()}
-          </span>
+          <span>Criado em: {formatDateTime(group.createdAt)}</span>
         </div>
 
         <div className="flex gap-2">

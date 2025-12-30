@@ -3,23 +3,10 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 import { Result } from "@/lib/results";
 import { BlogPostDTO } from "@/types/blog-post";
-import { parseWithFallback } from "@/lib/utils";
 
-export async function getPosts(
-  query?: string,
-  pageString?: string
-): Promise<Result<BlogPostDTO[]>> {
-  const page = Math.max(parseWithFallback(pageString ?? "", 1), 1);
-  const take = 10;
-  const skip = (page - 1) * take;
+export async function getHomePosts(): Promise<Result<BlogPostDTO[]>> {
   try {
     const posts = await prisma.blogPost.findMany({
-      where: {
-        title: {
-          contains: query,
-          mode: "insensitive",
-        },
-      },
       select: {
         id: true,
         title: true,
@@ -47,9 +34,17 @@ export async function getPosts(
           },
         },
       },
-      skip,
-      take,
-      orderBy: { createdAt: "desc" },
+      take: 5,
+      orderBy: [
+        {
+          messages: {
+            _count: "desc",
+          },
+        },
+        {
+          createdAt: "desc",
+        },
+      ],
     });
 
     return Result.success(posts as BlogPostDTO[]);

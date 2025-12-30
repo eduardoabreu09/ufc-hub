@@ -5,8 +5,12 @@ import { getCurrentUserId } from "@/features/session/queries/get-current-user-id
 import { Result } from "@/lib/results";
 import { EventDTO } from "@/types/event";
 import { Participation } from "@prisma/client";
+import { parseWithFallback } from "@/lib/utils";
 
-export async function getEvents(): Promise<Result<EventDTO[]>> {
+export async function getEvents(
+  query?: string,
+  pageString?: string
+): Promise<Result<EventDTO[]>> {
   const userIdResult = await getCurrentUserId();
 
   if (userIdResult.error && userIdResult.isFailure) {
@@ -15,18 +19,18 @@ export async function getEvents(): Promise<Result<EventDTO[]>> {
 
   const currentUserId = userIdResult.getValue();
 
+  const page = Math.max(parseWithFallback(pageString ?? "", 1), 1);
+  const take = 10;
+  const skip = (page - 1) * take;
+
   try {
     const events = await prisma.event.findMany({
-      /*
-      TODO: Uncomment to fetch only groups the user is a member of
       where: {
-        users: {
-          some: {
-            userId: userId,
-          },
+        title: {
+          contains: query,
+          mode: "insensitive",
         },
       },
-      */
       select: {
         id: true,
         title: true,
@@ -57,6 +61,8 @@ export async function getEvents(): Promise<Result<EventDTO[]>> {
           },
         },
       },
+      skip,
+      take,
       orderBy: { eventDate: "desc" },
     });
 

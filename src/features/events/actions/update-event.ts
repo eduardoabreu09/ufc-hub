@@ -2,7 +2,7 @@
 
 import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag, updateTag } from "next/cache";
 import { z } from "zod";
 import { CreateEventFormSchema } from "../form-schema/create-event";
 
@@ -156,8 +156,9 @@ export async function updateEvent(
       }),
     ]);
 
+    updateTag("event-details");
+    revalidateTag("event-list", "max");
     revalidatePath("/home/event");
-    revalidatePath("/home/event/[id]", "page");
 
     return {
       message: "Evento atualizado com sucesso.",

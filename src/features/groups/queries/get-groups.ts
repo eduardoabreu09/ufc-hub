@@ -12,13 +12,13 @@ export async function getGroups(): Promise<Result<GroupDTO[]>> {
     return Result.failure(userIdResult.error);
   }
 
+  const userId = userIdResult.getValue();
+
   try {
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0);
 
     const groups = await prisma.group.findMany({
-      /*
-      TODO: Uncomment to fetch only groups the user is a member of
       where: {
         users: {
           some: {
@@ -26,7 +26,6 @@ export async function getGroups(): Promise<Result<GroupDTO[]>> {
           },
         },
       },
-      */
       select: {
         id: true,
         name: true,

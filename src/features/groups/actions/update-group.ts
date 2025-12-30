@@ -69,8 +69,8 @@ export async function updateGroup(
       },
     });
 
-    revalidatePath("/home/group/[id]", "page");
     revalidatePath("/home/group");
+    revalidatePath(`/home/group/${groupId}`);
 
     return {
       message: "Grupo atualizado com sucesso.",

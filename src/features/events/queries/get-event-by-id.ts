@@ -1,19 +1,12 @@
 import "server-only";
 
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
-import { cache } from "react";
 import { Result } from "@/lib/results";
-import { EventMessageDTO } from "@/types/event";
+import { EventDetailsDTO } from "@/types/event";
+import { cache } from "react";
 
 export const getEventById = cache(
-  async (eventId: number): Promise<Result<EventMessageDTO>> => {
-    const userIdResult = await getCurrentUserId();
-
-    if (userIdResult.error && userIdResult.isFailure) {
-      return Result.failure(userIdResult.error);
-    }
-
+  async (eventId: number): Promise<Result<EventDetailsDTO>> => {
     try {
       const event = await prisma.event.findUnique({
         where: {
@@ -49,34 +42,12 @@ export const getEventById = cache(
           participations: {
             select: {
               userId: true,
-              eventId: true,
               createdAt: true,
               participation: true,
               user: {
                 select: { id: true, name: true, email: true, course: true },
               },
             },
-          },
-          messages: {
-            select: {
-              id: true,
-              body: true,
-              createdAt: true,
-              senderId: true,
-              eventId: true,
-              sentBy: {
-                select: {
-                  id: true,
-                  name: true,
-                  email: true,
-                  course: true,
-                },
-              },
-            },
-            // INFO: Quick fix to limit max messages;
-            // TODO: Add pagination later
-            take: 100,
-            orderBy: { createdAt: "desc" },
           },
         },
       });

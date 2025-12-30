@@ -14,16 +14,16 @@ import { commentOnEvent } from "@/features/events/actions/comment-on-event";
 
 interface CommentSectionProps {
   id: number;
-  comments: MessageDTO[];
   showInput?: boolean;
   type: "event" | "blog";
+  comments: MessageDTO[];
 }
 
 export function CommentSection({
   id,
-  comments,
   showInput,
   type,
+  comments,
 }: CommentSectionProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const commentOnCurrent =
@@ -35,15 +35,17 @@ export function CommentSection({
     undefined
   );
 
-  useEffect(() => {
-    if (!state) return;
+  const previousStateRef = useRef(state);
 
-    if (state.isSuccess) {
-      toast.success(state.message);
-      formRef.current?.reset();
-    } else if (state.message) {
+  useEffect(() => {
+    if (
+      !state?.isSuccess &&
+      state !== previousStateRef.current &&
+      state?.message
+    ) {
       toast.error(state.message);
     }
+    previousStateRef.current = state;
   }, [state]);
 
   return (

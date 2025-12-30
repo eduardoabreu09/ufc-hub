@@ -1,11 +1,17 @@
+import "dotenv/config";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
+import { Pool } from 'pg'
+import { attachDatabasePool } from '@vercel/functions'
 
-const globalForPrisma = global as unknown as { prisma?: PrismaClient };
+const connectionString = `${process.env.DATABASE_URL}`;
 
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    log: ["error", "warn"],
-  });
+const pool = new Pool({ connectionString });
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+attachDatabasePool(pool)
+
+const prisma = new PrismaClient({
+  adapter: new PrismaPg(pool),
+})
+
+export { prisma };
