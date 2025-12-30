@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { GeneralFormState } from "@/types/form";
 import { Participation } from "@prisma/client";
 
@@ -36,8 +36,8 @@ export async function participateInEvent(
       },
     });
 
+    updateTag("event-details");
     revalidatePath("/home/event");
-    revalidatePath(`/home/event/${eventId}`);
 
     return { isSuccess: true, message: "Participação confirmada" };
   } catch (error) {

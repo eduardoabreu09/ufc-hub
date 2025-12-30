@@ -6,9 +6,12 @@ import { EventAuthorActions } from "@/components/event/event-author-actions";
 import { getEventById } from "@/features/events/queries/get-event-by-id";
 import { notFound } from "next/navigation";
 import EventParticipationContent from "./event-participation-content";
+import { cacheTag } from "next/cache";
 
 export async function EventDetails({ eventId }: { eventId: number }) {
   "use cache";
+  cacheTag("event-details");
+
   const eventResult = await getEventById(eventId);
 
   if (eventResult.isFailure) {
@@ -16,10 +19,11 @@ export async function EventDetails({ eventId }: { eventId: number }) {
   }
 
   const event = eventResult.getValue();
+  const participations = event.participations ?? [];
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+      <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-3 max-w-3xl">
             <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
@@ -80,7 +84,7 @@ export async function EventDetails({ eventId }: { eventId: number }) {
         </div>
         <EventParticipationContent
           eventId={eventId}
-          participations={event.participations}
+          participations={participations}
         />
       </div>
       <Separator />

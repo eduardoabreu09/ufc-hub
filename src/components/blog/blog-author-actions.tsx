@@ -1,28 +1,12 @@
+"use client";
+import { useSession } from "@/context/session-context";
 import { EditPostDialog } from "./blog-dialog";
 import { DeletePostDialog } from "./delete-post-dialog";
-import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
-import { getPostById } from "@/features/blog/queries/get-post-by-id";
-import { connection } from "next/server";
+import { BlogPostDTO } from "@/types/blog-post";
 
-export default async function BlogAuthorActions({
-  postId,
-}: {
-  postId: number;
-}) {
-  await connection();
-  const [postResult, currentUserIdResult] = await Promise.all([
-    getPostById(postId),
-    getCurrentUserId(),
-  ]);
-
-  if (postResult.isFailure || currentUserIdResult.isFailure) {
-    return null;
-  }
-
-  const post = postResult.getValue();
-  const currentUserId = currentUserIdResult.getValue();
-
-  const isOwner = post.authorId === currentUserId;
+export default function BlogAuthorActions({ post }: { post: BlogPostDTO }) {
+  const { user } = useSession();
+  const isOwner = post.authorId === user?.id;
 
   if (!isOwner) return null;
 

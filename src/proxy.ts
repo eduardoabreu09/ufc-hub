@@ -19,7 +19,10 @@ export default async function proxy(req: NextRequest) {
   const isPublicRoute = publicRoutes.includes(reconstructedPath);
 
   const isProtectedRoute =
-    protectedRoutes.some((route) => path.startsWith(route)) && !isPublicRoute;
+    protectedRoutes.some((route) => path.startsWith(route)) &&
+    !isPublicRoute &&
+    // Exclude /home from being treated as a protected route here
+    path !== "/home";
 
   // 3. Decrypt the session from the cookie
   const cookie = (await cookies()).get("session")?.value;

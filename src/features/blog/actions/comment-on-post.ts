@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
-import { updateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import {
   SendMessageFormState,
@@ -60,7 +60,7 @@ export async function commentOnPost(
       },
     });
 
-    updateTag("post-comments");
+    revalidatePath("/home/blog");
 
     return {
       message: "Comentário enviado com sucesso.",

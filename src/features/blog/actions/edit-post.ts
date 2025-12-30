@@ -113,6 +113,7 @@ export async function editPost(
     ]);
 
     updateTag("post-details");
+    revalidateTag("post-list", "max");
     revalidatePath("/home/blog");
 
     return {

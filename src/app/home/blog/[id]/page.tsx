@@ -13,20 +13,27 @@ import { getPostCommentsById } from "@/features/blog/queries/get-post-comments";
 import { cacheLife, cacheTag } from "next/cache";
 import CommentSectionSkeleton from "@/components/comment-section-skeleton";
 import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
-import { getPosts } from "@/features/blog/queries/get-posts";
-import { Skeleton } from "@/components/ui/skeleton";
+import { getHomePosts } from "@/features/home/queries/get-home-posts";
+import { getPostsForCache } from "@/features/blog/queries/get-posts-for-cache";
 
 export async function generateStaticParams() {
-  const postsResult = await getPosts();
+  const [posts, homePostsResult] = await Promise.all([
+    getPostsForCache(),
+    getHomePosts(),
+  ]);
 
-  if (postsResult.isFailure) {
+  if (homePostsResult.isFailure) {
     return [];
   }
 
-  const posts = postsResult.getValue();
+  const homePosts = homePostsResult.getValue();
 
-  return posts.map((post) => ({
-    id: post.id.toString(),
+  const allPosts = [...posts, ...homePosts]
+    .map((post) => post.id)
+    .filter((e, i, self) => i === self.indexOf(e));
+
+  return allPosts.map((id) => ({
+    id: id.toString(),
   }));
 }
 
@@ -47,19 +54,7 @@ export default async function BlogPostPage({
 async function BlogDetails({ postId }: { postId: number }) {
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <PostBody postId={postId} />
-        <Suspense
-          fallback={
-            <div className="flex items-center gap-2">
-              <Skeleton className="h-9 w-24" />
-              <Skeleton className="h-9 w-24" />
-            </div>
-          }
-        >
-          <BlogAuthorActions postId={postId} />
-        </Suspense>
-      </div>
+      <PostBody postId={postId} />
 
       <Separator />
 
@@ -84,39 +79,42 @@ async function PostBody({ postId }: { postId: number }) {
   const post = postResult.getValue();
 
   return (
-    <div className="space-y-3 max-w-3xl">
-      <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-        <span className="flex items-center gap-1">
-          <CalendarIcon className="h-4 w-4" />
-          {formatDateTime(post.createdAt)}
-        </span>
-        {post.tags && post.tags.length > 0 && (
-          <>
-            <span>•</span>
-            <div className="flex flex-wrap items-center gap-2">
-              {post.tags.map((tag) => (
-                <Badge key={tag.name}>{tag.name.toUpperCase()}</Badge>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-
-      <h1 className="text-4xl font-bold tracking-tight">{post.title}</h1>
-      <p className="text-lg text-muted-foreground">{post.body}</p>
-
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <div className="flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-foreground">
-          <UserIcon className="h-4 w-4" />
-          <span className="font-medium">{post.author.name}</span>
+    <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="space-y-3 max-w-3xl">
+        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <CalendarIcon className="h-4 w-4" />
+            {formatDateTime(post.createdAt)}
+          </span>
+          {post.tags && post.tags.length > 0 && (
+            <>
+              <span>•</span>
+              <div className="flex flex-wrap items-center gap-2">
+                {post.tags.map((tag) => (
+                  <Badge key={tag.name}>{tag.name.toUpperCase()}</Badge>
+                ))}
+              </div>
+            </>
+          )}
         </div>
-        {post.author.course && (
-          <>
-            <span>•</span>
-            <span className="font-medium">{post.author.course}</span>
-          </>
-        )}
+
+        <h1 className="text-4xl font-bold tracking-tight">{post.title}</h1>
+        <p className="text-lg text-muted-foreground">{post.body}</p>
+
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-foreground">
+            <UserIcon className="h-4 w-4" />
+            <span className="font-medium">{post.author.name}</span>
+          </div>
+          {post.author.course && (
+            <>
+              <span>•</span>
+              <span className="font-medium">{post.author.course}</span>
+            </>
+          )}
+        </div>
       </div>
+      <BlogAuthorActions post={post} />
     </div>
   );
 }
