@@ -44,6 +44,8 @@ export async function deleteGroup(groupId: number): Promise<GeneralFormState> {
     });
 
     revalidatePath("/home/group");
+    revalidatePath(`/home/group/${groupId}`);
+
     return { isSuccess: true, message: "Grupo deletado com sucesso." };
   } catch (error) {
     console.error("Error deleting group:", error);

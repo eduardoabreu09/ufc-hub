@@ -1,8 +1,8 @@
 import { Participation } from "@prisma/client";
-import { MessageDTO } from "./message";
 import { UserDTO } from "./user";
+import { TagDto } from "./tag";
 
-export interface EventDTO {
+interface EventDTOBase {
   id: number;
   title: string;
   description: string;
@@ -14,15 +14,20 @@ export interface EventDTO {
   createdBy: UserDTO;
   creatorId: number;
   imageUrl: string | null;
-  participations: EventPaticipationSimpleDTO[];
-  tags: EventTagDTO[];
+  tags: TagDto[];
+}
+
+export interface EventHomeDTO extends EventDTOBase {
   _count?: {
     participations: number;
   };
 }
 
-export interface EventTagDTO {
-  name: string;
+export interface EventDTO extends EventDTOBase {
+  participations: EventPaticipationSimpleDTO[];
+  _count?: {
+    participations: number;
+  };
 }
 
 export interface EventPaticipationSimpleDTO {
@@ -30,27 +35,12 @@ export interface EventPaticipationSimpleDTO {
   participation: Participation;
 }
 
-export interface EventMessageDTO {
-  id: number;
-  title: string;
-  description: string;
-  body: string;
-  createdAt: Date;
-  eventDate: Date;
-  duration: number;
-  location: string;
-  createdBy: UserDTO;
-  creatorId: number;
-  imageUrl: string | null;
-
-  messages?: MessageDTO[];
-  tags: EventTagDTO[];
+export interface EventDetailsDTO extends EventDTOBase {
   participations?: EventParticipationDTO[];
 }
 
 export interface EventParticipationDTO {
   userId: number;
-  eventId: number;
   participation: Participation;
   user: UserDTO;
 }

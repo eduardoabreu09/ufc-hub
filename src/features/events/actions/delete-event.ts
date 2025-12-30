@@ -2,7 +2,7 @@
 
 import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { GeneralFormState } from "@/types/form";
 
 export async function deleteEvent(eventId: number): Promise<GeneralFormState> {
@@ -42,8 +42,9 @@ export async function deleteEvent(eventId: number): Promise<GeneralFormState> {
       prisma.event.delete({ where: { id: eventId } }),
     ]);
 
+    revalidateTag("event-list", "max");
     revalidatePath("/home/event");
-    revalidatePath("/home/event/[id]", "page");
+    revalidatePath(`/home/event/${eventId}`);
 
     return { isSuccess: true, message: "Evento deletado com sucesso." };
   } catch (error) {

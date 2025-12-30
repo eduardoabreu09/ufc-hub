@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { GeneralFormState } from "@/types/form";
 
 export async function deletePost(postId: number): Promise<GeneralFormState> {
@@ -48,7 +48,10 @@ export async function deletePost(postId: number): Promise<GeneralFormState> {
       }),
     ]);
 
+    revalidateTag("post-list", "max");
     revalidatePath("/home/blog");
+    revalidatePath(`/home/blog/${postId}`);
+
     return { isSuccess: true, message: "Postagem deletada com sucesso." };
   } catch (error) {
     console.error("Error deleting post:", error);

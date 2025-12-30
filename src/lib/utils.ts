@@ -171,3 +171,11 @@ export function formatDateTime(
     ...options,
   }).format(value);
 }
+
+export function parseWithFallback(value: string, fallbackValue = 0) {
+  const parsed = Number.parseInt(value, 10); // Always specify radix 10 for decimal
+  if (Number.isNaN(parsed)) {
+    return fallbackValue;
+  }
+  return parsed;
+}

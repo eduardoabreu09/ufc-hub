@@ -1,20 +1,12 @@
 "use client";
-
 import { useSession } from "@/context/session-context";
-import { BlogPostWithMessagesDTO } from "@/types/blog-post";
 import { EditPostDialog } from "./blog-dialog";
 import { DeletePostDialog } from "./delete-post-dialog";
+import { BlogPostDTO } from "@/types/blog-post";
 
-interface BlogProps {
-  post: BlogPostWithMessagesDTO;
-}
-
-export function BlogAuthorActions({ post }: BlogProps) {
+export default function BlogAuthorActions({ post }: { post: BlogPostDTO }) {
   const { user } = useSession();
-
-  if (!user) return null;
-
-  const isOwner = post.authorId === user.id;
+  const isOwner = post.authorId === user?.id;
 
   if (!isOwner) return null;
 

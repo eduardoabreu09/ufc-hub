@@ -40,7 +40,7 @@ export async function createGroup(
   try {
     const { name, description } = validatedFields.data;
 
-    await prisma.group.create({
+    const group = await prisma.group.create({
       data: {
         name,
         description,
@@ -55,6 +55,7 @@ export async function createGroup(
     });
 
     revalidatePath("/home/group");
+    revalidatePath(`/home/group/${group.id}`);
 
     return {
       message: "Grupo criado com sucesso.",

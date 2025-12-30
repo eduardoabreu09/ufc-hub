@@ -1,6 +1,5 @@
 "use client";
 
-import { SearchForm } from "@/components/ui/search-form";
 import {
   Sidebar,
   SidebarContent,
@@ -124,7 +123,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
         <hr className="border-t border-border mx-2 -mt-px" />
-        {/*<SearchForm className="mt-3" />*/}
       </SidebarHeader>
       <SidebarContent>
         {navigation.map((item) => (

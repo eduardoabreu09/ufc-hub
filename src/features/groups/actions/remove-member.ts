@@ -73,7 +73,7 @@ export async function removeMember(
       },
     });
 
-    revalidatePath("/home/group/[id]", "page");
+    revalidatePath(`/home/group/${groupId}`);
 
     return {
       message: "Membro removido com sucesso.",
