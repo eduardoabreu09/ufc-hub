@@ -36,7 +36,6 @@ export async function participateInEvent(
       },
     });
 
-    updateTag("event-details");
     revalidatePath("/home/event");
 
     return { isSuccess: true, message: "Participação confirmada" };

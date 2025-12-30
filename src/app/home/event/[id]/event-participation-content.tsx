@@ -1,4 +1,3 @@
-"use client";
 import AvatarName from "@/components/avatar-name";
 import {
   Card,
@@ -10,7 +9,9 @@ import {
 import { EventParticipationActions } from "./event-participation-actions";
 import { Participation } from "@prisma/client";
 import { EventParticipationDTO } from "@/types/event";
-import { useSession } from "@/context/session-context";
+import { getEventParticipations } from "@/features/events/queries/get-event-participations";
+import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
+import { connection } from "next/server";
 
 const PARTICIPATION_SECTION_LABELS: Record<Participation, string> = {
   YES: "Confirmados",
@@ -18,16 +19,18 @@ const PARTICIPATION_SECTION_LABELS: Record<Participation, string> = {
   MAYBE: "Talvez",
 };
 
-export default function EventParticipationContent({
+export default async function EventParticipationContent({
   eventId,
-  participations,
 }: {
   eventId: number;
-  participations: EventParticipationDTO[] | undefined;
 }) {
-  const { user } = useSession();
+  await connection();
+  const [participations, currentUserIdResult] = await Promise.all([
+    getEventParticipations(eventId),
+    getCurrentUserId(),
+  ]);
 
-  if (!user?.id || !participations) {
+  if (currentUserIdResult.isFailure || !participations) {
     return null;
   }
 
@@ -44,22 +47,24 @@ export default function EventParticipationContent({
   });
 
   return (
-    <Card className="h-full w-full">
-      <CardHeader>
-        <CardTitle>Participantes ({participations.length})</CardTitle>
-        <CardDescription>
-          Escolha uma das opções abaixo para indicar sua disponibilidade.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4 flex-1">
-        <EventParticipationActions
-          eventId={eventId}
-          participations={participations}
-        />
-        <div className="rounded-md border border-dashed p-3 text-xs text-muted-foreground">
-          <div className="space-y-3">
-            {(Object.keys(PARTICIPATION_SECTION_LABELS) as Participation[]).map(
-              (status) => {
+    <aside className="w-full lg:w-80 shrink-0 animate-in fade-in slide-in-from-right-4 duration-500">
+      <Card className="h-full w-full">
+        <CardHeader>
+          <CardTitle>Participantes ({participations.length})</CardTitle>
+          <CardDescription>
+            Escolha uma das opções abaixo para indicar sua disponibilidade.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4 flex-1">
+          <EventParticipationActions
+            eventId={eventId}
+            participations={participations}
+          />
+          <div className="rounded-md border border-dashed p-3 text-xs text-muted-foreground">
+            <div className="space-y-3">
+              {(
+                Object.keys(PARTICIPATION_SECTION_LABELS) as Participation[]
+              ).map((status) => {
                 const users = participationGroups[status];
                 return (
                   <div key={status} className="space-y-2">
@@ -89,11 +94,11 @@ export default function EventParticipationContent({
                     )}
                   </div>
                 );
-              }
-            )}
+              })}
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </aside>
   );
 }
