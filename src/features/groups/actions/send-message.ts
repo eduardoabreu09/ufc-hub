@@ -65,8 +65,6 @@ export async function sendMessage(
       },
     });
 
-    revalidatePath("/home/group/[id]", "page");
-
     return {
       message: "Mensagem enviada com sucesso.",
       isSuccess: true,

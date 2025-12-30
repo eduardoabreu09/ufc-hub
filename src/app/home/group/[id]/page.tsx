@@ -5,20 +5,21 @@ import { Suspense } from "react";
 
 export default async function GroupChatPage({
   params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  const groupId = Number(id);
-
+}: PageProps<"/home/group/[id]">) {
   return (
     <>
       <Suspense fallback={<GroupHeaderSkeleton />}>
-        <GroupHeader groupId={groupId} />
+        {params.then(({ id }) => (
+          <GroupHeader groupId={Number(id)} />
+        ))}
       </Suspense>
-      <div className="flex-1 overflow-hidden">
-        <GroupChat groupId={groupId} />
-      </div>
+      <Suspense fallback={null}>
+        {params.then(({ id }) => (
+          <div className="flex-1 overflow-hidden">
+            <GroupChat groupId={Number(id)} />
+          </div>
+        ))}
+      </Suspense>
     </>
   );
 }

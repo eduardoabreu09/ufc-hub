@@ -2,7 +2,7 @@
 
 import { getCurrentUser } from "@/features/session/queries/get-current-user";
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import { CreateEventFormSchema } from "../form-schema/create-event";
 
@@ -112,7 +112,7 @@ export async function createEvent(
       };
     }
 
-    await prisma.event.create({
+    const event = await prisma.event.create({
       data: {
         title,
         description: description,
@@ -131,7 +131,9 @@ export async function createEvent(
       },
     });
 
+    revalidateTag("event-list", "max");
     revalidatePath("/home/event");
+    revalidatePath(`/home/event/${event.id}`);
 
     return {
       message: "Evento criado com sucesso!",

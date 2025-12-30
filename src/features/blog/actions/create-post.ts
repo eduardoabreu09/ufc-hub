@@ -6,7 +6,7 @@ import {
 } from "@/features/blog/form-schema/create-post";
 import { getCurrentUser } from "@/features/session/queries/get-current-user";
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 
 const MAX_TAGS_LIMIT = 10;
@@ -72,7 +72,7 @@ export async function createPost(
       };
     }
 
-    await prisma.blogPost.create({
+    const post = await prisma.blogPost.create({
       data: {
         title,
         body,
@@ -89,7 +89,9 @@ export async function createPost(
       },
     });
 
+    revalidateTag("post-list", "max");
     revalidatePath("/home/blog");
+    revalidatePath(`/home/blog/${post.id}`);
 
     return {
       message: "Postagem criada com sucesso.",

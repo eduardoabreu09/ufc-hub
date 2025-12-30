@@ -1,9 +1,6 @@
 import type { MessageDTO } from "./message";
+import { TagDto } from "./tag";
 import type { UserDTO } from "./user";
-
-export interface BlogPostTagDTO {
-  name: string;
-}
 
 export interface BlogPostCountDTO {
   messages: number;
@@ -21,7 +18,7 @@ export interface BlogPostBaseDTO {
 
 export interface BlogPostDTO extends BlogPostBaseDTO {
   author: UserDTO;
-  tags?: BlogPostTagDTO[];
+  tags?: TagDto[];
   _count?: BlogPostCountDTO;
 }
 

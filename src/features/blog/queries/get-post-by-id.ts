@@ -1,13 +1,12 @@
 import "server-only";
 
-import { cache } from "react";
-
 import { prisma } from "@/lib/prisma";
 import { Result } from "@/lib/results";
-import type { BlogPostWithMessagesDTO } from "@/types/blog-post";
+import type { BlogPostDTO } from "@/types/blog-post";
+import { cache } from "react";
 
 export const getPostById = cache(
-  async (postId: number): Promise<Result<BlogPostWithMessagesDTO>> => {
+  async (postId: number): Promise<Result<BlogPostDTO>> => {
     try {
       const post = await prisma.blogPost.findUnique({
         where: { id: postId },
@@ -32,27 +31,6 @@ export const getPostById = cache(
               name: true,
             },
           },
-          messages: {
-            select: {
-              id: true,
-              body: true,
-              createdAt: true,
-              senderId: true,
-              eventId: true,
-              sentBy: {
-                select: {
-                  id: true,
-                  name: true,
-                  email: true,
-                  course: true,
-                },
-              },
-            },
-            // INFO: Quick fix to limit max messages;
-            // TODO: Add pagination later
-            take: 100,
-            orderBy: { createdAt: "asc" },
-          },
           _count: {
             select: {
               messages: true,
@@ -65,7 +43,7 @@ export const getPostById = cache(
         return Result.failure("Postagem não encontrada.");
       }
 
-      return Result.success<BlogPostWithMessagesDTO>(post);
+      return Result.success<BlogPostDTO>(post);
     } catch {
       return Result.failure("Erro ao buscar postagem.");
     }
