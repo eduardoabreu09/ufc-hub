@@ -9,11 +9,11 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import { EventDTO } from "@/types/event";
+import { EventHomeDTO } from "@/types/event";
 import Link from "next/link";
 
 interface EventGalleryProps {
-  events?: EventDTO[];
+  events?: EventHomeDTO[];
 }
 
 export function EventGallery({ events }: EventGalleryProps) {

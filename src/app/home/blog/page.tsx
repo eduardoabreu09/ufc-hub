@@ -1,21 +1,38 @@
 import { CreatePostDialog } from "@/components/blog/blog-dialog";
 import { PostCard } from "@/components/blog/post-card";
 import PageHeader from "@/components/page-header";
+import PaginationComponent from "@/components/pagination-component";
+import SearchFilter from "@/components/search-filter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getPosts } from "@/features/blog/queries/get-posts";
 import type { BlogPostDTO } from "@/types/blog-post";
 import { connection } from "next/server";
 import { Suspense } from "react";
 
-export default function BlogPage() {
+export default async function BlogPage({
+  searchParams,
+}: PageProps<"/home/blog">) {
   return (
     <PageHeader
       title="Blog"
       description="Compartilhe experiências e novidades com a comunidade acadêmica."
       DialogComponent={CreatePostDialog}
     >
+      <Suspense>
+        {searchParams.then((params) => (
+          <SearchFilter
+            label="Buscar Postagem"
+            key={params.query?.toString()}
+          />
+        ))}
+      </Suspense>
       <Suspense fallback={<LoadingPosts />}>
-        <PostList />
+        <PostList searchParams={searchParams} />
+      </Suspense>
+      <Suspense>
+        {searchParams.then((params) => (
+          <PaginationComponent key={params.page?.toString()} />
+        ))}
       </Suspense>
     </PageHeader>
   );
@@ -58,11 +75,16 @@ function LoadingPosts() {
   );
 }
 
-async function PostList() {
+async function PostList({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   // This is Dynamic data.
   // TODO: Add search params, search bar and navigation later.
   await connection();
-  const postsResult = await getPosts();
+  const { query, page } = await searchParams;
+  const postsResult = await getPosts(query?.toString(), page?.toString());
 
   if (!postsResult.isSuccess) {
     return <div>Erro ao carregar postagens.</div>;

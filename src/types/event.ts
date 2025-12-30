@@ -17,6 +17,12 @@ interface EventDTOBase {
   tags: TagDto[];
 }
 
+export interface EventHomeDTO extends EventDTOBase {
+  _count?: {
+    participations: number;
+  };
+}
+
 export interface EventDTO extends EventDTOBase {
   participations: EventPaticipationSimpleDTO[];
   _count?: {
