@@ -9,8 +9,9 @@ import {
   PaginationItem,
 } from "@/components/ui/pagination";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { parseWithFallback } from "@/lib/utils";
+import { PrefetchKind } from "next/dist/client/components/router-reducer/router-reducer-types";
 
 export default function PaginationComponent() {
   const searchParams = useSearchParams();
@@ -20,6 +21,25 @@ export default function PaginationComponent() {
     parseWithFallback(searchParams.get("page") ?? "", 1),
     1
   );
+
+  useEffect(() => {
+    let cancelled = false;
+    const poll = () => {
+      const nextPage = defaultPage + 1;
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("page", nextPage.toString());
+      if (!cancelled) {
+        router.prefetch(pathname + "?" + params.toString(), {
+          onInvalidate: poll,
+          kind: PrefetchKind.AUTO,
+        });
+      }
+    };
+    poll();
+    return () => {
+      cancelled = true;
+    };
+  }, [router, defaultPage, pathname, searchParams]);
 
   const [currentPage, setCurrentPage] = useState<number>(defaultPage);
 
