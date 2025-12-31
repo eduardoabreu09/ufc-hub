@@ -1,5 +1,4 @@
 "use client";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,6 +13,7 @@ import {
 import { Settings } from "lucide-react";
 import SignOutButton from "../ui/sign-out-button";
 import { useSession } from "@/context/session-context";
+import AvatarName from "../avatar-name";
 
 export default function UserDropdown() {
   const { user } = useSession();
@@ -22,14 +22,7 @@ export default function UserDropdown() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-auto p-0 hover:bg-transparent">
-          <Avatar className="size-8">
-            <AvatarImage
-              src="/default-avatar.jpg"
-              width={32}
-              height={32}
-              alt="Profile image"
-            />
-          </Avatar>
+          <AvatarName name={user?.name ?? "Usuário"} className="h-8 w-8" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="max-w-64" align="end">

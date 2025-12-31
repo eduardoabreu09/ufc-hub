@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/carousel";
 import { EventHomeDTO } from "@/types/event";
 import Link from "next/link";
+import Image from "next/image";
 
 interface EventGalleryProps {
   events?: EventHomeDTO[];
@@ -81,7 +82,7 @@ export function EventGallery({ events }: EventGalleryProps) {
           className="relative w-full max-w-full"
         >
           <CarouselContent className="hide-scrollbar w-full max-w-full">
-            {events?.map((event) => (
+            {events?.map((event, index) => (
               <CarouselItem key={event.id} className="md:max-w-[452px]">
                 <Link
                   href={`/home/event/${event.id}`}
@@ -92,10 +93,15 @@ export function EventGallery({ events }: EventGalleryProps) {
                       <div className="flex-1">
                         {event.imageUrl ? (
                           <div className="relative h-full w-full origin-bottom transition duration-300 group-hover:scale-105">
-                            <img
+                            <Image
+                              fill
+                              fetchPriority={index < 3 ? "high" : "auto"}
+                              priority={index < 3}
                               src={event.imageUrl}
                               alt={event.title}
-                              className="h-full w-full object-cover object-center"
+                              className="object-cover object-center"
+                              placeholder="blur"
+                              blurDataURL="/placeholder.webp"
                             />
                           </div>
                         ) : (
