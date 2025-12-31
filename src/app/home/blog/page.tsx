@@ -3,6 +3,7 @@ import { PostCard } from "@/components/blog/post-card";
 import PageHeader from "@/components/page-header";
 import PaginationComponent from "@/components/pagination-component";
 import SearchFilter from "@/components/search-filter";
+import SearchFilterSkeleton from "@/components/search-filter-skeleton";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getPosts } from "@/features/blog/queries/get-posts";
 import type { BlogPostDTO } from "@/types/blog-post";
@@ -18,7 +19,7 @@ export default async function BlogPage({
       description="Compartilhe experiências e novidades com a comunidade acadêmica."
       DialogComponent={CreatePostDialog}
     >
-      <Suspense>
+      <Suspense fallback={<SearchFilterSkeleton />}>
         {searchParams.then((params) => (
           <SearchFilter
             label="Buscar Postagem"

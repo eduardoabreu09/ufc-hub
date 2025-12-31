@@ -2,7 +2,6 @@
 
 import { useActionState, useEffect, useRef } from "react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { commentOnPost } from "@/features/blog/actions/comment-on-post";
@@ -11,6 +10,7 @@ import { Loader2, SendIcon } from "lucide-react";
 import { toast } from "sonner";
 import { formatDateTime } from "@/lib/utils";
 import { commentOnEvent } from "@/features/events/actions/comment-on-event";
+import AvatarName from "./avatar-name";
 
 interface CommentSectionProps {
   id: number;
@@ -65,12 +65,7 @@ export function CommentSection({
 
         {comments.map((comment) => (
           <div key={comment.id} className="flex gap-4">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src="" alt={comment.sentBy.name} />
-              <AvatarFallback>
-                {comment.sentBy.name.slice(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
+            <AvatarName name={comment.sentBy.name} className="h-10 w-10" />
 
             <div className="flex-1 space-y-1">
               <div className="flex items-center justify-between gap-2 text-sm">

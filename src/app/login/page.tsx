@@ -85,11 +85,11 @@ export default async function LoginPage() {
         </div>
 
         <Image
-          className="absolute inset-0 h-full w-full object-cover"
+          className="inset-0 object-cover"
           src="/portrait.png"
           alt="UFC Campus do Pici"
-          fill={true}
-          priority={true}
+          fill
+          priority
         />
       </div>
     </div>

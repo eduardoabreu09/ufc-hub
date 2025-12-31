@@ -16,7 +16,7 @@ prisma.$on("query", () => {
   queryCount++;
 });
 
-const USERS_TO_CREATE = 50000;
+const USERS_TO_CREATE = 70000;
 const GROUPS_TO_CREATE = 1000;
 const EVENTS_TO_CREATE = 2000;
 const BLOG_POSTS_TO_CREATE = 1800;
@@ -199,7 +199,7 @@ async function seedEvents(userIds: number[], count: number) {
       eventDate,
       duration: faker.number.int({ min: 30, max: 480 }),
       creatorId: faker.helpers.arrayElement(userIds),
-      imageUrl: faker.image.url(),
+      imageUrl: faker.image.url({ width: 500, height: 300 }),
     };
   });
 

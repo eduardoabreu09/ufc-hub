@@ -6,6 +6,7 @@ import EventCard from "@/components/event/event-card";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import SearchFilter from "@/components/search-filter";
+import SearchFilterSkeleton from "@/components/search-filter-skeleton";
 import PaginationComponent from "@/components/pagination-component";
 
 export default function EventsPage({ searchParams }: PageProps<"/home/event">) {
@@ -15,7 +16,7 @@ export default function EventsPage({ searchParams }: PageProps<"/home/event">) {
       description="Crie e participe de eventos da universidade."
       DialogComponent={CreateEventDialog}
     >
-      <Suspense>
+      <Suspense fallback={<SearchFilterSkeleton />}>
         {searchParams.then((params) => (
           <SearchFilter label="Buscar Evento" key={params.query?.toString()} />
         ))}
@@ -99,8 +100,8 @@ async function EventList({
 
   return (
     <div className="grid grid-cols-1 gap-y-10 sm:grid-cols-12">
-      {events.map((event) => (
-        <EventCard key={event.id} event={event} />
+      {events.map((event, index) => (
+        <EventCard key={event.id} event={event} priority={index < 2} />
       ))}
     </div>
   );

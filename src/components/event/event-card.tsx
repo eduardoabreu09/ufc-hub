@@ -5,12 +5,14 @@ import { EventDTO } from "@/types/event";
 import { Badge } from "../ui/badge";
 import { formatDateTime } from "@/lib/utils";
 import ParticipateDialog from "./participate-dialog";
+import Image from "next/image";
 
 interface EventCardProps {
   event: EventDTO;
+  priority?: boolean;
 }
 
-export default function EventCard({ event }: EventCardProps) {
+export default function EventCard({ event, priority }: EventCardProps) {
   const selectedParticipation = event.participations[0]?.participation;
 
   return (
@@ -93,9 +95,15 @@ export default function EventCard({ event }: EventCardProps) {
         <div className="order-first sm:order-last sm:col-span-5">
           <div className="relative aspect-16/9 overflow-clip rounded-lg border border-border bg-muted">
             {event.imageUrl ? (
-              <img
+              <Image
+                fill
+                fetchPriority={priority ? "high" : "auto"}
+                priority={priority}
+                alt={event.title}
                 src={event.imageUrl}
-                className="h-full w-full object-cover transition-opacity duration-200 fade-in hover:opacity-70"
+                className="object-cover transition-opacity duration-200 fade-in hover:opacity-70"
+                placeholder="blur"
+                blurDataURL="/placeholder.webp"
               />
             ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground">
