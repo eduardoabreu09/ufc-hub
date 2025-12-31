@@ -3,20 +3,17 @@ import "server-only";
 import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
 import { prisma } from "@/lib/prisma";
 import { MessageDTO } from "@/types/message";
-import { Result } from "@/lib/results";
 
-export async function getGroupMessages(
-  groupId: number
-): Promise<Result<MessageDTO[]>> {
+export async function getGroupMessages(groupId: number): Promise<MessageDTO[]> {
   const userIdResult = await getCurrentUserId();
 
-  if (userIdResult.error && userIdResult.isFailure) {
-    return Result.failure(userIdResult.error);
+  if (userIdResult.isFailure) {
+    return [];
   }
 
+  const userId = userIdResult.getValue();
+
   try {
-    /*
-    TODO: Uncomment to restrict access to group members only
     const userGroup = await prisma.userGroup.findUnique({
       where: {
         userId_groupId: {
@@ -29,7 +26,6 @@ export async function getGroupMessages(
     if (!userGroup) {
       return [];
     }
-    */
 
     const messages = await prisma.message.findMany({
       where: {
@@ -43,12 +39,12 @@ export async function getGroupMessages(
         senderId: true,
         sentBy: { select: { id: true, name: true, email: true, course: true } },
       },
-      orderBy: { createdAt: "asc" },
+      orderBy: [{ createdAt: "desc" }, { id: "asc" }],
       take: 100, // Limit to last 100 messages
     });
 
-    return Result.success(messages);
+    return messages.reverse() as MessageDTO[];
   } catch (error) {
-    return Result.failure("Erro ao buscar as mensagens do grupo.");
+    return [];
   }
 }
