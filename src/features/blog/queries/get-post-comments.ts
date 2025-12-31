@@ -37,7 +37,7 @@ export async function getPostCommentsById(
       orderBy: { createdAt: "desc" },
     });
 
-    return messages as MessageDTO[];
+    return messages.reverse() as MessageDTO[];
   } catch (error) {
     return [];
   }

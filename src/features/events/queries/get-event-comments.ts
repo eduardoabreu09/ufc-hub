@@ -32,7 +32,7 @@ export async function getEventCommentsById(
       orderBy: { createdAt: "desc" },
     });
 
-    return messages as MessageDTO[];
+    return messages.reverse() as MessageDTO[];
   } catch (error) {
     return [];
   }
