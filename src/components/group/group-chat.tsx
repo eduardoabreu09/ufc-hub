@@ -29,7 +29,7 @@ export function GroupChat({ groupId }: GroupChatProps) {
   const previousStateRef = useRef(state);
 
   function scrollToBottom() {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
   }
 
   useEffect(() => {
