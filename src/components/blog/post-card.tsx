@@ -33,9 +33,9 @@ export function PostCard({ post }: PostCardProps) {
               })}
             </span>
           </div>
-          <h3 className="mb-4 text-xl font-semibold md:text-2xl lg:text-3xl">
+          <h2 className="mb-4 text-xl font-semibold md:text-2xl lg:text-3xl">
             {post.title}
-          </h3>
+          </h2>
           <p className="mb-4 text-muted-foreground">{post.body}</p>
           <div className="flex items-center gap-2 text-muted-foreground">
             <span className="flex items-center gap-1">

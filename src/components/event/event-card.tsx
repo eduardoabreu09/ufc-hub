@@ -38,11 +38,11 @@ export default function EventCard({ event, priority }: EventCardProps) {
               })}
             </span>
           </div>
-          <h3 className="text-xl font-semibold md:text-2xl lg:text-3xl">
+          <h2 className="text-xl font-semibold md:text-2xl lg:text-3xl">
             <Link href={`/home/event/${event.id}`} className="hover:underline">
               {event.title}
             </Link>
-          </h3>
+          </h2>
           <p className="mt-4 text-muted-foreground md:mt-5">
             {event.description}
           </p>

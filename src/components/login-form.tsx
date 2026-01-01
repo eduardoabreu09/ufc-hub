@@ -31,7 +31,7 @@ export default function LoginForm() {
   return (
     <form className={"flex flex-col gap-6"} action={action}>
       <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-2xl font-bold">Entre na sua conta</h1>
+        <h2 className="text-2xl font-bold">Entre na sua conta</h2>
         <p className="text-muted-foreground text-sm text-balance">
           Insira suas credenciais para acessar sua conta.
         </p>

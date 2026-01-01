@@ -126,7 +126,7 @@ async function GroupList() {
   return (
     <div>
       <h2 className="mb-6 text-2xl font-semibold md:text-3xl">Seus Grupos</h2>
-      <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
         {groups.map((group) => (
           <GroupCard key={group.id} group={group} />
         ))}

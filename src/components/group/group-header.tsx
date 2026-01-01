@@ -38,7 +38,12 @@ export async function GroupHeader({ groupId }: GroupHeaderProps) {
     <div className="flex items-center justify-between p-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 h-16">
       <div className="flex items-center gap-3">
         <Link href="/home/group" className="md:hidden">
-          <Button variant="ghost" size="icon" className="-ml-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="-ml-2"
+            aria-label="Voltar para grupos"
+          >
             <ArrowLeftIcon className="h-5 w-5" />
           </Button>
         </Link>
@@ -54,7 +59,11 @@ export async function GroupHeader({ groupId }: GroupHeaderProps) {
       <div className="flex items-center">
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon">
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Abrir detalhes do grupo"
+            >
               <MoreVerticalIcon className="h-5 w-5" />
             </Button>
           </SheetTrigger>

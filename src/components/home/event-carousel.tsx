@@ -52,6 +52,7 @@ export function EventGallery({ events }: EventGalleryProps) {
             }}
             disabled={!canScrollPrev}
             className="disabled:pointer-events-auto"
+            aria-label="Ver eventos anteriores"
           >
             <ArrowLeft className="size-5" />
           </Button>
@@ -63,6 +64,7 @@ export function EventGallery({ events }: EventGalleryProps) {
             }}
             disabled={!canScrollNext}
             className="disabled:pointer-events-auto"
+            aria-label="Ver próximos eventos"
           >
             <ArrowRight className="size-5" />
           </Button>
