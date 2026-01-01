@@ -47,7 +47,7 @@ export function AppBreadcrumb() {
       <BreadcrumbList>
         {isMobile && (
           <BreadcrumbItem>
-            <BreadcrumbLink href="/home">
+            <BreadcrumbLink href="/home" aria-label="Ir para Home">
               <Home size={22} aria-hidden="true" />
             </BreadcrumbLink>
           </BreadcrumbItem>

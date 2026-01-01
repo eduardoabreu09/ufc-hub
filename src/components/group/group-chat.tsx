@@ -114,7 +114,11 @@ export function GroupChat({ groupId }: GroupChatProps) {
               className="flex-1"
               required
             />
-            <Button type="submit" disabled={isPending}>
+            <Button
+              type="submit"
+              disabled={isPending}
+              aria-label="Enviar mensagem"
+            >
               <SendIcon className="h-4 w-4" />
             </Button>
           </form>
