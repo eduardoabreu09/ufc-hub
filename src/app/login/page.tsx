@@ -1,5 +1,6 @@
 import LoginForm from "@/components/login-form";
 import Image from "next/image";
+import type { Metadata } from "next";
 import {
   Accordion,
   AccordionContent,
@@ -7,6 +8,17 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { cacheLife } from "next/cache";
+
+export const metadata: Metadata = {
+  title: "Entrar",
+  description:
+    "Faça login no UFC Hub para acessar grupos, eventos e conteúdos da UFC.",
+  openGraph: {
+    title: "Entrar | UFC Hub",
+    description:
+      "Entre para gerenciar seus grupos, eventos e publicações na comunidade UFC.",
+  },
+};
 
 export default async function LoginPage() {
   "use cache";

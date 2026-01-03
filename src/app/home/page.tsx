@@ -3,11 +3,23 @@ import { GroupCard } from "@/components/group/group-card";
 import { EventGallery } from "@/components/home/event-carousel";
 import PageHeader from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { Metadata } from "next";
 import { getGroups } from "@/features/groups/queries/get-groups";
 import { getHomeEvents } from "@/features/home/queries/get-home-events";
 import { getHomePosts } from "@/features/home/queries/get-home-posts";
 import { cacheTag } from "next/cache";
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: "Início",
+  description:
+    "Resumo com eventos, grupos e posts mais recentes para a comunidade da UFC.",
+  openGraph: {
+    title: "Início | UFC Hub",
+    description:
+      "Veja eventos, grupos e últimas publicações da comunidade da UFC.",
+  },
+};
 
 export default function Home() {
   return (

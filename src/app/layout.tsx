@@ -15,10 +15,28 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// TODO: Add metadata in all pages
 export const metadata: Metadata = {
-  title: "UFC Hub",
-  description: "Plataforma de colaboração para estudantes da UFC",
+  title: {
+    default: "UFC Hub",
+    template: "%s | UFC Hub",
+  },
+  description:
+    "Plataforma de colaboração para estudantes da UFC com grupos, eventos e blog.",
+  keywords: [
+    "UFC",
+    "universidade",
+    "grupos de estudo",
+    "eventos acadêmicos",
+    "blog estudantil",
+  ],
+  openGraph: {
+    title: "UFC Hub",
+    description:
+      "Central para grupos, eventos e notícias da comunidade da UFC.",
+    siteName: "UFC Hub",
+    locale: "pt_BR",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

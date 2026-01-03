@@ -3,6 +3,17 @@ import { GroupSidebarSkeleton } from "@/components/group/group-sidebar-skeleton"
 import { getGroups } from "@/features/groups/queries/get-groups";
 import { MessageCircleIcon } from "lucide-react";
 import { Suspense } from "react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Grupos",
+  description:
+    "Escolha um grupo para acompanhar mensagens e participantes no UFC Hub.",
+  openGraph: {
+    title: "Grupos | UFC Hub",
+    description: "Navegue pelos seus grupos de estudo e comunicação na UFC.",
+  },
+};
 
 export default function GroupsPage() {
   return (
