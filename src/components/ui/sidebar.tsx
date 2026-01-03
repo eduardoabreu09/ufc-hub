@@ -239,10 +239,7 @@ function SidebarTrigger({
       data-sidebar="trigger"
       variant="ghost"
       size="icon"
-      className={cn(
-        "text-muted-foreground/60 hover:text-foreground",
-        className
-      )}
+      className={cn("text-muted-foreground hover:text-foreground", className)}
       onClick={(event) => {
         onClick?.(event);
         toggleSidebar();

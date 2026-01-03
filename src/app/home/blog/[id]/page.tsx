@@ -102,7 +102,7 @@ async function PostBody({ postId }: { postId: number }) {
         <p className="text-lg text-muted-foreground">{post.body}</p>
 
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-foreground">
+          <div className="flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-secondary-foreground">
             <UserIcon className="h-4 w-4" />
             <span className="font-medium">{post.author.name}</span>
           </div>
@@ -134,12 +134,12 @@ async function PostContent({ postId }: { postId: number }) {
 
   return (
     <article
-      className="prose prose-neutral max-w-none dark:prose-invert 
-        prose-img:rounded-xl prose-a:text-primary prose-li:text-foreground
+      className="prose prose-neutral max-w-none dark:prose-invert high-contrast:prose-invert
+        prose-img:rounded-xl prose-a:text-primary prose-li:text-foreground high-contrast:prose-li:text-foreground high-contrast:prose-p:text-foreground
         prose-h1:font-bold prose-h1:border-b prose-h1:border-foreground/30 prose-h1:pb-2
         prose-h2:border-b prose-h2:border-foreground/30 prose-h2:pb-2
         prose-pre:bg-muted prose-pre:rounded-lg prose-pre:shadow-md
-        prose-code:text-foreground"
+        prose-code:text-foreground high-contrast:prose-a:text-primary high-contrast:prose-strong:text-foreground"
     >
       <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
         {post.content}

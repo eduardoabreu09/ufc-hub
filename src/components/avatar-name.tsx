@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 
 interface AvatarNameProps {
@@ -18,7 +19,7 @@ export default function AvatarName({
     .map((part) => part[0]?.toUpperCase() ?? "")
     .join("");
   return (
-    <Avatar className={className}>
+    <Avatar className={cn("text-secondary-foreground", className)}>
       <AvatarFallback className={textSize}>{initials}</AvatarFallback>
     </Avatar>
   );

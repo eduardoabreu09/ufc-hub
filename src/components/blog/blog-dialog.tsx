@@ -164,12 +164,12 @@ export function BlogDialog({ mode, post }: BlogDialogProps) {
                 </div>
 
                 <article
-                  className="prose prose-neutral max-w-none dark:prose-invert 
-                        prose-img:rounded-xl prose-a:text-primary prose-li:text-foreground
-                        prose-h1:font-bold prose-h1:border-b prose-h1:border-foreground/30 prose-h1:pb-2
-                        prose-h2:border-b prose-h2:border-foreground/30 prose-h2:pb-2
-                        prose-pre:bg-muted prose-pre:rounded-lg prose-pre:shadow-md
-                        prose-code:text-foreground border rounded-md bg-muted/40 p-3 max-h-[520px] overflow-auto"
+                  className="prose prose-neutral max-w-none dark:prose-invert high-contrast:prose-invert
+                    prose-img:rounded-xl prose-a:text-primary prose-li:text-foreground high-contrast:prose-li:text-foreground high-contrast:prose-p:text-foreground
+                    prose-h1:font-bold prose-h1:border-b prose-h1:border-foreground/30 prose-h1:pb-2
+                    prose-h2:border-b prose-h2:border-foreground/30 prose-h2:pb-2
+                    prose-pre:bg-muted prose-pre:rounded-lg prose-pre:shadow-md
+                    prose-code:text-foreground high-contrast:prose-a:text-primary high-contrast:prose-strong:text-foreground"
                 >
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}

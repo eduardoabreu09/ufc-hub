@@ -94,7 +94,11 @@ async function EventDetailsBody({ eventId }: { eventId: number }) {
       <EventAuthorActions event={event} />
 
       <Separator />
-      <div className="prose prose-neutral max-w-none whitespace-pre-wrap dark:prose-invert">
+      <div
+        className="prose prose-neutral max-w-none whitespace-pre-wrap dark:prose-invert high-contrast:prose-invert
+          high-contrast:prose-li:text-foreground high-contrast:prose-p:text-foreground
+          high-contrast:prose-a:text-primary high-contrast:prose-strong:text-foreground"
+      >
         {event.body}
       </div>
     </div>

@@ -54,6 +54,7 @@ export default function RootLayout({
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
+          themes={["light", "dark", "high-contrast"]}
         >
           {children}
           <Toaster position="top-center" />
