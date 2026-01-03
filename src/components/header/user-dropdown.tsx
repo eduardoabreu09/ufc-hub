@@ -3,14 +3,11 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { Settings } from "lucide-react";
 import SignOutButton from "../ui/sign-out-button";
 import { useSession } from "@/context/session-context";
 import AvatarName from "../avatar-name";
@@ -34,13 +31,6 @@ export default function UserDropdown() {
             {user?.email || "Usuário"}
           </span>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <Settings size={16} className="opacity-60" aria-hidden="true" />
-            <span>Configurações</span>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <SignOutButton />
       </DropdownMenuContent>

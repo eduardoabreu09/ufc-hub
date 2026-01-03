@@ -25,10 +25,22 @@ import {
   Settings,
   Users,
   FileText,
+  type LucideIcon,
 } from "lucide-react";
 import Image from "next/image";
+import ThemeSwitcher from "../theme-switcher";
 
-const navigation = [
+type Section = {
+  title: string;
+  url: string;
+  items: {
+    title: string;
+    url: string;
+    icon?: LucideIcon;
+  }[];
+};
+
+const navigation: Section[] = [
   {
     title: "Seções",
     url: "/",
@@ -53,11 +65,11 @@ const navigation = [
         url: "/home/event",
         icon: CalendarDays,
       },
-      // {
-      //   title: "Calendário",
-      //   url: "/home/calendar",
-      //   icon: Calendar1Icon,
-      // },
+      {
+        title: "Calendário",
+        url: "/home/calendar",
+        icon: Calendar1Icon,
+      },
     ],
   },
   {
@@ -98,64 +110,76 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     [clientPathname]
   );
 
+  const renderSideContent = useCallback(
+    (section: Section) => {
+      if (section.title === "Outros") {
+        return (
+          <SidebarGroup key={section.title}>
+            <SidebarGroupLabel className="uppercase text-muted-foreground">
+              {section.title}
+            </SidebarGroupLabel>
+            <SidebarGroupContent className="px-2">
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <ThemeSwitcher />
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        );
+      }
+      return (
+        <SidebarGroup key={section.title}>
+          <SidebarGroupLabel className="uppercase text-muted-foreground">
+            {section.title}
+          </SidebarGroupLabel>
+          <SidebarGroupContent className="px-2">
+            <SidebarMenu>
+              {section.items.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    className="font-medium text-muted-foreground gap-3 h-9 rounded-md [&>svg]:size-auto data-[active=true]:bg-sidebar-primary data-[active=true]:text-sidebar-primary-foreground"
+                    isActive={isActive(item.url)}
+                  >
+                    <Link href={item.url}>
+                      {item.icon && <item.icon size={22} aria-hidden="true" />}
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      );
+    },
+    [isActive]
+  );
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-3 [&>svg]:size-auto"
-            >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-md overflow-hidden bg-sidebar-primary text-sidebar-primary-foreground">
-                <Image
-                  src={"/logo.svg"}
-                  height={60}
-                  width={60}
-                  alt="UFC Hub Logo"
-                  priority
-                />
-              </div>
-              <div className="grid flex-1 text-left text-base leading-tight">
-                <span className="truncate font-medium">UFC Hub</span>
-              </div>
-            </SidebarMenuButton>
+          <SidebarMenuItem className="flex items-center gap-4 p-2">
+            <div className="flex aspect-square size-8 items-center justify-center rounded-md overflow-hidden bg-sidebar-primary text-sidebar-primary-foreground">
+              <Image
+                src={"/logo.svg"}
+                height={60}
+                width={60}
+                alt="UFC Hub Logo"
+                priority
+              />
+            </div>
+            <div className="grid flex-1 text-left text-base leading-tight">
+              <span className="truncate font-medium">UFC Hub</span>
+            </div>
           </SidebarMenuItem>
         </SidebarMenu>
         <hr className="border-t border-border mx-2 -mt-px" />
       </SidebarHeader>
       <SidebarContent>
-        {navigation.map((item) => (
-          <SidebarGroup key={item.title}>
-            <SidebarGroupLabel className="uppercase text-muted-foreground/60">
-              {item.title}
-            </SidebarGroupLabel>
-            <SidebarGroupContent className="px-2">
-              <SidebarMenu>
-                {item.items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      className="group/menu-button font-medium gap-3 h-9 rounded-md bg-gradient-to-r hover:bg-transparent hover:from-sidebar-accent hover:to-sidebar-accent/40 data-[active=true]:from-primary/20 data-[active=true]:to-primary/5 [&>svg]:size-auto"
-                      isActive={isActive(item.url)}
-                    >
-                      <Link href={item.url}>
-                        {item.icon && (
-                          <item.icon
-                            className="text-muted-foreground/60 group-data-[active=true]/menu-button:text-primary"
-                            size={22}
-                            aria-hidden="true"
-                          />
-                        )}
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+        {navigation.map((section) => renderSideContent(section))}
       </SidebarContent>
       <SidebarFooter>
         <hr className="border-t border-border mx-2 -mt-px" />
