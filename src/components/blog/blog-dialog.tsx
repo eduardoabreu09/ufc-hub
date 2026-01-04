@@ -169,7 +169,8 @@ export function BlogDialog({ mode, post }: BlogDialogProps) {
                     prose-h1:font-bold prose-h1:border-b prose-h1:border-foreground/30 prose-h1:pb-2
                     prose-h2:border-b prose-h2:border-foreground/30 prose-h2:pb-2
                     prose-pre:bg-muted prose-pre:rounded-lg prose-pre:shadow-md
-                    prose-code:text-foreground high-contrast:prose-a:text-primary high-contrast:prose-strong:text-foreground"
+                    prose-code:text-foreground high-contrast:prose-a:text-primary high-contrast:prose-strong:text-foreground
+                    border border-border rounded-md bg-muted p-4 max-h-[520px] overflow-y-auto"
                 >
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}

@@ -22,7 +22,6 @@ import {
   CalendarDays,
   Home,
   LogOut,
-  Settings,
   Users,
   FileText,
   type LucideIcon,
@@ -32,11 +31,11 @@ import ThemeSwitcher from "../theme-switcher";
 
 type Section = {
   title: string;
-  url: string;
-  items: {
+  url?: string;
+  items?: {
     title: string;
     url: string;
-    icon?: LucideIcon;
+    icon: LucideIcon;
   }[];
 };
 
@@ -74,14 +73,6 @@ const navigation: Section[] = [
   },
   {
     title: "Outros",
-    url: "#",
-    items: [
-      {
-        title: "Configurações",
-        url: "#",
-        icon: Settings,
-      },
-    ],
   },
 ];
 
@@ -135,7 +126,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupLabel>
           <SidebarGroupContent className="px-2">
             <SidebarMenu>
-              {section.items.map((item) => (
+              {section.items?.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
@@ -143,7 +134,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     isActive={isActive(item.url)}
                   >
                     <Link href={item.url}>
-                      {item.icon && <item.icon size={22} aria-hidden="true" />}
+                      <item.icon size={22} aria-hidden="true" />
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
