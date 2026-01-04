@@ -22,9 +22,18 @@ export default function ThemeSwitcher() {
           className="flex w-full items-center justify-between"
         >
           <span>Alterar Tema</span>
-          <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90 high-contrast:scale-0 high-contrast:-rotate-90" />
-          <Moon className="absolute right-3 h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0 high-contrast:scale-0 high-contrast:rotate-90" />
-          <Zap className="absolute right-3 h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all high-contrast:scale-100 high-contrast:rotate-0" />
+          <Sun
+            className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90 high-contrast:scale-0 high-contrast:-rotate-90"
+            aria-hidden="true"
+          />
+          <Moon
+            className="absolute right-3 h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0 high-contrast:scale-0 high-contrast:rotate-90"
+            aria-hidden={true}
+          />
+          <Zap
+            className="absolute right-3 h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all high-contrast:scale-100 high-contrast:rotate-0"
+            aria-hidden={true}
+          />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

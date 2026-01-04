@@ -2,97 +2,84 @@
 
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
 } from "@/components/ui/pagination";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useMemo, useState } from "react";
 import { parseWithFallback } from "@/lib/utils";
-import { PrefetchKind } from "next/dist/client/components/router-reducer/router-reducer-types";
+import Link from "next/link";
 
 export default function PaginationComponent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
   const defaultPage = Math.max(
     parseWithFallback(searchParams.get("page") ?? "", 1),
     1
   );
 
-  useEffect(() => {
-    let cancelled = false;
-    const poll = () => {
-      const nextPage = defaultPage + 1;
-      const params = new URLSearchParams(searchParams.toString());
-      params.set("page", nextPage.toString());
-      if (!cancelled) {
-        router.prefetch(pathname + "?" + params.toString(), {
-          onInvalidate: poll,
-          kind: PrefetchKind.AUTO,
-        });
-      }
-    };
-    poll();
-    return () => {
-      cancelled = true;
-    };
-  }, [router, defaultPage, pathname, searchParams]);
-
   const [currentPage, setCurrentPage] = useState<number>(defaultPage);
+
+  const nextPage = useMemo(() => currentPage + 1, [currentPage]);
+  const previousPage = useMemo(
+    () => Math.max(currentPage - 1, 1),
+    [currentPage]
+  );
+  const nextHref = useMemo(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", nextPage.toString());
+    return "?" + params.toString();
+  }, [nextPage, searchParams]);
+  const previousHref = useMemo(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", previousPage.toString());
+    return "?" + params.toString();
+  }, [searchParams, previousPage]);
 
   const handlePageChange = useCallback(
     (type: "increase" | "decrease") => {
-      const newPage = currentPage + (type === "increase" ? 1 : -1);
-      const params = new URLSearchParams(searchParams.toString());
-      params.set("page", newPage.toString());
-
-      router.push(pathname + "?" + params.toString());
+      const newPage = type === "increase" ? nextPage : previousPage;
       setCurrentPage(newPage);
     },
-    [searchParams, pathname, router, currentPage]
+    [nextPage, previousPage]
   );
 
   return (
     <Pagination className="mt-6">
       <PaginationContent className="w-full justify-between gap-3">
         <PaginationItem>
-          <Button
-            variant="outline"
-            className="aria-disabled:pointer-events-none aria-disabled:opacity-50"
+          <Link
+            href={`/home/event${previousHref}`}
+            className="flex items-center justify-center gap-2 px-2 py-2 rounded-md text-sm font-medium
+            border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50
+            aria-disabled:pointer-events-none aria-disabled:opacity-50"
             aria-disabled={currentPage === 1 ? true : undefined}
             role={currentPage === 1 ? "link" : undefined}
-            asChild
             onClick={() => handlePageChange("decrease")}
           >
-            <span>
-              <ChevronLeftIcon
-                className="-ms-1 opacity-60"
-                size={16}
-                aria-hidden="true"
-              />
-              Anterior
-            </span>
-          </Button>
+            <ChevronLeftIcon
+              className="-ms-1 opacity-60"
+              size={16}
+              aria-hidden="true"
+            />
+            Anterior
+          </Link>
         </PaginationItem>
         <PaginationItem>
-          <Button
-            variant="outline"
-            className="aria-disabled:pointer-events-none aria-disabled:opacity-50"
-            asChild
+          <Link
+            href={`/home/event${nextHref}`}
+            className="flex items-center justify-center gap-2 px-2 py-2 rounded-md text-sm font-medium
+            border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50"
             onClick={() => handlePageChange("increase")}
           >
-            <span>
-              Próximo
-              <ChevronRightIcon
-                className="-me-1 opacity-60"
-                size={16}
-                aria-hidden="true"
-              />
-            </span>
-          </Button>
+            Próximo
+            <ChevronRightIcon
+              className="-me-1 opacity-60"
+              size={16}
+              aria-hidden="true"
+            />
+          </Link>
         </PaginationItem>
       </PaginationContent>
     </Pagination>
