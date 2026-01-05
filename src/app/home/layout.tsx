@@ -11,7 +11,7 @@ export default function HomeLayout({
 }>) {
   return (
     <SessionProvider>
-      <SidebarProvider>
+      <SidebarProvider defaultOpen={false}>
         <Suspense>
           <AppSidebar />
         </Suspense>
