@@ -10,37 +10,36 @@ import {
   BreadcrumbSeparator,
 } from "../ui/breadcrumb";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export function AppBreadcrumb() {
   const pathname = usePathname();
   const isMobile = useIsMobile();
-  const [clientPathname, setClientPathname] = useState("");
-
-  useEffect(() => {
-    setClientPathname(pathname);
-  }, [pathname]);
 
   const title = useMemo(() => {
-    if (clientPathname.includes("group")) {
+    if (pathname.includes("group")) {
       return "Grupos";
     }
-    if (clientPathname.includes("event")) {
+    if (pathname.includes("event")) {
       return "Eventos";
     }
-    if (clientPathname.includes("blog")) {
+    if (pathname.includes("blog")) {
       return "Blog";
     }
     return "";
-  }, [clientPathname]);
+  }, [pathname]);
 
   const routes = useMemo(() => {
-    if (clientPathname.split("/").length > 3) {
-      return clientPathname.split("/").slice(2, -1);
+    if (pathname.split("/").length > 3) {
+      return pathname.split("/").slice(2, -1);
     }
-    return clientPathname.split("/").slice(2);
-  }, [clientPathname]);
+    return pathname.split("/").slice(2);
+  }, [pathname]);
+
+  if (isMobile === undefined) {
+    return null;
+  }
 
   return (
     <Breadcrumb>

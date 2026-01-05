@@ -13,7 +13,7 @@ export default async function GroupChatPage({
           <GroupHeader groupId={Number(id)} />
         ))}
       </Suspense>
-      <Suspense fallback={null}>
+      <Suspense>
         {params.then(({ id }) => (
           <div className="flex-1 overflow-hidden">
             <GroupChat groupId={Number(id)} />
