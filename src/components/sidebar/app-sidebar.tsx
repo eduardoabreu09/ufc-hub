@@ -14,7 +14,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { logout } from "@/features/session/actions/logout";
-import { useActionState, useCallback, useEffect, useState } from "react";
+import { useActionState, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import {
@@ -79,16 +79,11 @@ const navigation: Section[] = [
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [state, action, isPending] = useActionState(logout, undefined);
   const pathname = usePathname();
-  const [clientPathname, setClientPathname] = useState("");
-
-  useEffect(() => {
-    setClientPathname(pathname);
-  }, [pathname]);
 
   const isActive = useCallback(
     (url: string) => {
       let parsedPath = "";
-      const splitPath = clientPathname?.split("/");
+      const splitPath = pathname?.split("/");
       if (splitPath.length > 3) {
         splitPath.pop();
       }
@@ -96,9 +91,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       if (parsedPath !== "") {
         return parsedPath === url;
       }
-      return clientPathname === url;
+      return pathname === url;
     },
-    [clientPathname]
+    [pathname]
   );
 
   const renderSideContent = useCallback(

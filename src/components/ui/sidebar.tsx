@@ -32,7 +32,7 @@ type SidebarContext = {
   setOpen: (open: boolean) => void;
   openMobile: boolean;
   setOpenMobile: (open: boolean) => void;
-  isMobile: boolean;
+  isMobile: boolean | undefined;
   toggleSidebar: () => void;
 };
 
@@ -162,6 +162,10 @@ function Sidebar({
         {children}
       </div>
     );
+  }
+
+  if (isMobile === undefined) {
+    return null;
   }
 
   if (isMobile) {
