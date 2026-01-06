@@ -1,6 +1,13 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, CalendarDays } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CalendarDays,
+  MapPin,
+  UserRound,
+  Clock,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { CarouselApi } from "@/components/ui/carousel";
@@ -12,6 +19,9 @@ import {
 import { EventHomeDTO } from "@/types/event";
 import Link from "next/link";
 import Image from "next/image";
+import { Badge } from "../ui/badge";
+import { formatDateTime } from "@/lib/utils";
+import { Separator } from "../ui/separator";
 
 interface EventGalleryProps {
   events?: EventHomeDTO[];
@@ -85,45 +95,94 @@ export function EventGallery({ events }: EventGalleryProps) {
         >
           <CarouselContent className="hide-scrollbar w-full max-w-full">
             {events?.map((event, index) => (
-              <CarouselItem key={event.id} className="md:max-w-[452px]">
+              <CarouselItem key={event.id} className="md:max-w-[452px] py-2">
                 <Link
                   href={`/home/event/${event.id}`}
-                  className="group flex flex-col justify-between"
+                  className="group flex flex-col h-full bg-card border border-border rounded-2xl p-5 shadow-sm hover:shadow-lg transition-all duration-300"
                 >
-                  <div>
-                    <div className="aspect-3/2 flex overflow-clip rounded-xl">
-                      <div className="flex-1">
-                        {event.imageUrl ? (
-                          <div className="relative h-full w-full origin-bottom transition duration-300 group-hover:scale-105">
-                            <Image
-                              fill
-                              fetchPriority={index < 3 ? "high" : "auto"}
-                              priority={index < 3}
-                              src={event.imageUrl}
-                              alt={event.title}
-                              className="object-cover object-center"
-                              placeholder="blur"
-                              blurDataURL="/placeholder.webp"
-                            />
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {event.tags.slice(0, 3).map((tag) => (
+                      <Badge
+                        key={tag.name}
+                        variant="secondary"
+                        className="text-xs uppercase tracking-wider"
+                      >
+                        {tag.name}
+                      </Badge>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center gap-1 text-sm text-secondary-foreground mb-3">
+                    <CalendarDays size={14} />
+                    <span>
+                      {formatDateTime(event.eventDate, {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </div>
+
+                  <div className="aspect-3/2 flex overflow-clip rounded-xl mb-4">
+                    <div className="flex-1">
+                      {event.imageUrl ? (
+                        <div className="relative h-full w-full origin-bottom transition duration-300 group-hover:scale-105">
+                          <Image
+                            fill
+                            fetchPriority={index < 3 ? "high" : "auto"}
+                            priority={index < 3}
+                            src={event.imageUrl}
+                            alt={event.title}
+                            className="object-cover object-center"
+                            placeholder="blur"
+                            blurDataURL="/placeholder.webp"
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex h-full w-full transition duration-300 group-hover:scale-105 justify-center items-center bg-muted gap-2">
+                          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted-foreground">
+                            <CalendarDays size={24} />
                           </div>
-                        ) : (
-                          <div className="flex h-full w-full transition duration-300 group-hover:scale-105 justify-center items-center bg-muted gap-2">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted-foreground/10">
-                              <CalendarDays size={24} />
-                            </div>
-                            <span className="text-sm font-medium">
-                              Imagem indisponível
-                            </span>
-                          </div>
-                        )}
-                      </div>
+                          <span className="text-sm font-medium">
+                            Imagem indisponível
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
-                  <div className="mb-2 line-clamp-3 break-words pt-4 text-lg font-medium md:mb-3 md:pt-4 md:text-xl lg:pt-4 lg:text-2xl">
-                    {event.title}
-                  </div>
-                  <div className="text-muted-foreground mb-8 line-clamp-2 text-sm md:mb-12 md:text-base lg:mb-9">
-                    {event.description}
+
+                  <div className="flex flex-col flex-1 gap-2">
+                    <h3 className="line-clamp-2 break-words text-lg font-semibold md:text-xl group-hover:underline">
+                      {event.title}
+                    </h3>
+
+                    <p className="text-secondary-foreground line-clamp-2 text-sm">
+                      {event.description}
+                    </p>
+
+                    <div className="flex flex-col mt-2 gap-2">
+                      <div className="flex flex-wrap items-center gap-3 text-muted-foreground text-xs">
+                        <div className="flex gap-1 items-center">
+                          <MapPin size={14} />
+                          <span className="line-clamp-1">{event.location}</span>
+                        </div>
+                        <div className="flex gap-1 items-center">
+                          <Clock size={14} />
+                          <span>{event.duration} min</span>
+                        </div>
+                      </div>
+
+                      <Separator />
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex gap-1 items-center text-xs text-muted-foreground">
+                          <UserRound size={14} />
+                          <span>{event.createdBy.name}</span>
+                        </div>
+                        <div className="text-xs font-bold text-primary">
+                          {event._count?.participations || 0} participantes
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </Link>
               </CarouselItem>
