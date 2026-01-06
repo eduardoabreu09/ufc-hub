@@ -1,8 +1,13 @@
+"use client";
 import { Separator } from "@radix-ui/react-separator";
-import { AppBreadcrumb } from "./app-breadcrumb";
 import UserDropdown from "./user-dropdown";
-import { Suspense } from "react";
 import { SidebarTrigger } from "../ui/sidebar";
+import dynamic from "next/dynamic";
+
+const AppBreadcrumb = dynamic(
+  () => import("./app-breadcrumb").then((mod) => mod.AppBreadcrumb),
+  { ssr: false }
+);
 
 export default function AppHeader() {
   return (
@@ -13,9 +18,7 @@ export default function AppHeader() {
           orientation="vertical"
           className="mr-2 data-[orientation=vertical]:h-4"
         />
-        <Suspense>
-          <AppBreadcrumb />
-        </Suspense>
+        <AppBreadcrumb />
       </div>
       <div className="flex gap-3 ml-auto">
         <UserDropdown />
