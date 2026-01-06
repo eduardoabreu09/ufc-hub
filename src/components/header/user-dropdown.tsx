@@ -19,7 +19,7 @@ export default function UserDropdown() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-auto p-0 hover:bg-transparent">
-          <AvatarName name={user?.name ?? "Usuário"} className="h-8 w-8" />
+          <AvatarName name={user?.name ?? "Usuário"} className="h-10 w-10" textSize="text-lg" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="max-w-64" align="end">

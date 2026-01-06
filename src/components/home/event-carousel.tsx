@@ -178,7 +178,7 @@ export function EventGallery({ events }: EventGalleryProps) {
                           <UserRound size={14} />
                           <span>{event.createdBy.name}</span>
                         </div>
-                        <div className="text-xs font-bold text-primary">
+                        <div className="text-xs font-bold text-foreground">
                           {event._count?.participations || 0} participantes
                         </div>
                       </div>

@@ -135,7 +135,7 @@ function Sidebar({
     setMounted(true);
   }, []);
 
-  if (!mounted) {
+  if (!mounted || isMobile === undefined) {
     return null;
   }
 
