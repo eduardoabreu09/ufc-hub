@@ -13,9 +13,7 @@ export async function EventDetails({ eventId }: { eventId: number }) {
   return (
     <div className="space-y-8">
       <div className="flex flex-col lg:flex-row gap-8 items-start">
-        <div className="flex-1 min-w-0">
-          <EventDetailsBody eventId={eventId} />
-        </div>
+        <EventDetailsBody eventId={eventId} />
         <Suspense>
           <EventParticipationContent eventId={eventId} />
         </Suspense>
@@ -37,7 +35,6 @@ async function EventDetailsBody({ eventId }: { eventId: number }) {
   }
 
   const event = eventResult.getValue();
-  const participations = event.participations ?? [];
 
   return (
     <div className="flex flex-wrap items-start justify-between gap-4">

@@ -47,8 +47,8 @@ export default async function EventParticipationContent({
   });
 
   return (
-    <aside className="w-full lg:w-80 shrink-0 animate-in fade-in slide-in-from-right-4 duration-500">
-      <Card className="h-full w-full">
+    <aside className="w-full max-h-screen overflow-auto lg:w-2xl animate-in fade-in slide-in-from-right-4 duration-500">
+      <Card>
         <CardHeader>
           <CardTitle>Participantes ({participations.length})</CardTitle>
           <CardDescription>

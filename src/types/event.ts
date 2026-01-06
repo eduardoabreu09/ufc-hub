@@ -35,9 +35,7 @@ export interface EventPaticipationSimpleDTO {
   participation: Participation;
 }
 
-export interface EventDetailsDTO extends EventDTOBase {
-  participations?: EventParticipationDTO[];
-}
+export interface EventDetailsDTO extends EventDTOBase {}
 
 export interface EventParticipationDTO {
   userId: number;
