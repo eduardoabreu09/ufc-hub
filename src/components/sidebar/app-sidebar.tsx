@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
@@ -28,6 +27,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import ThemeSwitcher from "../theme-switcher";
+import dynamic from "next/dynamic";
 
 type Section = {
   title: string;
@@ -38,6 +38,11 @@ type Section = {
     icon: LucideIcon;
   }[];
 };
+
+const Sidebar = dynamic(
+  () => import("@/components/ui/sidebar").then((mod) => mod.Sidebar),
+  { ssr: false }
+);
 
 const navigation: Section[] = [
   {

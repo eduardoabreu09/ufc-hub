@@ -23,6 +23,7 @@ const SIDEBAR_WIDTH = "16rem";
 const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
+const DEFAULT_MOBILE_BREAKPOINT = 768;
 
 type SidebarContext = {
   state: "expanded" | "collapsed";
@@ -128,16 +129,8 @@ function Sidebar({
   variant?: "sidebar" | "floating" | "inset";
   collapsible?: "offcanvas" | "icon" | "none";
 }) {
-  const [mounted, setMounted] = React.useState(false);
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted || isMobile === undefined) {
-    return null;
-  }
+  const defaultOpenMobile = window.innerWidth < DEFAULT_MOBILE_BREAKPOINT;
 
   if (collapsible === "none") {
     return (
@@ -151,6 +144,10 @@ function Sidebar({
         {children}
       </div>
     );
+  }
+
+  if (defaultOpenMobile && isMobile === undefined) {
+    return null;
   }
 
   if (isMobile) {
