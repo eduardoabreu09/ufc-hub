@@ -11,14 +11,6 @@ export const getEventById = cache(
       const event = await prisma.event.findUnique({
         where: {
           id: eventId,
-          /*
-          // TODO: Uncomment to restrict access to group members only
-          users: {
-            some: {
-              userId: userId,
-            },
-          },
-          */
         },
         select: {
           id: true,
@@ -37,16 +29,6 @@ export const getEventById = cache(
           tags: {
             select: {
               name: true,
-            },
-          },
-          participations: {
-            select: {
-              userId: true,
-              createdAt: true,
-              participation: true,
-              user: {
-                select: { id: true, name: true, email: true, course: true },
-              },
             },
           },
         },
