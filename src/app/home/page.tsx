@@ -4,11 +4,11 @@ import { EventGallery } from "@/components/home/event-carousel";
 import PageHeader from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Metadata } from "next";
-import { getGroups } from "@/features/groups/queries/get-groups";
 import { getHomeEvents } from "@/features/home/queries/get-home-events";
 import { getHomePosts } from "@/features/home/queries/get-home-posts";
 import { cacheTag } from "next/cache";
 import { Suspense } from "react";
+import { getHomeGroups } from "@/features/home/queries/get-home-groups";
 
 export const metadata: Metadata = {
   title: "Início",
@@ -123,7 +123,7 @@ async function PostList() {
 }
 
 async function GroupList() {
-  const groupResult = await getGroups();
+  const groupResult = await getHomeGroups();
 
   if (groupResult.isFailure) {
     return null;
