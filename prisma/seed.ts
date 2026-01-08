@@ -159,7 +159,7 @@ async function seedGroups(userIds: number[], count: number) {
       role: GroupRole.ADMIN,
     });
 
-    // Add 5-20 random members
+    // Add 5-100 random members
     const memberCount = faker.number.int({ min: 5, max: 100 });
     const randomMembers = faker.helpers.arrayElements(userIds, memberCount);
 

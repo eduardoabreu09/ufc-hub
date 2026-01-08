@@ -5,7 +5,7 @@ import { getCurrentUserId } from "@/features/session/queries/get-current-user-id
 import { Result } from "@/lib/results";
 import { GroupDTO } from "@/types/group";
 
-export async function getGroups(): Promise<Result<GroupDTO[]>> {
+export async function getHomeGroups(): Promise<Result<GroupDTO[]>> {
   const userIdResult = await getCurrentUserId();
 
   if (userIdResult.error && userIdResult.isFailure) {
@@ -47,7 +47,8 @@ export async function getGroups(): Promise<Result<GroupDTO[]>> {
           },
         },
       },
-      orderBy: { createdAt: "desc" },
+      take: 9,
+      orderBy: [{ messages: { _count: "desc" } }, { createdAt: "desc" }],
     });
 
     return Result.success(groups);

@@ -37,12 +37,12 @@ export async function getHomePosts(): Promise<Result<BlogPostDTO[]>> {
       take: 5,
       orderBy: [
         {
+          createdAt: "desc",
+        },
+        {
           messages: {
             _count: "desc",
           },
-        },
-        {
-          createdAt: "desc",
         },
       ],
     });
