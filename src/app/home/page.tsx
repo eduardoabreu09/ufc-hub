@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <PageHeader
-      title="Bem-vindo ao UFC hub"
+      title="Bem-vindo ao UFC Hub"
       description="Seu portal central para eventos, notícias e recursos da universidade."
     >
       <div className="flex flex-col gap-10">
