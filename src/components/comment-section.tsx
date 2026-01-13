@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { formatDateTime } from "@/lib/utils";
 import { commentOnEvent } from "@/features/events/actions/comment-on-event";
 import AvatarName from "./avatar-name";
+import Link from "next/link";
 
 interface CommentSectionProps {
   id: number;
@@ -69,7 +70,10 @@ export function CommentSection({
 
             <div className="flex-1 space-y-1">
               <div className="flex items-center justify-between gap-2 text-sm">
-                <div className="flex flex-wrap items-center gap-2">
+                <Link
+                  className="flex flex-wrap items-center gap-2"
+                  href={`/home/profile/${comment.senderId}`}
+                >
                   <span className="font-semibold">{comment.sentBy.name}</span>
                   <span className="text-muted-foreground">
                     {formatDateTime(comment.createdAt, {
@@ -80,7 +84,7 @@ export function CommentSection({
                       minute: "2-digit",
                     })}
                   </span>
-                </div>
+                </Link>
               </div>
 
               <p className="text-sm text-muted-foreground whitespace-pre-wrap">

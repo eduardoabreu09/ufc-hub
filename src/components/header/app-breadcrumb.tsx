@@ -27,6 +27,9 @@ export function AppBreadcrumb() {
     if (pathname.includes("blog")) {
       return "Blog";
     }
+    if (pathname.includes("profile")) {
+      return "Perfil";
+    }
     return "";
   }, [pathname]);
 

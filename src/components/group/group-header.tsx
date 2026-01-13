@@ -105,7 +105,10 @@ export async function GroupHeader({ groupId }: GroupHeaderProps) {
                       key={userGroup.userId}
                       className="flex items-center justify-between"
                     >
-                      <div className="flex items-center gap-3">
+                      <Link
+                        className="flex items-center gap-3"
+                        href={`/home/profile/${userGroup.userId}`}
+                      >
                         <AvatarName
                           name={userGroup.user.name}
                           className="h-8 w-8"
@@ -128,7 +131,7 @@ export async function GroupHeader({ groupId }: GroupHeaderProps) {
                             </p>
                           )}
                         </div>
-                      </div>
+                      </Link>
                       <GroupMemberManager
                         group={group}
                         memberId={userGroup.userId}
