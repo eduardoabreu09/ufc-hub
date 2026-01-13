@@ -8,6 +8,7 @@ import { notFound } from "next/navigation";
 import EventParticipationContent from "./event-participation-content";
 import { cacheTag } from "next/cache";
 import { Suspense } from "react";
+import Link from "next/link";
 
 export async function EventDetails({ eventId }: { eventId: number }) {
   return (
@@ -65,10 +66,13 @@ async function EventDetailsBody({ eventId }: { eventId: number }) {
         <p className="text-lg text-muted-foreground">{event.description}</p>
 
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-foreground">
+          <Link
+            className="flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-foreground"
+            href={`/home/profile/${event.creatorId}`}
+          >
             <UserIcon className="h-4 w-4" />
             <span className="font-medium">{event.createdBy.name}</span>
-          </div>
+          </Link>
           {event.createdBy.course && (
             <>
               <span>•</span>

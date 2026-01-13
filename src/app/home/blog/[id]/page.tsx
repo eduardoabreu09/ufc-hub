@@ -15,6 +15,7 @@ import CommentSectionSkeleton from "@/components/comment-section-skeleton";
 import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
 import { getHomePosts } from "@/features/home/queries/get-home-posts";
 import { getPostsForCache } from "@/features/blog/queries/get-posts-for-cache";
+import Link from "next/link";
 
 export async function generateStaticParams() {
   const [posts, homePostsResult] = await Promise.all([
@@ -101,7 +102,10 @@ async function PostBody({ postId }: { postId: number }) {
         <h1 className="text-4xl font-bold tracking-tight">{post.title}</h1>
         <p className="text-lg text-muted-foreground">{post.body}</p>
 
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Link
+          className="flex items-center gap-2 text-sm text-muted-foreground"
+          href={`/home/profile/${post.authorId}`}
+        >
           <div className="flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-secondary-foreground">
             <UserIcon className="h-4 w-4" />
             <span className="font-medium">{post.author.name}</span>
@@ -112,7 +116,7 @@ async function PostBody({ postId }: { postId: number }) {
               <span className="font-medium">{post.author.course}</span>
             </>
           )}
-        </div>
+        </Link>
       </div>
       <BlogAuthorActions post={post} />
     </div>

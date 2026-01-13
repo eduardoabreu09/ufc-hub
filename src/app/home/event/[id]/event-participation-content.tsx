@@ -12,6 +12,7 @@ import { EventParticipationDTO } from "@/types/event";
 import { getEventParticipations } from "@/features/events/queries/get-event-participations";
 import { getCurrentUserId } from "@/features/session/queries/get-current-user-id";
 import { connection } from "next/server";
+import Link from "next/link";
 
 const PARTICIPATION_SECTION_LABELS: Record<Participation, string> = {
   YES: "Confirmados",
@@ -79,16 +80,17 @@ export default async function EventParticipationContent({
                     ) : (
                       <ul className="space-y-1">
                         {users.map((participant) => (
-                          <li
+                          <Link
                             key={`${status}-${participant.userId}`}
                             className="flex items-center gap-2 text-sm text-foreground"
+                            href={`/home/profile/${participant.userId}`}
                           >
                             <AvatarName
                               name={participant.user.name}
                               className="size-7"
                             />
                             <span>{participant.user.name}</span>
-                          </li>
+                          </Link>
                         ))}
                       </ul>
                     )}
