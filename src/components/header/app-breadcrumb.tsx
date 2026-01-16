@@ -30,6 +30,9 @@ export function AppBreadcrumb() {
     if (pathname.includes("profile")) {
       return "Perfil";
     }
+    if (pathname.includes("calendar")) {
+      return "Calendário";
+    }
     return "";
   }, [pathname]);
 

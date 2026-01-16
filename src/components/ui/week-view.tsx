@@ -7,6 +7,7 @@ import {
   differenceInMinutes,
   eachDayOfInterval,
   eachHourOfInterval,
+  endOfDay,
   endOfWeek,
   format,
   getHours,
@@ -18,7 +19,7 @@ import {
   startOfWeek,
 } from "date-fns";
 
-import { cn, isMultiDayEvent } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { useCurrentTimeIndicator } from "@/hooks/use-current-time-indicator";
 import {
   CalendarEvent,
@@ -26,15 +27,13 @@ import {
   EndHour,
   WeekCellsHeight,
 } from "@/types/calendar";
-import { DraggableEvent } from "./draggable-event";
-import { DroppableCell } from "./droppable-cell";
 import { EventItem } from "./event-item";
+import { ptBR } from "date-fns/locale";
 
 interface WeekViewProps {
   currentDate: Date;
   events: CalendarEvent[];
   onEventSelect: (event: CalendarEvent) => void;
-  onEventCreate: (startTime: Date) => void;
 }
 
 interface PositionedEvent {
@@ -50,7 +49,6 @@ export function WeekView({
   currentDate,
   events,
   onEventSelect,
-  onEventCreate,
 }: WeekViewProps) {
   const days = useMemo(() => {
     const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
@@ -67,7 +65,7 @@ export function WeekView({
     const dayStart = startOfDay(currentDate);
     return eachHourOfInterval({
       start: addHours(dayStart, StartHour),
-      end: addHours(dayStart, EndHour - 1),
+      end: addHours(dayStart, EndHour),
     });
   }, [currentDate]);
 
@@ -76,7 +74,7 @@ export function WeekView({
     return events
       .filter((event) => {
         // Include explicitly marked all-day events or multi-day events
-        return event.allDay || isMultiDayEvent(event);
+        return event.allDay;
       })
       .filter((event) => {
         const eventStart = new Date(event.start);
@@ -96,8 +94,7 @@ export function WeekView({
       // Get events for this day that are not all-day events or multi-day events
       const dayEvents = events.filter((event) => {
         // Skip all-day events and multi-day events
-        if (event.allDay || isMultiDayEvent(event)) return false;
-
+        if (event.allDay) return false;
         const eventStart = new Date(event.start);
         const eventEnd = new Date(event.end);
 
@@ -129,6 +126,7 @@ export function WeekView({
       // Calculate positions for each event
       const positionedEvents: PositionedEvent[] = [];
       const dayStart = startOfDay(day);
+      const endDay = endOfDay(day);
 
       // Track columns for overlapping events
       const columns: { event: CalendarEvent; end: Date }[][] = [];
@@ -141,9 +139,7 @@ export function WeekView({
         const adjustedStart = isSameDay(day, eventStart)
           ? eventStart
           : dayStart;
-        const adjustedEnd = isSameDay(day, eventEnd)
-          ? eventEnd
-          : addHours(dayStart, 24);
+        const adjustedEnd = isSameDay(day, eventEnd) ? eventEnd : endDay; // End of the day
 
         // Calculate top position and height
         const startHour =
@@ -230,9 +226,11 @@ export function WeekView({
             data-today={isToday(day) || undefined}
           >
             <span className="sm:hidden" aria-hidden="true">
-              {format(day, "E")[0]} {format(day, "d")}
+              {format(day, "E", { locale: ptBR })[0]} {format(day, "d")}
             </span>
-            <span className="max-sm:hidden">{format(day, "EEE dd")}</span>
+            <span className="max-sm:hidden">
+              {format(day, "EEE dd", { locale: ptBR })}
+            </span>
           </div>
         ))}
       </div>
@@ -241,8 +239,8 @@ export function WeekView({
         <div className="border-border/70 bg-muted/50 border-b">
           <div className="grid grid-cols-8">
             <div className="border-border/70 relative border-r">
-              <span className="text-muted-foreground/70 absolute bottom-0 left-0 h-6 w-16 max-w-full pe-2 text-right text-[10px] sm:pe-4 sm:text-xs">
-                All day
+              <span className="text-muted-foreground/70 absolute top-2 left-0 pl-2 sm:pe-4 text-xs sm:top-4">
+                Dia todo
               </span>
             </div>
             {days.map((day, dayIndex) => {
@@ -311,7 +309,7 @@ export function WeekView({
             >
               {index > 0 && (
                 <span className="bg-background text-muted-foreground/70 absolute -top-3 left-0 flex h-6 w-16 max-w-full items-center justify-end pe-2 text-[10px] sm:pe-4 sm:text-xs">
-                  {format(hour, "h a")}
+                  {format(hour, "HH")}
                 </span>
               )}
             </div>
@@ -339,12 +337,11 @@ export function WeekView({
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="size-full">
-                  <DraggableEvent
+                  <EventItem
                     event={positionedEvent.event}
                     view="week"
                     onClick={(e) => handleEventClick(positionedEvent.event, e)}
                     showTime
-                    height={positionedEvent.height}
                   />
                 </div>
               </div>
@@ -363,41 +360,11 @@ export function WeekView({
               </div>
             )}
             {hours.map((hour) => {
-              const hourValue = getHours(hour);
               return (
                 <div
                   key={hour.toString()}
                   className="border-border/70 relative min-h-[var(--week-cells-height)] border-b last:border-b-0"
-                >
-                  {/* Quarter-hour intervals */}
-                  {[0, 1, 2, 3].map((quarter) => {
-                    const quarterHourTime = hourValue + quarter * 0.25;
-                    return (
-                      <DroppableCell
-                        key={`${hour.toString()}-${quarter}`}
-                        id={`week-cell-${day.toISOString()}-${quarterHourTime}`}
-                        date={day}
-                        time={quarterHourTime}
-                        className={cn(
-                          "absolute h-[calc(var(--week-cells-height)/4)] w-full",
-                          quarter === 0 && "top-0",
-                          quarter === 1 &&
-                            "top-[calc(var(--week-cells-height)/4)]",
-                          quarter === 2 &&
-                            "top-[calc(var(--week-cells-height)/4*2)]",
-                          quarter === 3 &&
-                            "top-[calc(var(--week-cells-height)/4*3)]"
-                        )}
-                        onClick={() => {
-                          const startTime = new Date(day);
-                          startTime.setHours(hourValue);
-                          startTime.setMinutes(quarter * 15);
-                          onEventCreate(startTime);
-                        }}
-                      />
-                    );
-                  })}
-                </div>
+                />
               );
             })}
           </div>

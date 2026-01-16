@@ -6,6 +6,7 @@ import { addDays, format, isToday } from "date-fns";
 import { AgendaDaysToShow, CalendarEvent } from "@/types/calendar";
 import { getAgendaEventsForDay } from "@/lib/utils";
 import { EventItem } from "./event-item";
+import { ptBR } from "date-fns/locale";
 
 interface AgendaViewProps {
   currentDate: Date;
@@ -45,9 +46,9 @@ export function AgendaView({
             size={32}
             className="text-muted-foreground/50 mb-2"
           />
-          <h3 className="text-lg font-medium">No events found</h3>
+          <h3 className="text-lg font-medium">Nenhum evento encontrado</h3>
           <p className="text-muted-foreground">
-            There are no events scheduled for this time period.
+            Não há eventos agendados para os próximos dias.
           </p>
         </div>
       ) : (
@@ -65,7 +66,7 @@ export function AgendaView({
                 className="bg-background absolute -top-3 left-0 flex h-6 items-center pe-4 text-[10px] uppercase data-today:font-medium sm:pe-4 sm:text-xs"
                 data-today={isToday(day) || undefined}
               >
-                {format(day, "d MMM, EEEE")}
+                {format(day, "d MMM, EEEE", { locale: ptBR })}
               </span>
               <div className="mt-6 space-y-2">
                 {dayEvents.map((event) => (

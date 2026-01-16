@@ -6,6 +6,7 @@ import {
   areIntervalsOverlapping,
   differenceInMinutes,
   eachHourOfInterval,
+  endOfDay,
   format,
   getHours,
   getMinutes,
@@ -13,7 +14,6 @@ import {
   startOfDay,
 } from "date-fns";
 
-import { cn, isMultiDayEvent } from "@/lib/utils";
 import {
   CalendarEvent,
   EndHour,
@@ -22,14 +22,11 @@ import {
 } from "@/types/calendar";
 import { useCurrentTimeIndicator } from "@/hooks/use-current-time-indicator";
 import { EventItem } from "./event-item";
-import { DraggableEvent } from "./draggable-event";
-import { DroppableCell } from "./droppable-cell";
 
 interface DayViewProps {
   currentDate: Date;
   events: CalendarEvent[];
   onEventSelect: (event: CalendarEvent) => void;
-  onEventCreate: (startTime: Date) => void;
 }
 
 interface PositionedEvent {
@@ -41,17 +38,12 @@ interface PositionedEvent {
   zIndex: number;
 }
 
-export function DayView({
-  currentDate,
-  events,
-  onEventSelect,
-  onEventCreate,
-}: DayViewProps) {
+export function DayView({ currentDate, events, onEventSelect }: DayViewProps) {
   const hours = useMemo(() => {
     const dayStart = startOfDay(currentDate);
     return eachHourOfInterval({
       start: addHours(dayStart, StartHour),
-      end: addHours(dayStart, EndHour - 1),
+      end: addHours(dayStart, EndHour),
     });
   }, [currentDate]);
 
@@ -75,7 +67,7 @@ export function DayView({
   const allDayEvents = useMemo(() => {
     return dayEvents.filter((event) => {
       // Include explicitly marked all-day events or multi-day events
-      return event.allDay || isMultiDayEvent(event);
+      return event.allDay;
     });
   }, [dayEvents]);
 
@@ -83,7 +75,7 @@ export function DayView({
   const timeEvents = useMemo(() => {
     return dayEvents.filter((event) => {
       // Exclude all-day events and multi-day events
-      return !event.allDay && !isMultiDayEvent(event);
+      return !event.allDay;
     });
   }, [dayEvents]);
 
@@ -91,6 +83,7 @@ export function DayView({
   const positionedEvents = useMemo(() => {
     const result: PositionedEvent[] = [];
     const dayStart = startOfDay(currentDate);
+    const dayEnd = endOfDay(currentDate);
 
     // Sort events by start time and duration
     const sortedEvents = [...timeEvents].sort((a, b) => {
@@ -120,9 +113,7 @@ export function DayView({
       const adjustedStart = isSameDay(currentDate, eventStart)
         ? eventStart
         : dayStart;
-      const adjustedEnd = isSameDay(currentDate, eventEnd)
-        ? eventEnd
-        : addHours(dayStart, 24);
+      const adjustedEnd = isSameDay(currentDate, eventEnd) ? eventEnd : dayEnd;
 
       // Calculate top position and height
       const startHour =
@@ -233,7 +224,7 @@ export function DayView({
             >
               {index > 0 && (
                 <span className="bg-background text-muted-foreground/70 absolute -top-3 left-0 flex h-6 w-16 max-w-full items-center justify-end pe-2 text-[10px] sm:pe-4 sm:text-xs">
-                  {format(hour, "h a")}
+                  {format(hour, "HH")}
                 </span>
               )}
             </div>
@@ -255,12 +246,11 @@ export function DayView({
               }}
             >
               <div className="size-full">
-                <DraggableEvent
+                <EventItem
                   event={positionedEvent.event}
                   view="day"
                   onClick={(e) => handleEventClick(positionedEvent.event, e)}
                   showTime
-                  height={positionedEvent.height}
                 />
               </div>
             </div>
@@ -286,36 +276,7 @@ export function DayView({
               <div
                 key={hour.toString()}
                 className="border-border/70 relative h-[var(--week-cells-height)] border-b last:border-b-0"
-              >
-                {/* Quarter-hour intervals */}
-                {[0, 1, 2, 3].map((quarter) => {
-                  const quarterHourTime = hourValue + quarter * 0.25;
-                  return (
-                    <DroppableCell
-                      key={`${hour.toString()}-${quarter}`}
-                      id={`day-cell-${currentDate.toISOString()}-${quarterHourTime}`}
-                      date={currentDate}
-                      time={quarterHourTime}
-                      className={cn(
-                        "absolute h-[calc(var(--week-cells-height)/4)] w-full",
-                        quarter === 0 && "top-0",
-                        quarter === 1 &&
-                          "top-[calc(var(--week-cells-height)/4)]",
-                        quarter === 2 &&
-                          "top-[calc(var(--week-cells-height)/4*2)]",
-                        quarter === 3 &&
-                          "top-[calc(var(--week-cells-height)/4*3)]"
-                      )}
-                      onClick={() => {
-                        const startTime = new Date(currentDate);
-                        startTime.setHours(hourValue);
-                        startTime.setMinutes(quarter * 15);
-                        onEventCreate(startTime);
-                      }}
-                    />
-                  );
-                })}
-              </div>
+              />
             );
           })}
         </div>
