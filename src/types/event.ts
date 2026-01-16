@@ -17,6 +17,22 @@ interface EventDTOBase {
   tags: TagDto[];
 }
 
+export interface EventCalendarDTO {
+  id: number;
+  title: string;
+  description: string;
+  eventDate: Date;
+  duration: number;
+  location: string;
+  createdBy: UserDTO;
+  creatorId: number;
+  tags: TagDto[];
+  participations: EventParticipationSimpleDTO[];
+  _count?: {
+    participations: number;
+  };
+}
+
 export interface EventHomeDTO extends EventDTOBase {
   _count?: {
     participations: number;
@@ -24,13 +40,13 @@ export interface EventHomeDTO extends EventDTOBase {
 }
 
 export interface EventDTO extends EventDTOBase {
-  participations: EventPaticipationSimpleDTO[];
+  participations: EventParticipationSimpleDTO[];
   _count?: {
     participations: number;
   };
 }
 
-export interface EventPaticipationSimpleDTO {
+export interface EventParticipationSimpleDTO {
   userId: number;
   participation: Participation;
 }
