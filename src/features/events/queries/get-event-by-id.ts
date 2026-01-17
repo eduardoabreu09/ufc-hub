@@ -42,5 +42,5 @@ export const getEventById = cache(
     } catch (error) {
       return Result.failure("Erro ao buscar o evento.");
     }
-  }
+  },
 );

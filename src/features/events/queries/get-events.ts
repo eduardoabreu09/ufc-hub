@@ -9,7 +9,7 @@ import { parseWithFallback } from "@/lib/utils";
 
 export async function getEvents(
   query?: string,
-  pageString?: string
+  pageString?: string,
 ): Promise<Result<EventDTO[]>> {
   const userIdResult = await getCurrentUserId();
 

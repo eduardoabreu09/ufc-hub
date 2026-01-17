@@ -1,6 +1,6 @@
 import { Card, CardFooter, CardHeader } from "@/components/ui/card";
 import type { BlogPostDTO } from "@/types/blog-post";
-import { CalendarDays, MessageSquareIcon, UserIcon } from "lucide-react";
+import { CalendarDays, Heart, MessageSquareIcon, UserIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatDateTime } from "@/lib/utils";
 import Link from "next/link";
@@ -11,6 +11,7 @@ interface PostCardProps {
 
 export function PostCard({ post }: PostCardProps) {
   const commentCount = post._count?.messages ?? 0;
+  const likeCount = post._count?.likes ?? 0;
 
   return (
     <Card className="h-full w-full sm:max-w-2xl lg:max-w-3xl hover:bg-muted/50 transition-colors cursor-pointer flex flex-col">
@@ -50,10 +51,16 @@ export function PostCard({ post }: PostCardProps) {
             )}
           </div>
         </CardHeader>
-        <CardFooter className="text-sm text-muted-foreground mt-4">
-          <div className="flex items-center gap-1">
-            <MessageSquareIcon size={16} />
-            <span>{commentCount} comentários</span>
+        <CardFooter className="text-sm text-muted-foreground mt-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5">
+              <Heart size={18} />
+              <span className="text-sm font-medium">{likeCount}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <MessageSquareIcon size={16} />
+              <span>{commentCount} comentários</span>
+            </div>
           </div>
         </CardFooter>
       </Link>

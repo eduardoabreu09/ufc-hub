@@ -4,6 +4,7 @@ import type { UserDTO } from "./user";
 
 export interface BlogPostCountDTO {
   messages: number;
+  likes: number;
 }
 
 export interface BlogPostBaseDTO {

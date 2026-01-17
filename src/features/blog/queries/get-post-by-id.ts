@@ -34,6 +34,7 @@ export const getPostById = cache(
           _count: {
             select: {
               messages: true,
+              likes: true,
             },
           },
         },
@@ -47,5 +48,5 @@ export const getPostById = cache(
     } catch {
       return Result.failure("Erro ao buscar postagem.");
     }
-  }
+  },
 );
