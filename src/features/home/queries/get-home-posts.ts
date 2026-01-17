@@ -31,6 +31,7 @@ export async function getHomePosts(): Promise<Result<BlogPostDTO[]>> {
         _count: {
           select: {
             messages: true,
+            likes: true,
           },
         },
       },

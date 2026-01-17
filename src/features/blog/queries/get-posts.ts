@@ -7,7 +7,7 @@ import { parseWithFallback } from "@/lib/utils";
 
 export async function getPosts(
   query?: string,
-  pageString?: string
+  pageString?: string,
 ): Promise<Result<BlogPostDTO[]>> {
   const page = Math.max(parseWithFallback(pageString ?? "", 1), 1);
   const take = 10;
@@ -44,6 +44,7 @@ export async function getPosts(
         _count: {
           select: {
             messages: true,
+            likes: true,
           },
         },
       },
