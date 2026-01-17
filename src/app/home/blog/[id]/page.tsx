@@ -16,6 +16,7 @@ import { getCurrentUserId } from "@/features/session/queries/get-current-user-id
 import { getHomePosts } from "@/features/home/queries/get-home-posts";
 import { getPostsForCache } from "@/features/blog/queries/get-posts-for-cache";
 import Link from "next/link";
+import { LikeButton } from "@/components/like-button";
 
 export async function generateStaticParams() {
   const [posts, homePostsResult] = await Promise.all([
@@ -117,6 +118,9 @@ async function PostBody({ postId }: { postId: number }) {
             </>
           )}
         </Link>
+        <div className="flex items-center gap-2 pt-2">
+          <LikeButton id={postId} type="blog" />
+        </div>
       </div>
       <BlogAuthorActions post={post} />
     </div>

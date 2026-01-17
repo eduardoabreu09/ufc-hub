@@ -9,6 +9,7 @@ import EventParticipationContent from "./event-participation-content";
 import { cacheTag } from "next/cache";
 import { Suspense } from "react";
 import Link from "next/link";
+import { LikeButton } from "@/components/like-button";
 
 export async function EventDetails({ eventId }: { eventId: number }) {
   return (
@@ -88,6 +89,10 @@ async function EventDetailsBody({ eventId }: { eventId: number }) {
             <span>•</span>
             <Clock className="h-4 w-4" />
             <span>Duração: {event.duration} minutos</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span>•</span>
+            <LikeButton id={eventId} type="event" />
           </div>
         </div>
       </div>
