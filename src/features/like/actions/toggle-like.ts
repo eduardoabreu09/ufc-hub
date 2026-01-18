@@ -34,8 +34,6 @@ export async function toggleLike(
         },
       });
 
-      console.log({ existingLike });
-
       if (!existingLike) {
         await prisma.like.create({
           data: {

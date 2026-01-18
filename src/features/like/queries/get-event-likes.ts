@@ -7,10 +7,9 @@ export async function getEventLikes(eventId: number): Promise<number> {
     const count = await prisma.like.count({
       where: { eventId },
     });
-    console.log({ count });
     return count;
   } catch (error) {
-    console.error("Error fetching post likes:", error);
+    console.error("Error fetching event likes:", error);
     return 0;
   }
 }

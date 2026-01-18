@@ -7,7 +7,6 @@ export async function getPostLikes(postId: number): Promise<number> {
     const count = await prisma.like.count({
       where: { blogPostId: postId },
     });
-    console.log({ count });
     return count;
   } catch (error) {
     console.error("Error fetching post likes:", error);

@@ -20,11 +20,9 @@ export async function isLikedByUser(
       where: { userId, blogPostId: postId, eventId },
     });
 
-    console.log({ liked });
-
     return liked > 0;
   } catch (error) {
-    console.error("Error fetching post likes:", error);
+    console.error("Error fetching like by user:", error);
     return false;
   }
 }
