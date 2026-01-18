@@ -17,6 +17,7 @@ import { getHomePosts } from "@/features/home/queries/get-home-posts";
 import { getPostsForCache } from "@/features/blog/queries/get-posts-for-cache";
 import Link from "next/link";
 import { LikeButton } from "@/components/like-button";
+import { ShareButton } from "@/components/share-button";
 
 export async function generateStaticParams() {
   const [posts, homePostsResult] = await Promise.all([
@@ -103,23 +104,26 @@ async function PostBody({ postId }: { postId: number }) {
         <h1 className="text-4xl font-bold tracking-tight">{post.title}</h1>
         <p className="text-lg text-muted-foreground">{post.body}</p>
 
-        <Link
-          className="flex items-center gap-2 text-sm text-muted-foreground"
-          href={`/home/profile/${post.authorId}`}
-        >
-          <div className="flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-secondary-foreground">
-            <UserIcon className="h-4 w-4" />
-            <span className="font-medium">{post.author.name}</span>
+        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+          <Link
+            className="flex items-center gap-2 text-sm text-muted-foreground"
+            href={`/home/profile/${post.authorId}`}
+          >
+            <div className="flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-secondary-foreground">
+              <UserIcon className="h-4 w-4" />
+              <span className="font-medium">{post.author.name}</span>
+            </div>
+            {post.author.course && (
+              <>
+                <span>•</span>
+                <span className="font-medium">{post.author.course}</span>
+              </>
+            )}
+          </Link>
+          <div className="flex items-center gap-2">
+            <LikeButton id={postId} type="blog" />
+            <ShareButton />
           </div>
-          {post.author.course && (
-            <>
-              <span>•</span>
-              <span className="font-medium">{post.author.course}</span>
-            </>
-          )}
-        </Link>
-        <div className="flex items-center gap-2 pt-2">
-          <LikeButton id={postId} type="blog" />
         </div>
       </div>
       <BlogAuthorActions post={post} />
