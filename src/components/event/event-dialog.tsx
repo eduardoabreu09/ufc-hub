@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useState, useTransition } from "react";
+import { FormEvent, Suspense, useMemo, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -46,7 +46,7 @@ export function EventDialog({ mode, event }: EventDialogProps) {
   const [isPending, startTransition] = useTransition();
 
   const defaultStartTime = useMemo(() => {
-    if (!event) return "11:00";
+    if (!event) return "12:00";
     const eventDate = new Date(event.eventDate);
     const timezoneOffset = eventDate.getTimezoneOffset();
     const utcDate = new Date(eventDate.getTime() + timezoneOffset * 60000);
@@ -261,9 +261,17 @@ export function EventDialog({ mode, event }: EventDialogProps) {
 }
 
 export function CreateEventDialog() {
-  return <EventDialog mode="create" />;
+  return (
+    <Suspense>
+      <EventDialog mode="create" />
+    </Suspense>
+  );
 }
 
 export function EditEventDialog({ event }: { event: EventDetailsDTO }) {
-  return <EventDialog mode="edit" event={event} />;
+  return (
+    <Suspense>
+      <EventDialog mode="edit" event={event} />
+    </Suspense>
+  );
 }
