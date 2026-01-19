@@ -11,7 +11,7 @@ const TAG_LENGTH_LIMIT = 32;
 
 export async function updateEvent(
   eventId: number,
-  formData: FormData
+  formData: FormData,
 ): Promise<CreateEventFormSchema> {
   const userIdResult = await getCurrentUserId();
 
@@ -90,8 +90,8 @@ export async function updateEvent(
 
     const [startHour, startMinute] = startTime.split(":");
     const eventDateValue = new Date(eventDate);
-    eventDateValue.setHours(Number(startHour));
-    eventDateValue.setMinutes(Number(startMinute));
+    eventDateValue.setUTCHours(Number(startHour));
+    eventDateValue.setUTCMinutes(Number(startMinute));
 
     if (eventDateValue <= new Date()) {
       return {
