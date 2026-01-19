@@ -8,6 +8,11 @@ import { Participation } from "@prisma/client";
 export async function getHomeEvents(): Promise<Result<EventHomeDTO[]>> {
   try {
     const events = await prisma.event.findMany({
+      where: {
+        eventDate: {
+          gte: new Date(),
+        },
+      },
       select: {
         id: true,
         title: true,

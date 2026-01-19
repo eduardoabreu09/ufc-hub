@@ -64,8 +64,7 @@ export function EventDialog({ event, isOpen, onClose }: EventDialogProps) {
   const dateLabel = (() => {
     if (!startDate || !endDate || Number.isNaN(startDate.getTime()))
       return "Data não informada";
-    if (Number.isNaN(endDate.getTime()))
-      return format(startDate, "dd/MM/yyyy HH:mm");
+    if (Number.isNaN(endDate.getTime())) return format(startDate, "dd/MM/yyyy");
 
     if (event?.allDay)
       return `${format(startDate, "dd/MM/yyyy")} • Dia inteiro`;
@@ -76,15 +75,12 @@ export function EventDialog({ event, isOpen, onClose }: EventDialogProps) {
       startDate.getDate() === endDate.getDate();
 
     if (sameDay) {
-      return `${format(startDate, "dd/MM/yyyy")} • ${format(
-        startDate,
-        "HH:mm"
-      )} - ${format(endDate, "HH:mm")}`;
+      return `${format(startDate, "dd/MM/yyyy")}`;
     }
 
-    return `${format(startDate, "dd/MM/yyyy HH:mm")} - ${format(
+    return `${format(startDate, "dd/MM/yyyy")} • ${format(
       endDate,
-      "dd/MM/yyyy HH:mm"
+      "dd/MM/yyyy",
     )}`;
   })();
 
@@ -160,7 +156,7 @@ export function EventDialog({ event, isOpen, onClose }: EventDialogProps) {
               <div className="flex flex-wrap gap-2">
                 {tags.map((tag) => (
                   <Badge key={tag} variant="secondary">
-                    {tag}
+                    {tag.toUpperCase()}
                   </Badge>
                 ))}
               </div>

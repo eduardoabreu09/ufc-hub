@@ -9,11 +9,16 @@ type EventCacheDTO = {
 export async function getEventsForCache(): Promise<EventCacheDTO[]> {
   try {
     const events = await prisma.event.findMany({
+      where: {
+        eventDate: {
+          gte: new Date(),
+        },
+      },
       select: {
         id: true,
       },
       take: 50,
-      orderBy: { eventDate: "desc" },
+      orderBy: { eventDate: "asc" },
     });
 
     return events as EventCacheDTO[];
