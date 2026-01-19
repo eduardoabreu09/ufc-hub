@@ -46,22 +46,29 @@ export function EventDialog({ mode, event }: EventDialogProps) {
   const [isPending, startTransition] = useTransition();
 
   const defaultStartTime = useMemo(() => {
-    if (!event) return "09:00";
-    return format(new Date(event.eventDate), "HH:mm");
+    if (!event) return "11:00";
+    const eventDate = new Date(event.eventDate);
+    const timezoneOffset = eventDate.getTimezoneOffset();
+    const utcDate = new Date(eventDate.getTime() + timezoneOffset * 60000);
+    return format(utcDate, "HH:mm");
   }, [event]);
 
   const defaultTags = useMemo(
     () => event?.tags.map((tag) => tag.name).join(", ") ?? "",
-    [event]
+    [event],
   );
 
   const timeOptions = useMemo(() => {
     const options: { value: string; label: string }[] = [];
     for (let hour = StartHour; hour <= EndHour; hour++) {
       for (let minute = 0; minute < 60; minute += 15) {
-        const date = new Date(2000, 0, 1, hour, minute);
+        const date = new Date();
+        date.setHours(hour, minute, 0, 0);
         const label = format(date, "HH:mm");
-        options.push({ value: label, label });
+        const timezoneOffset = date.getTimezoneOffset();
+        const utcDate = new Date(date.getTime() + timezoneOffset * 60000);
+        const value = format(utcDate, "HH:mm");
+        options.push({ label, value });
       }
     }
     return options;
