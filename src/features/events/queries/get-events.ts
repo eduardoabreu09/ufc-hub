@@ -30,6 +30,11 @@ export async function getEvents(
           contains: query,
           mode: "insensitive",
         },
+        AND: {
+          eventDate: {
+            gte: new Date(),
+          },
+        },
       },
       select: {
         id: true,
