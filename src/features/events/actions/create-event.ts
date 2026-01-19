@@ -10,7 +10,7 @@ const MAX_TAGS_LIMIT = 10;
 const TAG_LENGTH_LIMIT = 32;
 
 export async function createEvent(
-  formData: FormData
+  formData: FormData,
 ): Promise<CreateEventFormSchema> {
   const userResult = await getCurrentUser();
 
@@ -68,8 +68,8 @@ export async function createEvent(
 
     const splitedStartTime = startTime.split(":");
     const eventDateValue = new Date(eventDate);
-    eventDateValue.setHours(Number(splitedStartTime[0]));
-    eventDateValue.setMinutes(Number(splitedStartTime[1]));
+    eventDateValue.setUTCHours(Number(splitedStartTime[0]));
+    eventDateValue.setUTCMinutes(Number(splitedStartTime[1]));
 
     if (eventDateValue <= new Date()) {
       return {
