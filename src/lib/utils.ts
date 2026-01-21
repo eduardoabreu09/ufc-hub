@@ -3,6 +3,9 @@ import { clsx, type ClassValue } from "clsx";
 import { isSameDay } from "date-fns";
 import { twMerge } from "tailwind-merge";
 
+const DEFAULT_TIME_ZONE =
+  process.env.NEXT_PUBLIC_TIMEZONE ?? "America/Fortaleza";
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -31,7 +34,7 @@ export function getEventColorClasses(color?: EventColor | string): string {
  */
 export function getBorderRadiusClasses(
   isFirstDay: boolean,
-  isLastDay: boolean
+  isLastDay: boolean,
 ): string {
   if (isFirstDay && isLastDay) {
     return "rounded"; // Both ends rounded
@@ -58,7 +61,7 @@ export function isMultiDayEvent(event: CalendarEvent): boolean {
  */
 export function getEventsForDay(
   events: CalendarEvent[],
-  day: Date
+  day: Date,
 ): CalendarEvent[] {
   return events
     .filter((event) => {
@@ -88,7 +91,7 @@ export function sortEvents(events: CalendarEvent[]): CalendarEvent[] {
  */
 export function getSpanningEventsForDay(
   events: CalendarEvent[],
-  day: Date
+  day: Date,
 ): CalendarEvent[] {
   return events.filter((event) => {
     if (!isMultiDayEvent(event)) return false;
@@ -109,7 +112,7 @@ export function getSpanningEventsForDay(
  */
 export function getAllEventsForDay(
   events: CalendarEvent[],
-  day: Date
+  day: Date,
 ): CalendarEvent[] {
   return events.filter((event) => {
     const eventStart = new Date(event.start);
@@ -127,7 +130,7 @@ export function getAllEventsForDay(
  */
 export function getAgendaEventsForDay(
   events: CalendarEvent[],
-  day: Date
+  day: Date,
 ): CalendarEvent[] {
   return events
     .filter((event) => {
@@ -153,16 +156,18 @@ export function addHoursToDate(date: Date, hours: number): Date {
 
 export function formatDateTime(
   value: Date | null,
-  options?: Intl.DateTimeFormatOptions
+  options?: Intl.DateTimeFormatOptions,
 ) {
   if (!value) {
     return "Data não informada";
   }
 
+  // Default to Fortaleza timezone to avoid UTC rendering on the server; callers can override.
   return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "long",
     year: "numeric",
+    timeZone: DEFAULT_TIME_ZONE,
     ...options,
   }).format(value);
 }

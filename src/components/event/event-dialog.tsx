@@ -1,6 +1,13 @@
 "use client";
 
-import { FormEvent, Suspense, useMemo, useState, useTransition } from "react";
+import {
+  FormEvent,
+  Suspense,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -44,13 +51,12 @@ export function EventDialog({ mode, event }: EventDialogProps) {
   const [open, setOpen] = useState(false);
   const [state, setState] = useState<CreateEventFormSchema>();
   const [isPending, startTransition] = useTransition();
+  const [timezoneOffset, setTimezoneOffset] = useState(0);
 
   const defaultStartTime = useMemo(() => {
     if (!event) return "12:00";
     const eventDate = new Date(event.eventDate);
-    const timezoneOffset = eventDate.getTimezoneOffset();
-    const utcDate = new Date(eventDate.getTime() + timezoneOffset * 60000);
-    return format(utcDate, "HH:mm");
+    return format(eventDate, "HH:mm");
   }, [event]);
 
   const defaultTags = useMemo(
@@ -64,14 +70,16 @@ export function EventDialog({ mode, event }: EventDialogProps) {
       for (let minute = 0; minute < 60; minute += 15) {
         const date = new Date();
         date.setHours(hour, minute, 0, 0);
-        const label = format(date, "HH:mm");
-        const timezoneOffset = date.getTimezoneOffset();
-        const utcDate = new Date(date.getTime() + timezoneOffset * 60000);
-        const value = format(utcDate, "HH:mm");
-        options.push({ label, value });
+        const value = format(date, "HH:mm");
+        options.push({ label: value, value });
       }
     }
     return options;
+  }, []);
+
+  useEffect(() => {
+    // Capture client offset so server can convert local time to UTC correctly.
+    setTimezoneOffset(new Date().getTimezoneOffset());
   }, []);
 
   function handleSubmit(formEvent: FormEvent<HTMLFormElement>) {
@@ -122,6 +130,11 @@ export function EventDialog({ mode, event }: EventDialogProps) {
       <DialogTrigger asChild>{defaultTrigger}</DialogTrigger>
       <DialogContent className="w-full sm:max-w-[520px] md:max-w-2xl max-h-[calc(100svh-2rem)] overflow-y-auto">
         <form onSubmit={handleSubmit} className="space-y-6">
+          <input
+            type="hidden"
+            name="timezoneOffset"
+            value={`${timezoneOffset}`}
+          />
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>{description}</DialogDescription>

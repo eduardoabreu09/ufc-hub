@@ -66,10 +66,24 @@ export async function createEvent(
       };
     }
 
-    const splitedStartTime = startTime.split(":");
-    const eventDateValue = new Date(eventDate);
-    eventDateValue.setUTCHours(Number(splitedStartTime[0]));
-    eventDateValue.setUTCMinutes(Number(splitedStartTime[1]));
+    const [startHour, startMinute] = startTime.split(":").map(Number);
+    const selectedDate = new Date(eventDate);
+    const timezoneOffset = Number(
+      formData.get("timezoneOffset") ?? selectedDate.getTimezoneOffset(),
+    );
+
+    const eventDateValue = new Date(
+      Date.UTC(
+        selectedDate.getUTCFullYear(),
+        selectedDate.getUTCMonth(),
+        selectedDate.getUTCDate(),
+        startHour,
+        startMinute,
+        0,
+        0,
+      ) +
+        timezoneOffset * 60 * 1000,
+    );
 
     if (eventDateValue <= new Date()) {
       return {
